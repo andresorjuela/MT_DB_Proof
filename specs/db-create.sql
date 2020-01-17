@@ -17,6 +17,7 @@ DROP TABLE IF EXISTS `t_custom_attribute` ;
 DROP TABLE IF EXISTS `t_category` ;
 DROP TABLE IF EXISTS `t_family` ;
 
+DROP TABLE IF EXISTS `t_brand` ;
 DROP TABLE IF EXISTS `t_image_type` ;
 DROP TABLE IF EXISTS `t_certificate` ;
 DROP TABLE IF EXISTS `t_warranty` ;
@@ -161,21 +162,9 @@ CREATE TABLE `t_image_type` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE `t_family` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name_en` varchar(255) NOT NULL DEFAULT '',
-  `name_zh` varchar(255) NOT NULL DEFAULT '',
-  `brand_id` int(11) DEFAULT NULL,
-  `technology_id` int(11) DEFAULT NULL,
-  `family_connector_id` varchar(255) DEFAULT NULL,
-  `image_link_connector_distal` varchar(255) DEFAULT NULL,
-  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `version` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
+/**
+  table: t_category
+*/
 CREATE TABLE `t_category` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name_en` varchar(255) NOT NULL DEFAULT '',
@@ -184,6 +173,40 @@ CREATE TABLE `t_category` (
   `product_name_formula` varchar(255) NOT NULL DEFAULT '',
   `product_description_formula` varchar(255) NOT NULL DEFAULT '',
   `valid_image_types` varchar(255) NOT NULL DEFAULT '',
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `version` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+/**
+  table: t_brand
+*/
+CREATE TABLE `t_brand` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name_en` varchar(255) NOT NULL DEFAULT '',
+  `name_zh` varchar(255) NOT NULL DEFAULT '',
+  `parent_id` int(11) NULL,                                           --FK t_brand (self)
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `version` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+--
+-- Tables with FK relationships with the above.
+--
+
+CREATE TABLE `t_family` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name_en` varchar(255) NOT NULL DEFAULT '',
+  `name_zh` varchar(255) NOT NULL DEFAULT '',
+  `brand_id` int(11) DEFAULT NULL,                            --FK t_brand
+  `technology_id` int(11) DEFAULT NULL,
+  `family_connector_id` varchar(255) DEFAULT NULL,
+  `image_link_connector_distal` varchar(255) DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
