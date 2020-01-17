@@ -7,13 +7,13 @@
   Authors: Andres Orjuela, Derek Gau
 */
 
-insert into t_brand (id, name_en, name_zh, inheritance) values 
-(1, 'GE', '', 0),
-(2, 'Mindray', '', 0),
-(3, 'Philips', '', 0),
+insert into t_brand (id, name_en, name_zh, parent_id) values 
+(1, 'GE', '', null),
+(2, 'Mindray', '', null),
+(3, 'Philips', '', null),
 (4, 'Marquette', '', 1);
 
-insert into t_product_type (id, value) values
+insert into t_product_type (id, name_en) values
 (1, 'OEM'),
 (2, 'Replacement'),
 (3, 'Refurbished'),
@@ -21,7 +21,7 @@ insert into t_product_type (id, value) values
 (5, 'Repair Service'),
 (6, 'Repair');
 
-insert into t_category (id, value, inheritance, product_name_formula, product_description_formula, valid_image_types ) values 
+insert into t_category (id, name_en, inheritance, product_name_formula, product_description_formula, valid_image_types ) values 
 (1,	'Parts', 0, '', '', ''),
 (2,	'Accessories and Supplies', 0, '', '', ''),
 (3,	'Repair Service', 0, '', '', ''),

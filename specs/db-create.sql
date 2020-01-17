@@ -187,7 +187,7 @@ CREATE TABLE `t_brand` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name_en` varchar(255) NOT NULL DEFAULT '',
   `name_zh` varchar(255) NOT NULL DEFAULT '',
-  `parent_id` int(11) NULL,                                           --FK t_brand (self)
+  `parent_id` int(11) NULL,                                   -- FK t_brand (self)
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
@@ -203,7 +203,7 @@ CREATE TABLE `t_family` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name_en` varchar(255) NOT NULL DEFAULT '',
   `name_zh` varchar(255) NOT NULL DEFAULT '',
-  `brand_id` int(11) DEFAULT NULL,                            --FK t_brand
+  `brand_id` int(11) DEFAULT NULL,                            -- FK t_brand
   `technology_id` int(11) DEFAULT NULL,
   `family_connector_id` varchar(255) DEFAULT NULL,
   `image_link_connector_distal` varchar(255) DEFAULT NULL,
