@@ -215,27 +215,4 @@ router.use(function (err, req, res, next) {
 })
 
 
-// STRIPE related
-router.get('/:product_id/stripe/customers/:customer_id', async function (req, res, next) {
-
-  res.locals.stripeInstructions = {
-    entity_plural: 'customers',
-    id: req.params.customer_id
-  }
-  next();
-  //The response includes subscriptions, sources that contain additional url methods
-}, stripeById);
-
-
-router.post('/:product_id/stripe/sources/:source_id', async function (req, res, next) {
-
-  res.locals.stripeInstructions = {
-    entity_plural: 'sources',
-    id: req.params.source_id
-  }
-  next();
-
-}, stripeById);
-
-
 module.exports = router;

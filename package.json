@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "startmon": "nodemon ./bin/www"
   },
   "dependencies": {
     "@apigrate/logger": "^3.0.0",
@@ -11,6 +12,7 @@
     "@apigrate/sdk": "^1.0.0",
     "@apigrate/slack": "^3.0.1",
     "aws-sdk": "^2.528.0",
+    "aws-serverless-express": "^3.3.6",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^8.1.0",
@@ -20,7 +22,8 @@
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.26",
     "morgan": "~1.9.1",
-    "pug": "2.0.0-beta11",
+    "mysql": "^2.17.1",
+    "pug": "^2.0.4",
     "request": "^2.88.0"
   }
 }

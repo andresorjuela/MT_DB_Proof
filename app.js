@@ -1,13 +1,12 @@
+require('dotenv').config();
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const mysql = require('mysql');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-
-require('dotenv').config();
 
 var app = express();
 
@@ -23,23 +22,28 @@ var connPool = mysql.createPool({
 });
 
 //Makes a DAO factory, named 'Database' available globally.
-var Database = require('./services/database')(connPool);
+var Database = require('./src/helpers/database')(connPool);
 app.locals.Database = Database;
 
 // Other Global App Config .....................................................
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'src', 'webapp', 'views'));
 app.set('view engine', 'pug');
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'src', 'webapp', 'public')));
+
+
+// Routing .....................................................................
+var indexRouter = require('./src/webapp/routes/index');
+var productsApiRouter = require('./src/webapp/routes/api/product');
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/v1/api/products', productsApiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
