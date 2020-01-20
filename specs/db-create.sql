@@ -276,18 +276,18 @@ CREATE TABLE `t_equipment_group` (
 */
 CREATE TABLE `t_product` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name_en` varchar(255) NOT NULL DEFAULT '',
-  `name_zh` varchar(255) NOT NULL DEFAULT '',
-  `category_id` int(11) DEFAULT NULL,                        -- FK t_category
-  `family_id` int(11) DEFAULT NULL,                          -- FK t_family
-  `lifecycle_id` int(11) DEFAULT NULL,                       -- FK t_lifecycle
-  `manufacturer_id` int(11) DEFAULT NULL,                    -- FK t_manufacturer
-  `product_type_id` int(11) DEFAULT NULL,                    -- FK t_product_type
-  `supplier_id` int(11) DEFAULT NULL,                        -- FK t_supplier_id
-  `warranty_duration_months` smallint DEFAULT 0,  -- TODO: discuss whether table is needed
-  `packaging_factor` varchar(10) DEFAULT 1,       -- TODO: discuss whether table is needed
-  `oem` varchar(255) DEFAULT NULL,
-  `sku` varchar(255) DEFAULT NULL,
+  `sku` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  `product_type_id` int(11) DEFAULT NULL,
+  `oem` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `name_en` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '',
+  `name_zh` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '',
+  `category_id` int(11) DEFAULT NULL,
+  `family_id` int(11) DEFAULT NULL,
+  `lifecycle_id` int(11) DEFAULT NULL,
+  `manufacturer_id` int(11) DEFAULT NULL,
+  `supplier_id` int(11) DEFAULT NULL,
+  `warranty_duration_months` smallint(6) DEFAULT '0',
+  `packaging_factor` varchar(10) DEFAULT '1',
   `price` decimal(9,2) DEFAULT NULL,
   `weight` decimal(9,2) DEFAULT NULL,
   `description_zh` varchar(500) DEFAULT NULL,
