@@ -62,6 +62,7 @@ typings/
 
 *.DS_Store
 
+tmp/*
 temp.*
 test/*
 
