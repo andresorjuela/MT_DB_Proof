@@ -72,16 +72,11 @@ CREATE TABLE `t_equipment` (
   `brand_id` int(11) unsigned NOT NULL,
   `equipment_type_id` int(11) unsigned NOT NULL,
   `model` varchar(255) DEFAULT NULL,
-  `image_1` varchar(255) DEFAULT NULL,
-  `image_2` varchar(255) DEFAULT NULL,
-  `image_3` varchar(255) DEFAULT NULL,
-  `image_4` varchar(255) DEFAULT NULL,
-  `image_5` varchar(255) DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- Create syntax for TABLE 't_equipment_group'
 CREATE TABLE `t_equipment_group` (
