@@ -227,8 +227,8 @@ CREATE TABLE `t_product_certificate` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- Create syntax for TABLE 't_product_family'
-CREATE TABLE `t_product_family` (
+-- Create syntax for TABLE 't_product_family_connect'
+CREATE TABLE `t_product_family_connect` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `product_id` int(11) unsigned DEFAULT NULL,
   `family_id` int(11) unsigned DEFAULT NULL,
@@ -272,6 +272,17 @@ CREATE TABLE `t_product_oem_reference` (
   `version` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Create syntax for TABLE 't_product_option'
+CREATE TABLE `t_product_option` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `product_id` int(11) unsigned NOT NULL,
+  `filter_option_id` int(11) unsigned NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `version` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+);
 
 -- Create syntax for TABLE 't_product_set'
 CREATE TABLE `t_product_set` (
@@ -396,11 +407,11 @@ ALTER TABLE `t_product_certificate`
   ADD CONSTRAINT `fk_product_certificate_cert` FOREIGN KEY (`certificate_id`) REFERENCES `t_certificate` (`id`);
 
 
-ALTER TABLE `t_product_family` 
-  ADD CONSTRAINT `fk_product_family_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
+ALTER TABLE `t_product_family_connect` 
+  ADD CONSTRAINT `fk_product_family_connect_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
 
-ALTER TABLE `t_product_family` 
-  ADD CONSTRAINT `fk_product_family_family` FOREIGN KEY (`family_id`) REFERENCES `t_family` (`id`);
+ALTER TABLE `t_product_family_connect` 
+  ADD CONSTRAINT `fk_product_family_connect_family` FOREIGN KEY (`family_id`) REFERENCES `t_family` (`id`);
 
 
 ALTER TABLE `t_product_filter` 
@@ -422,6 +433,13 @@ ALTER TABLE `t_product_oem_reference`
 
 ALTER TABLE `t_product_oem_reference` 
   ADD CONSTRAINT `fk_product_oem_reference_brand` FOREIGN KEY (`brand_id`) REFERENCES `t_brand` (`id`);
+
+
+ALTER TABLE `t_product_option` 
+  ADD CONSTRAINT `fk_product_option_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
+
+ALTER TABLE `t_product_option` 
+  ADD CONSTRAINT `fk_product_option_option` FOREIGN KEY (`filter_option_id`) REFERENCES `t_filter_option` (`id`);
 
 
 ALTER TABLE `t_product_set` 
