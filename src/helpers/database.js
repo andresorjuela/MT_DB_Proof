@@ -38,10 +38,11 @@ module.exports = function (pool) {
   factory.Lifecycle              = ()=>{ return create_dao('t_lifecycle', 'lifecycle', standard_opts, null); };
   factory.Product                = ()=>{ return create_dao('t_product', 'product', standard_opts, null); };
   factory.ProductCertificate     = ()=>{ return create_dao('t_product_certificate', 'product-certificate', standard_opts, null); };
-  factory.ProductFamily          = ()=>{ return create_dao('t_product_family', 'product-family', standard_opts, null); };
+  factory.ProductFamily          = ()=>{ return create_dao('t_product_family_connect', 'product-family-connect', standard_opts, null); };
   factory.ProductFilter          = ()=>{ return create_dao('t_product_filter', 'product-filter', standard_opts, null); };
   factory.ProductImage           = ()=>{ return create_dao('t_product_image', 'product-image', standard_opts, null); };
   factory.ProductOemReference    = ()=>{ return create_dao('t_product_oem_reference', 'product-oem-reference', standard_opts, null); };
+  factory.ProductOption          = ()=>{ return create_dao('t_product_option', 'product-option', standard_opts, null); };
   factory.ProductSet             = ()=>{ return create_dao('t_product_set', 'product-set', standard_opts, null); };
   factory.ProductType            = ()=>{ return create_dao('t_product_type', 'product-type', standard_opts, null); };
   factory.Supplier               = ()=>{ return create_dao('t_supplier', 'supplier', standard_opts, null); };

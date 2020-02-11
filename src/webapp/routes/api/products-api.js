@@ -8,11 +8,11 @@ router.get('/', function (req, res, next) {
   let query = req.query;
   let query_options = {
     limit: 10000,
-    order_by: ['+en_title', '+id']
+    order_by: ['+name_en', '+id']
   };
   for (key in query) {
     //Valid search fields
-    if (['product_id', 'name', 'en_title', 'ch_title'].indexOf(key) >= 0) continue;
+    if (['product_id', 'name_en', 'name_zh'].indexOf(key) >= 0) continue;
 
     if (key === 'limit') {
       query_options.limit = query[key];

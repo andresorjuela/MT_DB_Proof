@@ -1,0 +1,28 @@
+extends ./layout
+block content
+  b-container#app
+   
+    b-row
+      b-col
+        b-link(href="#" to="/")
+          img(src="/images/logo_1.jpg" width="200px")
+      b-col(cols="8")
+      b-col
+    b-row
+      b-col
+      b-col(cols="8")
+        b-nav(variant="light" justified)
+          b-nav-item(href="#" to="/product") Product
+          b-nav-item(href="#" to="/family") Family
+          b-nav-item(href="#" to="/equipment") Equipment
+          b-nav-item(href="#" to="/group") Group
+      b-col
+    b-row
+      b-col
+      b-col(cols="8")
+        //- route outlet
+        //- component matched by the route will render here
+        router-view
+      b-col
+append endbody
+  script(src="/javascripts/ui/ProductsApp.js" type="module")

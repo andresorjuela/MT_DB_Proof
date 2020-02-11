@@ -40,10 +40,16 @@ app.use(express.static(path.join(__dirname, 'src', 'webapp', 'public')));
 
 // Routing .....................................................................
 var indexRouter = require('./src/webapp/routes/index');
-var productsApiRouter = require('./src/webapp/routes/api/product');
+var productsRouter = require('./src/webapp/routes/products');
+var productsApiRouter = require('./src/webapp/routes/api/products-api');
+var familiesApiRouter = require('./src/webapp/routes/api/families-api');
 
 app.use('/', indexRouter);
-app.use('/v1/api/products', productsApiRouter);
+app.use('/products', productsRouter);
+
+// api related
+app.use('/api/v1/products', productsApiRouter);
+app.use('/api/v1/families', familiesApiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
