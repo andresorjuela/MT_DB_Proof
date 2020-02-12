@@ -8,6 +8,7 @@ var app = new Vue({
   el: "#app",
   router: router,
   data:{
-    busy: false
+    busy: false,
+    selectedMenu: null
   }
 }).$mount('#app');

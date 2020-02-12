@@ -28,6 +28,7 @@ export default {
   computed: {},
   created: function(){
     this.getFamilies();
+    this.$router.app.selectedMenu="family";
   },
   methods: {
     getFamilies : async function(){

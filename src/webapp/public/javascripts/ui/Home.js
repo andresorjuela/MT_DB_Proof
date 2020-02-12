@@ -3,8 +3,9 @@ export default {
   template: `
 <div class="container">
 
-  <p>Welcome to the MedTen Product database proof of concept.</p>
-
+  <b-jumbotron header="Medten Product Database" lead="Proof of Concept">
+    <p>Please choose an option from the navigation bar.</p>
+  </b-jumbotron>
 </div>
 `,
   data: function () {

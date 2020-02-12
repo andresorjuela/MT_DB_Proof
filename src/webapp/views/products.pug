@@ -7,18 +7,22 @@ block content
         b-link(href="#" to="/")
           img(src="/images/logo_1.jpg" width="200px")
       b-col(cols="8")
+        b-nav(variant="light" justified tabs)
+          b-nav-item(href="#" to="/product" :active="selectedMenu==='product'") Product
+          b-nav-item(href="#" to="/family" :active="selectedMenu==='family'") Family
+          b-nav-item(href="#" to="/equipment" :active="selectedMenu==='equipment'") Equipment
+          b-nav-item(href="#" to="/group" :active="selectedMenu==='group'") Group
+        b-form
+              b-form-input#primary_search(placeholder="Search")
+        
       b-col
+    
     b-row
       b-col
-      b-col(cols="8")
-        b-nav(variant="light" justified)
-          b-nav-item(href="#" to="/product") Product
-          b-nav-item(href="#" to="/family") Family
-          b-nav-item(href="#" to="/equipment") Equipment
-          b-nav-item(href="#" to="/group") Group
-      b-col
-    b-row
-      b-col
+        b-nav(variant="light" vertical class="w-100")
+          b-nav-item(href="#" to="/product/add") Add Product
+          b-nav-item(href="#" to="/family/add") Add Family
+          b-nav-item(href="#" to="/equipment/add") Add Equipment
       b-col(cols="8")
         //- route outlet
         //- component matched by the route will render here
