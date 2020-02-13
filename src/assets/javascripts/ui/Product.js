@@ -1,5 +1,5 @@
 'use strict'
-import { ApiError } from "../api.js";
+import { ApiError } from "../Api.js";
 
 export default {
   template:

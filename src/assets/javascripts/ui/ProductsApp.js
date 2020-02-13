@@ -1,5 +1,5 @@
 import env from "../env.js";
-import {Api} from "../api.js";
+import {Api} from "../Api.js";
 import router from  "./ProductsAppRouter.js";
 
 Vue.use(new Api(env().API_BASE_URL));

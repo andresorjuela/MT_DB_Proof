@@ -48,6 +48,9 @@ module.exports = function (pool) {
   factory.Supplier               = ()=>{ return create_dao('t_supplier', 'supplier', standard_opts, null); };
   factory.Technology             = ()=>{ return create_dao('t_technology', 'technology', standard_opts, null); };
 
+  //views
+  factory.ProductView            = ()=>{ return create_dao('v_product', 'product-view', null, null); };
+
   /**
    * Provides a reference to the pool. Be careful. Other resources are sharing it.
    * To close all connections on the pool, invoke pool.end();

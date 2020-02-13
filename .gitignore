@@ -69,3 +69,7 @@ test/*
 .vscode
 package.yaml
 package*.yaml
+
+production.env
+development.env
+test.env

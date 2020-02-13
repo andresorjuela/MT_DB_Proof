@@ -1,11 +1,10 @@
 extends ./layout
 block content
   b-container#app
-   
     b-row
       b-col
         b-link(href="#" to="/")
-          img(src="/images/logo_1.jpg" width="200px")
+          img(src=`${assetspath}/images/logo_1.jpg` width="200px")
       b-col(cols="8")
         b-nav(variant="light" justified tabs)
           b-nav-item(href="#" to="/product" :active="selectedMenu==='product'") Product
@@ -29,4 +28,4 @@ block content
         router-view
       b-col
 append endbody
-  script(src="/javascripts/ui/ProductsApp.js" type="module")
+  script(src=`${assetspath}/javascripts/ui/ProductsApp.js` type="module")

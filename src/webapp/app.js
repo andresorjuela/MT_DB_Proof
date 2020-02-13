@@ -6,6 +6,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mysql = require('mysql');
+const cors = require('cors');
+const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 
 
 var app = express();
@@ -22,27 +24,52 @@ var connPool = mysql.createPool({
 });
 
 //Makes a DAO factory, named 'Database' available globally.
-var Database = require('./src/helpers/database')(connPool);
+var Database = require('./helpers/database')(connPool);
 app.locals.Database = Database;
 
 // Other Global App Config .....................................................
+console.log("Environment initialized to: " + process.env.NODE_ENV);
+
+//Note, allow cross origin access to S3 static assets bucket cors config.
+/*
+<CORSConfiguration>
+  <CORSRule>
+    <AllowedOrigin>*</AllowedOrigin>
+    <AllowedMethod>GET</AllowedMethod>
+    <MaxAgeSeconds>3000</MaxAgeSeconds>
+  </CORSRule>
+</CORSConfiguration>
+*/
+app.use(cors());
+
+if(process.env.NODE_ENV==="production"){
+  app.use(awsServerlessExpressMiddleware.eventContext())
+}
 
 // view engine setup
-app.set('views', path.join(__dirname, 'src', 'webapp', 'views'));
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'src', 'webapp', 'public')));
 
+let assetspath = process.env.STATIC_ASSETS_PATH;
+//Make available to all view components.
+app.use((req,res,next)=>{ res.locals.assetspath = assetspath; next() })
+if(process.env.NODE_ENV==="production"){
+  //Not serving static files...
+} else {
+  //In non-production environments, serve static files from express.
+  app.use(assetspath, express.static(path.join(__dirname, '..', 'assets')));
+}
 
 // Routing .....................................................................
-var indexRouter = require('./src/webapp/routes/index');
-var productsRouter = require('./src/webapp/routes/products');
-var productsApiRouter = require('./src/webapp/routes/api/products-api');
-var familiesApiRouter = require('./src/webapp/routes/api/families-api');
+var indexRouter = require('./routes/index');
+var productsRouter = require('../../products');
+var productsApiRouter = require('./routes/api/products-api');
+var familiesApiRouter = require('./routes/api/families-api');
 
 app.use('/', indexRouter);
 app.use('/products', productsRouter);
