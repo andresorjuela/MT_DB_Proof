@@ -73,3 +73,5 @@ package*.yaml
 production.env
 development.env
 test.env
+
+src/assets/javascripts/ui/env.js
