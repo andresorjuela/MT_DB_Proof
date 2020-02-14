@@ -40,6 +40,10 @@ export class Api{
     let result =  await this._get(`${this.base_url}/products/${id}/certificates`);
     return result.product_certificates;
   }
+  async getProductFamilies(id){
+    let result =  await this._get(`${this.base_url}/products/${id}/families`);
+    return result.product_family_connects;
+  }
   async getProductTypes(){
     let result = await this._get(`${this.base_url}/product-types`, {limit:1000, order_by:'+name_en'});
     return result.product_types;

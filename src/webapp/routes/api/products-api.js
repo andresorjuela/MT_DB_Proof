@@ -38,6 +38,16 @@ router.get('/:product_id/certificates', function (req, res, next) {
   next();
 }, fetchMany);
 
+// Get all product family connections
+router.get('/:product_id/families', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductFamily(),
+    query: {product_id: req.params.product_id},
+    //query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
 router.get('/view/:product_id', function (req, res, next) {
 
   res.locals.dbInstructions = {

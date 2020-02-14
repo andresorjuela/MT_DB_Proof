@@ -22,10 +22,10 @@ block content
           b-nav-item(href="#" to="/product/add") Add Product
           b-nav-item(href="#" to="/family/add") Add Family
           b-nav-item(href="#" to="/equipment/add") Add Equipment
-      b-col(cols="8")
+      b-col(cols="10")
         //- route outlet
         //- component matched by the route will render here
         router-view
-      b-col
+
 append endbody
   script(src=`${assetspath}/javascripts/ui/ProductsApp.js` type="module")
