@@ -213,6 +213,40 @@ async function deleteMatching(req, res, next) {
   }
 }
 
+/**
+ * Parses the query instructions for a query from the request.
+ * @param {object} req the request
+ * @param {array} allowed_query_fields allowable query fields
+ * @param {array} default_orderby order by these fields by default (default ['+id'])
+ * @param {number} default_limit max records returned (default: 10000)
+ * @returns {object}
+ * @example {
+ *  query: { name: 'platypus', type: 'mammal'}
+ *  query_options: {limit: 10000, order_by: [...]}
+ * }
+ */
+function parseQueryOptions(req, default_orderby, allowed_query_fields, default_limit){
+  let query = req.query;
+  let query_options = {
+    limit: default_limit || 10000,
+    order_by: default_orderby || ['+id']
+  };
+  for (key in query) {
+    //Valid search fields
+    if (allowed_query_fields.indexOf(key) >= 0) continue;
+
+    if (key === 'limit') {
+      query_options.limit = query[key];
+    }
+    if (key === 'order_by') {
+      query_options.order_by = query[key].split(',');
+    }
+
+    delete query[key];
+  }
+  return { query, query_options };
+}
+
 
 module.exports.fetchById = fetchById;
 module.exports.fetchOne = fetchOne;
@@ -222,3 +256,5 @@ module.exports.updateById = updateById;
 module.exports.save = save;
 module.exports.deleteById = deleteById;
 module.exports.deleteMatching = deleteMatching;
+
+module.exports.parseQueryOptions = parseQueryOptions;

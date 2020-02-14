@@ -8,7 +8,26 @@ export class Api{
     }
     this.base_url = base_url;
   }
-
+  async getCategories(){
+    let result = await this._get(`${this.base_url}/categories`, {limit:1000, order_by:'+name_en'});
+    return result.categories;
+  }
+  async getCertificates(){
+    let result = await this._get(`${this.base_url}/certificates`, {limit:1000, order_by:'+name_en'});
+    return result.certificates;
+  }
+  async getFamilies(){
+    let result = await this._get(`${this.base_url}/families`, {limit:10, order_by:'+family_code'});
+    return result.families;
+  }
+  async getFamily(id){
+    let result =  await this._get(`${this.base_url}/families/${id}`);
+    return result;
+  }
+  async getLifecycles(){
+    let result = await this._get(`${this.base_url}/lifecycles`, {limit:1000, order_by:'+name_en'});
+    return result.lifecycles;
+  }
   async getProducts(){
     let result = await this._get(`${this.base_url}/products`, {limit:10, order_by:'+name_en'});
     return result.products;
@@ -17,13 +36,21 @@ export class Api{
     let result =  await this._get(`${this.base_url}/products/${id}`);
     return result;
   }
-  async getFamilies(){
-    let result = await this._get(`${this.base_url}/families`, {limit:10, order_by:'+family_code'});
-    return result.families;
+  async getProductCertificates(id){
+    let result =  await this._get(`${this.base_url}/products/${id}/certificates`);
+    return result.product_certificates;
   }
-  async getProduct(id){
-    let result =  await this._get(`${this.base_url}/families/${id}`);
+  async getProductTypes(){
+    let result = await this._get(`${this.base_url}/product-types`, {limit:1000, order_by:'+name_en'});
+    return result.product_types;
+  }
+  async getProductView(id){
+    let result =  await this._get(`${this.base_url}/products/view/${id}`);
     return result;
+  }
+  async getSuppliers(){
+    let result = await this._get(`${this.base_url}/suppliers`, {limit:10, order_by:'+name_en'});
+    return result.suppliers;
   }
   
   //common methods.

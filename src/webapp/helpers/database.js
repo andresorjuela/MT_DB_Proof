@@ -23,33 +23,33 @@ module.exports = function (pool) {
   factory.Brand                  = ()=>{ return create_dao('t_brand', 'brand', standard_opts, null); };
   factory.Category               = ()=>{ return create_dao('t_category', 'category', standard_opts, null); };
   factory.Certificate            = ()=>{ return create_dao('t_certificate', 'certificate', standard_opts, null); };
-  factory.CustomAttribute        = ()=>{ return create_dao('t_custom_attribute', 'custom-attribute', standard_opts, null); };
-  factory.CustomAttributeOption  = ()=>{ return create_dao('t_custom_attribute_option', 'custom-attribute-option', standard_opts, null); };
+  factory.CustomAttribute        = ()=>{ return create_dao('t_custom_attribute', 'custom_attribute', standard_opts, null); };
+  factory.CustomAttributeOption  = ()=>{ return create_dao('t_custom_attribute_option', 'custom_attribute_option', standard_opts, null); };
   factory.Equipment              = ()=>{ return create_dao('t_equipment', 'equipment', standard_opts, null); };
-  factory.EquipmentGroup         = ()=>{ return create_dao('t_equipment_group', 'equipment-group', standard_opts, null); };
-  factory.EquipmentImage         = ()=>{ return create_dao('t_equipment_image', 'equipment-image', standard_opts, null); };
-  factory.EquipmentType          = ()=>{ return create_dao('t_equipment_type', 'equipment-type', standard_opts, null); };
+  factory.EquipmentGroup         = ()=>{ return create_dao('t_equipment_group', 'equipment_group', standard_opts, null); };
+  factory.EquipmentImage         = ()=>{ return create_dao('t_equipment_image', 'equipment_image', standard_opts, null); };
+  factory.EquipmentType          = ()=>{ return create_dao('t_equipment_type', 'equipment_type', standard_opts, null); };
   factory.Family                 = ()=>{ return create_dao('t_family', 'family', standard_opts, null); };
-  factory.FamilyGroup            = ()=>{ return create_dao('t_family_group', 'family-group', standard_opts, null); };
+  factory.FamilyGroup            = ()=>{ return create_dao('t_family_group', 'family_group', standard_opts, null); };
   factory.Filter                 = ()=>{ return create_dao('t_filter', 'filter', standard_opts, null); };
-  factory.FilterOption           = ()=>{ return create_dao('t_filter_option', 'filter-option', standard_opts, null); };
+  factory.FilterOption           = ()=>{ return create_dao('t_filter_option', 'filter_option', standard_opts, null); };
   factory.Group                  = ()=>{ return create_dao('t_group', 'group', standard_opts, null); };
-  factory.ImageType              = ()=>{ return create_dao('t_image_type', 'image-type', standard_opts, null); };
+  factory.ImageType              = ()=>{ return create_dao('t_image_type', 'image_type', standard_opts, null); };
   factory.Lifecycle              = ()=>{ return create_dao('t_lifecycle', 'lifecycle', standard_opts, null); };
   factory.Product                = ()=>{ return create_dao('t_product', 'product', standard_opts, null); };
-  factory.ProductCertificate     = ()=>{ return create_dao('t_product_certificate', 'product-certificate', standard_opts, null); };
-  factory.ProductFamily          = ()=>{ return create_dao('t_product_family_connect', 'product-family-connect', standard_opts, null); };
-  factory.ProductFilter          = ()=>{ return create_dao('t_product_filter', 'product-filter', standard_opts, null); };
-  factory.ProductImage           = ()=>{ return create_dao('t_product_image', 'product-image', standard_opts, null); };
-  factory.ProductOemReference    = ()=>{ return create_dao('t_product_oem_reference', 'product-oem-reference', standard_opts, null); };
-  factory.ProductOption          = ()=>{ return create_dao('t_product_option', 'product-option', standard_opts, null); };
-  factory.ProductSet             = ()=>{ return create_dao('t_product_set', 'product-set', standard_opts, null); };
-  factory.ProductType            = ()=>{ return create_dao('t_product_type', 'product-type', standard_opts, null); };
+  factory.ProductCertificate     = ()=>{ return create_dao('t_product_certificate', 'product_certificate', standard_opts, null); };
+  factory.ProductFamily          = ()=>{ return create_dao('t_product_family_connect', 'product_family_connect', standard_opts, null); };
+  factory.ProductFilter          = ()=>{ return create_dao('t_product_filter', 'product_filter', standard_opts, null); };
+  factory.ProductImage           = ()=>{ return create_dao('t_product_image', 'product_image', standard_opts, null); };
+  factory.ProductOemReference    = ()=>{ return create_dao('t_product_oem_reference', 'product_oem_reference', standard_opts, null); };
+  factory.ProductOption          = ()=>{ return create_dao('t_product_option', 'product_option', standard_opts, null); };
+  factory.ProductSet             = ()=>{ return create_dao('t_product_set', 'product_set', standard_opts, null); };
+  factory.ProductType            = ()=>{ return create_dao('t_product_type', 'product_type', standard_opts, null); };
   factory.Supplier               = ()=>{ return create_dao('t_supplier', 'supplier', standard_opts, null); };
   factory.Technology             = ()=>{ return create_dao('t_technology', 'technology', standard_opts, null); };
 
   //views
-  factory.ProductView            = ()=>{ return create_dao('v_product', 'product-view', null, null); };
+  factory.ProductView            = ()=>{ return create_dao('v_product', 'product_view', null, null); };
 
   /**
    * Provides a reference to the pool. Be careful. Other resources are sharing it.

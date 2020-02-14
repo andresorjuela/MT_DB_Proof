@@ -1,13 +1,15 @@
 import Home from './Home.js';
-import Product from './Product.js';
-import Family from './Family.js';
+import ProductList from './ProductList.js';
+import ProductForm from './ProductForm.js';
+import FamilyList from './FamilyList.js';
 
 let router = new VueRouter({
   //mode: "history",
   routes: [
     { path: '/', component: Home },
-    { path: '/product', component: Product},
-    { path: '/family', component: Family},
+    { path: '/product', component: ProductList},
+    { path: '/product/:id', component: ProductForm},
+    { path: '/family', component: FamilyList},
     { path: '/equipment', component: Home},
     { path: '/group', component: Home},
     // { path: '/family', component: Family},

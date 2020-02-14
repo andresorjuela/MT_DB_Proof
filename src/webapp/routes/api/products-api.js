@@ -1,33 +1,19 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchOne, fetchById, fetchMany, deleteMatching } = require('../middleware/db-api');
+let { fetchOne, fetchById, fetchMany, deleteMatching, parseQueryOptions } = require('../middleware/db-api');
 
 /* GET checks if service is online */
 router.get('/', function (req, res, next) {
-  let query = req.query;
-  let query_options = {
-    limit: 10000,
-    order_by: ['+name_en', '+id']
-  };
-  for (key in query) {
-    //Valid search fields
-    if (['product_id', 'name_en', 'name_zh'].indexOf(key) >= 0) continue;
-
-    if (key === 'limit') {
-      query_options.limit = query[key];
-    }
-    if (key === 'order_by') {
-      query_options.order_by = query[key].split(',');
-    }
-
-    delete query[key];
-  }
+  let q = parseQueryOptions(req, 
+    ['+name_en', '+id'],
+    ['product_id', 'name_en', 'name_zh'],
+    1000);
 
   res.locals.dbInstructions = {
     dao: req.app.locals.Database.Product(),
-    query: query,
-    query_options: query_options
+    query: q.query,
+    query_options: q.query_options
   }
   next();
 }, fetchMany);
@@ -36,6 +22,26 @@ router.get('/:product_id', function (req, res, next) {
 
   res.locals.dbInstructions = {
     dao: req.app.locals.Database.Product(),
+    id: req.params.product_id
+  }
+  next();
+
+}, fetchById);
+
+// Get all product certificates
+router.get('/:product_id/certificates', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductCertificate(),
+    query: {product_id: req.params.product_id},
+    //query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
+router.get('/view/:product_id', function (req, res, next) {
+
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductView(),
     id: req.params.product_id
   }
   next();
@@ -116,88 +122,6 @@ router.get('/:product_id/properties', async function (req, res, next) {
   next();
 
 }, fetchMany);
-
-
-router.get('/:product_id/instances', async function (req, res, next) {
-  let query = req.query;
-  let query_options = {
-    limit: 10000,
-    order_by: ['+app_id', '+id']
-  };
-  for (key in query) {
-    //Valid search fields
-    if (['app_id', 'status', 'subscription_status', 'created', 'updated'].indexOf(key) >= 0) continue;
-
-    if (key === 'limit') {
-      query_options.limit = query[key];
-    }
-    if (key === 'order_by') {
-      query_options.order_by = query[key].split(',');
-    }
-
-    delete query[key];
-  }
-  query.product_id = req.params.product_id;//always
-
-  res.locals.dbInstructions = {
-    dao: req.app.locals.Database.Inst(),
-    query: query,
-    query_options: query_options
-  }
-  next();
-
-}, fetchMany);
-
-
-router.get('/:product_id/instances/:inst_id', async function (req, res, next) {
-
-  res.locals.dbInstructions = {
-    dao: req.app.locals.Database.Inst(),
-    id: req.params.inst_id
-  }
-  next();
-
-}, fetchById);
-
-
-router.get('/:product_id/instances/:inst_id/connections', async function (req, res, next) {
-
-  res.locals.dbInstructions = {
-    dao: req.app.locals.Database.InstConnection(),
-    query: {
-      inst_id: req.params.inst_id
-    }
-  }
-  next();
-
-}, fetchMany);
-
-
-router.get('/:product_id/instances/:inst_id/xrefs', async function (req, res, next) {
-
-  res.locals.dbInstructions = {
-    dao: req.app.locals.Database.InstXref(),
-    query: {
-      inst_id: req.params.inst_id
-    }
-  }
-  next();
-
-}, fetchMany);
-
-
-router.get('/:product_id/instances/:inst_id/properties', async function (req, res, next) {
-
-  res.locals.dbInstructions = {
-    dao: req.app.locals.Database.InstProperty(),
-    query: {
-      inst_id: req.params.inst_id
-    }
-  }
-  next();
-
-}, fetchMany);
-
 
 
 

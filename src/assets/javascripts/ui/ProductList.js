@@ -7,7 +7,7 @@ export default {
 <div>
   <b-alert v-if="!busy && error" variant="danger">{{ error }}</b-alert>
   <b-alert v-if="!busy && message" variant="info">{{ message }}</b-alert>
-  <b-table hover :items="products" :fields="fields"></b-table>
+  <b-table hover :items="products" :fields="fields" selectable @row-selected="onRowSelected" ></b-table>
   <b-spinner v-if="busy" variant="secondary" />
 </div>
   `,
@@ -21,7 +21,8 @@ export default {
         {key: "oem", sortable: true},
         {key: "sku", sortable: true},
         {key: "name_en", label: "Name", sortable: true}
-      ]
+      ],
+      selected : null
     }
   },
   //props: {},
@@ -47,6 +48,10 @@ export default {
       } finally {
         this.busy = false;
       }
+    },
+    onRowSelected(items) {
+      let selected = items[0];
+      this.$router.push({ path: `/product/${selected.id}` })
     }
     
   }

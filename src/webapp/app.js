@@ -70,6 +70,7 @@ var indexRouter = require('./routes/index');
 var productsRouter = require('../../products');
 var productsApiRouter = require('./routes/api/products-api');
 var familiesApiRouter = require('./routes/api/families-api');
+var apiRouter = require('./routes/api/api');
 
 app.use('/', indexRouter);
 app.use('/products', productsRouter);
@@ -77,6 +78,7 @@ app.use('/products', productsRouter);
 // api related
 app.use('/api/v1/products', productsApiRouter);
 app.use('/api/v1/families', familiesApiRouter);
+app.use('/api/v1', apiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

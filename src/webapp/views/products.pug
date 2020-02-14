@@ -1,6 +1,6 @@
 extends ./layout
 block content
-  b-container#app
+  b-container(@reload="reloadData")#app
     b-row
       b-col
         b-link(href="#" to="/")

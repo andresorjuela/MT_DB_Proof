@@ -1,33 +1,18 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchOne, fetchById, fetchMany, deleteMatching } = require('../middleware/db-api');
+let { fetchOne, fetchById, fetchMany, parseQueryOptions } = require('../middleware/db-api');
 
 
 router.get('/', function (req, res, next) {
-  let query = req.query;
-  let query_options = {
-    limit: 10000,
-    order_by: ['+family_code', '+id']
-  };
-  for (key in query) {
-    //Valid search fields
-    if (['id', 'brand_id', 'technology_id', 'family_connector_code', 'family_code'].indexOf(key) >= 0) continue;
-
-    if (key === 'limit') {
-      query_options.limit = query[key];
-    }
-    if (key === 'order_by') {
-      query_options.order_by = query[key].split(',');
-    }
-
-    delete query[key];
-  }
-
+  let q = parseQueryOptions(req, 
+    ['+family_code', '+id'],['id', 'brand_id', 'technology_id', 'family_connector_code', 'family_code'],
+    1000);
+     
   res.locals.dbInstructions = {
     dao: req.app.locals.Database.Family(),
-    query: query,
-    query_options: query_options
+    query: q.query,
+    query_options: q.query_options
   }
   next();
 }, fetchMany);
