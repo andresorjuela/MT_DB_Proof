@@ -29,7 +29,6 @@ export default {
   computed: {},
   created: function(){
     this.getProducts();
-    console.log(this.$router);
     this.$router.app.selectedMenu="product";
   },
   methods: {

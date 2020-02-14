@@ -20,7 +20,7 @@ export default {
         <b-form-group
           id="g_p_name_en"
           description=""
-          label="Title (EN)"
+          label="Title (EN):"
           label-for="p_name_en"
           label-cols="2" >
           <b-input-group>
@@ -35,7 +35,7 @@ export default {
         <b-form-group
           id="g_p_category"
           description=""
-          label="Category"
+          label="Category:"
           label-for="p_category"
           label-align="right"
           label-cols="4" >
@@ -52,7 +52,7 @@ export default {
         <b-form-group
           id="g_p_name_zh"
           description=""
-          label="Title"
+          label="Title:"
           label-for="p_name_zh"
           label-cols="2" >
           <b-input-group>
@@ -68,7 +68,7 @@ export default {
         <b-form-group
           id="g_p_product_type"
           description=""
-          label="Product Type"
+          label="Product Type:"
           label-for="p_product_type"
           label-align="right"
           label-cols="4" >
@@ -85,7 +85,7 @@ export default {
         <b-form-group
           id="g_p_oem"
           description=""
-          label="OEM"
+          label="OEM:"
           label-for="p_oem"
           label-align="right"
           label-cols="4" >
@@ -99,7 +99,7 @@ export default {
         <b-form-group
           id="g_p_sku"
           description=""
-          label="SKU"
+          label="SKU:"
           label-for="p_sku"
           label-align="right"
           label-cols="4" >
@@ -113,8 +113,8 @@ export default {
       <b-col cols="5">
         <b-form-group
           id="g_p_oem"
-          description="(not clear where this comes from)"
-          label="Manufacturer"
+          description="???"
+          label="Manufacturer:"
           label-for="p_manufacturer"
           label-align="right"
           label-cols="4" >
@@ -128,7 +128,7 @@ export default {
         <b-form-group
           id="g_p_supplier"
           description=""
-          label="Supplier"
+          label="Supplier:"
           label-for="p_supplier"
           label-align="right"
           label-cols="4" >
@@ -145,18 +145,18 @@ export default {
         <b-form-group
           id="g_p_family"
           description=""
-          label="Family"
+          label="Family:"
           label-for="p_family"
           label-align="right"
           label-cols="4" >
-          <b-form-select id="p_family" v-model="product.family_id" :options="this.families" value-field="id" text-field="family_code"></b-form-select>
+          <b-form-select id="p_family" v-model="product.family_id" :options="this.families" value-field="id" text-field="family_code" :disabled="loading_dependencies"></b-form-select>
         </b-form-group>
       </b-col>
       <b-col cols="3">
         <b-form-group
           id="g_p_warranty"
           description="months duration"
-          label="Warranty"
+          label="Warranty:"
           label-for="p_warranty"
           label-align="right"
           label-cols="4" >
@@ -167,12 +167,12 @@ export default {
         <b-form-group
           id="g_p_certificates"
           description=""
-          label="Certificates"
+          label="Certificates:"
           label-for="p_certificates"
-          label-align="right"
-          label-cols="4" >
+          label-cols="3" >
           <b-form-checkbox-group
             id="p_certficates"
+            :disabled="loading_dependencies"
             v-model="product_certificates"
             :options="this.$router.app.certificates"
             value-field="id"
@@ -182,11 +182,63 @@ export default {
           
         </b-form-group>
       </b-col>
-
     </b-form-row>
 
+    <b-form-row>
+      <b-col cols="3">
+        <b-form-group
+          id="g_p_lifecycle"
+          description=""
+          label="Lifecycle:"
+          label-for="p_lifecycle"
+          label-align="right"
+          label-cols="4" >
+          <b-form-select id="p_lifecycle" v-model="product.lifecycle_id" :options="this.$router.app.lifecycles" value-field="id" text-field="name_en"></b-form-select>
+        </b-form-group>
+      </b-col>
+
+      <b-col cols="3">
+        <b-form-group
+          id="g_p_price"
+          description=""
+          label="Price:"
+          label-for="p_price"
+          label-align="right"
+          label-cols="4" >
+          <b-form-input id="p_price" v-model="product.price" type="number" min=0></b-form-input>
+        </b-form-group>
+      </b-col>
+      
+      <b-col cols="3">
+        <b-form-group
+          id="g_p_weight"
+          description=""
+          label="Weight:"
+          label-for="p_weight"
+          label-align="right"
+          label-cols="4" >
+          <b-form-input id="p_weight" v-model="product.weight" type="number" min=0></b-form-input>
+        </b-form-group>
+      </b-col>
+
+      <b-col cols="3">
+        <b-form-group
+          id="g_p_unit"
+          description="???"
+          label="Unit:"
+          label-for="p_unit"
+          label-align="right"
+          label-cols="4" >
+          <b-form-select id="p_unit" v-model="product.lifecycle_id" >
+            <b-form-select-option value="" disabled>? discuss ?</b-form-select-option>
+          </b-form-select>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
+
+
   </b-form>
-  <b-spinner v-if="busy" variant="secondary" />
+  <b-spinner v-if="busy || loading_dependencies" variant="secondary" />
 </div>
   `,
   data (){
@@ -194,16 +246,16 @@ export default {
       message: null,
       error: null,
       busy: false,
+      loading_dependencies: false,
       product: null,//actually a product-view
       product_certificates: [],
-      families: [],
+      families: []
     }
   },
   //props: {},
   computed: {},
   created: function(){
     this.loadData();
-    console.log(this.$router);
     this.$router.app.selectedMenu="product";
   },
   methods: {
@@ -220,6 +272,8 @@ export default {
           this.$emit('reload');
         }
         this.families = await Vue.mtapi.getFamilies(this.product.family_id);
+
+        this.loading_dependencies = true;
         let tempcerts = await Vue.mtapi.getProductCertificates(this.product.id);
         this.product_certificates = tempcerts.map(v=>{return v.certificate_id});//just the cert ids.
       } catch (err){
@@ -230,6 +284,7 @@ export default {
         }
       } finally {
         this.busy = false;
+        this.loading_dependencies = false;
       }
     },
     onSubmit: async function(){
