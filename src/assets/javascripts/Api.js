@@ -28,6 +28,10 @@ export class Api{
     let result =  await this._get(`${this.base_url}/families/${id}`);
     return result;
   }
+  async getImageTypes(){
+    let result = await this._get(`${this.base_url}/image_types`, {limit:1000, order_by:'+name'});
+    return result.image_types;
+  }
   async getLifecycles(){
     let result = await this._get(`${this.base_url}/lifecycles`, {limit:1000, order_by:'+name_en'});
     return result.lifecycles;
@@ -47,6 +51,14 @@ export class Api{
   async getProductFamilies(id){
     let result =  await this._get(`${this.base_url}/products/${id}/families`);
     return result.product_family_connects;
+  }
+  async getProductImages(id){
+    let result =  await this._get(`${this.base_url}/products/${id}/images`);
+    return result.product_images;
+  }
+  async getProductOemReferences(id){
+    let result =  await this._get(`${this.base_url}/products/${id}/oem_references`);
+    return result.product_oem_references;
   }
   async getProductTypes(){
     let result = await this._get(`${this.base_url}/product-types`, {limit:1000, order_by:'+name_en'});

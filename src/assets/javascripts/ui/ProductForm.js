@@ -4,17 +4,21 @@ import { ApiError } from "../Api.js";
 export default {
   template: /*html*/
   `
-<div class="mt-2">
+<div class="mt-2" v-if="product" >
   <b-alert v-if="!busy && error" variant="danger">{{ error }}</b-alert>
   <b-alert v-if="!busy && message" variant="info">{{ message }}</b-alert>
-  <b-form @submit="onSubmit" v-if="product">
-    <b-form-row>
-      <b-col class="text-center">
-        <h5 v-cloak v-if="product">Editing Product: ID = {{product.id}}</h5>
-        <h5 v-cloak v-else >Adding new Product</h5>
-      </b-col>
-    </b-form-row>
+  <b-row >
+    <b-col class="justify-content-between" class="bg-light">
+      <span class="h5" v-cloak v-if="product">Editing Product: ID = {{product.id}}</span>
+      <span class="h5" v-cloak v-else >Adding new Product</span>
+      <span v-show="busy || loading_dependencies"  >
+        <b-spinner small variant="secondary" />
+        <span>loading...</span>
+      </span>
+    </b-col>
+  </b-row>
 
+  <b-form @submit="onSubmit" >
     <b-form-row>
       <b-col cols="5">
         <b-form-group
@@ -23,8 +27,8 @@ export default {
           label="Category:"
           label-for="p_category"
           label-cols="4" >
-          <b-form-select id="p_category" v-model="product.category_id" :options="this.$router.app.categories" value-field="id" text-field="name_zh" v-if="this.$router.app.lang==='zh'" ></b-form-select>
-          <b-form-select id="p_category" v-model="product.category_id" :options="this.$router.app.categories" value-field="id" text-field="name_en" v-else></b-form-select>
+          <b-form-select id="p_category" v-model="product.category_id" :options="$router.app.categories" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" ></b-form-select>
+          <b-form-select id="p_category" v-model="product.category_id" :options="$router.app.categories" value-field="id" text-field="name_en" v-else></b-form-select>
           
         </b-form-group>
       </b-col>
@@ -56,8 +60,8 @@ export default {
           label-for="p_product_type"
           label-cols="4" >
           
-          <b-form-select id="p_product_type" v-model="product.product_type_id" :options="this.$router.app.product_types" value-field="id" text-field="name_zh" v-if="this.$router.app.lang==='zh'" ></b-form-select>
-          <b-form-select id="p_product_type" v-model="product.product_type_id" :options="this.$router.app.product_types" value-field="id" text-field="name_en" v-else ></b-form-select>
+          <b-form-select id="p_product_type" v-model="product.product_type_id" :options="$router.app.product_types" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" ></b-form-select>
+          <b-form-select id="p_product_type" v-model="product.product_type_id" :options="$router.app.product_types" value-field="id" text-field="name_en" v-else ></b-form-select>
         </b-form-group>
       </b-col>
       <b-col >
@@ -114,8 +118,8 @@ export default {
           label="Manufacturer:"
           label-for="p_manufacturer"
           label-cols="4" >
-          <b-form-select id="p_manufacturer" v-model="product.brand_id" :options="this.$router.app.brands" value-field="id" text-field="name_zh" v-if="this.$router.app.lang==='zh'" ></b-form-select>
-          <b-form-select id="p_manufacturer" v-model="product.brand_id" :options="this.$router.app.brands" value-field="id" text-field="name_en" v-else ></b-form-select>
+          <b-form-select id="p_manufacturer" v-model="product.brand_id" :options="$router.app.brands" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" ></b-form-select>
+          <b-form-select id="p_manufacturer" v-model="product.brand_id" :options="$router.app.brands" value-field="id" text-field="name_en" v-else ></b-form-select>
           
         </b-form-group>
       </b-col>
@@ -130,8 +134,8 @@ export default {
           label-for="p_supplier"
           label-align="right"
           label-cols="4" >
-          <b-form-select id="p_supplier" v-model="product.supplier_id" :options="this.$router.app.suppliers" value-field="id" text-field="name_zh" v-if="this.$router.app.lang==='zh'" ></b-form-select>
-          <b-form-select id="p_supplier" v-model="product.supplier_id" :options="this.$router.app.suppliers" value-field="id" text-field="name_en" v-else ></b-form-select>
+          <b-form-select id="p_supplier" v-model="product.supplier_id" :options="$router.app.suppliers" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" ></b-form-select>
+          <b-form-select id="p_supplier" v-model="product.supplier_id" :options="$router.app.suppliers" value-field="id" text-field="name_en" v-else ></b-form-select>
           
         </b-form-group>
       </b-col>
@@ -176,7 +180,7 @@ export default {
           <b-form-checkbox-group id="p_certficates"
             :disabled="busy || loading_dependencies"
             v-model="product_certificates"
-            :options="this.$router.app.certificates"
+            :options="$router.app.certificates"
             value-field="id"
             text-field="name_en">
 
@@ -195,7 +199,7 @@ export default {
           label-for="p_lifecycle"
           label-align="right"
           label-cols="4" >
-          <b-form-select id="p_lifecycle" v-model="product.lifecycle_id" :options="this.$router.app.lifecycles" value-field="id" text-field="name_en"></b-form-select>
+          <b-form-select id="p_lifecycle" v-model="product.lifecycle_id" :options="$router.app.lifecycles" value-field="id" text-field="name_en"></b-form-select>
         </b-form-group>
       </b-col>
 
@@ -208,7 +212,7 @@ export default {
           label-align="right"
           label-cols="4" >
           <b-input-group>
-          <b-form-input id="p_price" v-model="product.price" type="number" :number="true" min=0 step=0.01 ></b-form-input>
+            <b-form-input id="p_price" v-model="product.price" type="number" :number="true" min=0 step=0.01 ></b-form-input>
             <template v-slot:append>
               <b-input-group-text>&yen;</b-input-group-text>
             </template>
@@ -260,6 +264,8 @@ export default {
           label-cols="2" >
           <b-form-textarea id="p_description_en" v-model="product.description_en" rows="3" max-rows="6"></b-form-textarea>
         </b-form-group>
+      </b-col>
+      <b-col>
       </b-col>
     </b-form-row>
 
@@ -317,31 +323,98 @@ export default {
     <b-form-row>
       <b-col>
         <b-form-group
-          id="g_p_oem_references"
-          description=""
-          label="OEM References:"
-          label-for="p_oem_references"
-          label-cols="2" >
-          <b-form-textarea id="p_oem_references" v-model="product.oem_references" rows="3" max-rows="6"></b-form-textarea>
-        </b-form-group>
-      </b-col>
-    </b-form-row>
-
-    <b-form-row>
-      <b-col>
-        <b-form-group
           id="g_p_tags"
           description=""
           label="Tags:"
           label-for="p_tags"
           label-align="left"
           label-cols="2" >
-          <b-form-textarea id="p_tags" v-model="product.tags" rows="3" max-rows="6"></b-form-textarea>
+          <b-form-tags id="p_tags" v-model="product_tags" separator="," ></b-form-textarea>
         </b-form-group>
       </b-col>
     </b-form-row>
   </b-form>
-  <b-spinner v-if="busy || loading_dependencies" variant="secondary" />
+  
+  <!-- 1:N relationships -->
+  <b-card v-cloak>
+    <b-tabs content-class="mt-3" card>
+      <b-tab title="Images" active>
+        <h5>Images</h5>
+        <b-form v-for="(pimage, idx) in product_images" key="pimage.id">
+          <b-form-row>
+            <b-col cols="5">
+              <b-form-group
+                label="Image Type:"
+                label-cols="4" >
+                <b-form-select v-model="pimage.image_type_id" :options="$router.app.image_types" value-field="id" text-field="name"></b-form-select>
+              </b-form-group>
+            </b-col>
+          
+            <b-col cols="5">
+              <b-form-group
+                label="Link:"
+                label-align="right"
+                label-cols="4" >
+                <b-form-input v-model="pimage.image_link" type="text" placeholder="url for the image" ></b-form-input>
+              </b-form-group>
+            </b-col>
+
+            <b-col cols="2">
+              <b-button @click="removeProductImage(idx)"  variant="outline-danger" size="sm">Delete</b-button>
+            </b-col>
+          </b-form-row>
+        </b-form>
+        
+        <b-button variant="outline-success" @click="newProductImage" size="sm">Add Image</b-button>
+      </b-tab>
+      
+      <b-tab title="OEM References">
+        <h5>OEM References</h5>
+        <b-form v-for="(oemref, idx) in product_oem_refs" key="oemref.id">
+          <b-form-row>
+            <b-col cols="5">
+              <b-form-group
+                label="OEM:"
+                label-cols="4" >
+                <b-form-select v-model="oemref.brand_id" :options="$router.app.brands" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" ></b-form-select>
+                <b-form-select v-model="oemref.brand_id" :options="$router.app.brands" value-field="id" text-field="name_en" v-else ></b-form-select>
+                
+              </b-form-group>
+            </b-col>
+          
+            <b-col cols="5">
+              <b-form-group
+                label="Reference:"
+                label-align="right"
+                label-cols="4" >
+                <b-form-input v-model="oemref.name" type="text" ></b-form-input>
+              </b-form-group>
+            </b-col>
+
+            <b-col cols="2">
+              <b-button @click="removeOemReference(idx)" variant="outline-danger" size="sm">Delete</b-button>
+            </b-col>
+          </b-form-row>
+        </b-form>
+        
+        <b-button variant="outline-success" @click="newOemReference" size="sm">Add OEM Reference</b-button>
+      </b-tab>
+
+      <b-tab title="Filters">
+        <h5>Filters</h5>
+      </b-tab>
+      
+      <b-tab title="Custom Attributes">
+        <h5>Custom Attributes</h5>
+      </b-tab>
+
+      <b-tab title="Set">
+        <h5>Set</h5>
+      </b-tab>
+    </b-tabs>
+  </b-card>
+
+
 </div>
   `,
   data (){
@@ -352,6 +425,9 @@ export default {
       loading_dependencies: false,
       product: null,//actually a product-view
       product_certificates: [],
+      product_images: [],
+      product_oem_refs: [],
+      product_tags: [],
       families: [],
       family_connects: []//family ids only
     }
@@ -375,7 +451,7 @@ export default {
       return this.$router.app.topAncestorCategoryFor(this.product.category_id);
     },
     valid_units: function(){
-      let units = [1,10,20,30,50,100];
+      let units = [1, 5, 6, 10, 12, 16, 20, 24, 25, 50, 100];
       let ancestor = this.general_category;
       if(ancestor && ancestor.name_en==='Parts'){
         units.push("Set");
@@ -385,6 +461,7 @@ export default {
   },
   created: function(){
     this.loadData();
+    this.loadProductImages();//default tab.
     this.$router.app.selectedMenu="product";
   },
   methods: {
@@ -394,6 +471,7 @@ export default {
         this.message = null;
         this.busy = true;
         this.product = await Vue.mtapi.getProductView(this.$route.params.id);
+        this.product_tags = product.tags ? product.tags.split() : [];
         if(!this.$router.app.categories 
           || !this.$router.app.certificates
           || !this.$router.app.lifecycles
@@ -420,6 +498,78 @@ export default {
         this.busy = false;
         this.loading_dependencies = false;
       }
+    },
+    // tabActivated: function(newTabIndex, prevTabIndex){
+    //   console.log(`Tab ${newTabIndex} activated`);
+    //   switch(newTabIndex){
+    //     case 0:
+    //       this.loadProductImages();
+    //       break;
+    //     case 1:
+    //       this.loadOemReferences();
+    //       break;
+    //     case 2:
+    //     case 3:
+    //     case 4:
+    //     default:
+    //       break;
+    //   }
+    // },
+    loadProductImages : async function(){
+      try{
+        this.error = null;
+        this.message = null;
+        this.busy = true;
+        this.product_images = await Vue.mtapi.getProductImages(this.$route.params.id);
+
+      } catch (err){
+        if(err instanceof ApiError){
+          this.error = `Couldn't get product images. ${err.message}`;
+        } else {
+          console.error(err);
+        }
+      } finally {
+        this.busy = false;
+      }
+    },
+    newProductImage : function(){
+      this.product_images.push({
+        id: null,
+        product_id: this.product.id,
+        image_type_id: null,
+        image_link: null
+      });
+    },
+    removeProductImage : function(idx){
+      if(idx>=0) this.product_images.splice(idx, 1);
+    },
+    loadOemReferences : async function(){
+      try{
+        this.error = null;
+        this.message = null;
+        this.busy = true;
+        this.product_oem_refs = await Vue.mtapi.getProductOemReferences(this.$route.params.id);
+
+      } catch (err){
+        if(err instanceof ApiError){
+          this.error = `Couldn't get product OEM references. ${err.message}`;
+        } else {
+          console.error(err);
+        }
+      } finally {
+        this.busy = false;
+      }
+    },
+    newOemReference : function(){
+      this.product_oem_refs.push({
+        id: null,
+        product_id: this.product.id,
+        brand_id: null,
+        name: ""
+      });
+    },
+    removeOemReference : function(idx){
+      if(idx>=0) this.product_oem_refs.splice(idx, 1);
     },
     onSubmit: async function(){
 

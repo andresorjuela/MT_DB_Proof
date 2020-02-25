@@ -33,6 +33,16 @@ router.get('/certificates', function (req, res, next) {
   next();
 }, fetchMany);
 
+router.get('/image_types', function (req, res, next) {
+  let  q = parseQueryOptions(req, ['+name','+id'], ['name','id'], 1000);
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ImageType(),
+    query: q.query,
+    query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
 router.get('/lifecycles', function (req, res, next) {
   let  q = parseQueryOptions(req, ['+name_en','+id'], ['name_en','id'], 1000);
   res.locals.dbInstructions = {

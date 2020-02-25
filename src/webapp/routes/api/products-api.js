@@ -48,6 +48,26 @@ router.get('/:product_id/families', function (req, res, next) {
   next();
 }, fetchMany);
 
+// Get all product family connections
+router.get('/:product_id/images', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductImage(),
+    query: {product_id: req.params.product_id},
+    //query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
+// Get all product oem references
+router.get('/:product_id/oem_references', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductOemReference(),
+    query: {product_id: req.params.product_id},
+    //query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
 router.get('/view/:product_id', function (req, res, next) {
 
   res.locals.dbInstructions = {
