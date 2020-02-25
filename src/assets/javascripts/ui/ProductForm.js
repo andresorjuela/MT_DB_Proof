@@ -207,7 +207,12 @@ export default {
           label-for="p_price"
           label-align="right"
           label-cols="4" >
-          <b-form-input id="p_price" v-model="product.price" type="number" min=0></b-form-input>
+          <b-input-group>
+          <b-form-input id="p_price" v-model="product.price" type="number" :number="true" min=0 step=0.01 ></b-form-input>
+            <template v-slot:append>
+              <b-input-group-text>&yen;</b-input-group-text>
+            </template>
+          </b-input-group>
         </b-form-group>
       </b-col>
       
@@ -219,20 +224,26 @@ export default {
           label-for="p_weight"
           label-align="right"
           label-cols="4" >
-          <b-form-input id="p_weight" v-model="product.weight" type="number" min=0></b-form-input>
+          <b-input-group>
+            <b-form-input id="p_weight" v-model="product.weight" type="number" :number="true" min=0 step=0.01 ></b-form-input>
+            <template v-slot:append>
+              <b-input-group-text>kg</b-input-group-text>
+            </template>
+          </b-input-group>
         </b-form-group>
       </b-col>
 
       <b-col cols="3">
         <b-form-group
           id="g_p_unit"
-          description="???"
           label="Unit:"
           label-for="p_unit"
           label-align="right"
           label-cols="4" >
-          <b-form-select id="p_unit" v-model="product.lifecycle_id" >
-            <b-form-select-option value="" disabled>? discuss ?</b-form-select-option>
+          <b-form-select id="p_unit" v-model="product.lifecycle_id" :options="valid_units">
+            <template v-slot:first>
+              <b-form-select-option value="" >Choose</b-form-select-option>
+            </template>
           </b-form-select>
         </b-form-group>
       </b-col>
@@ -356,6 +367,20 @@ export default {
           if(f) return f.family_code;
         })
         .join(",");
+    },
+    /**
+     * The highest-level ancestor of the current category.
+     */
+    general_category: function(){
+      return this.$router.app.topAncestorCategoryFor(this.product.category_id);
+    },
+    valid_units: function(){
+      let units = [1,10,20,30,50,100];
+      let ancestor = this.general_category;
+      if(ancestor && ancestor.name_en==='Parts'){
+        units.push("Set");
+      }
+      return units;
     }
   },
   created: function(){

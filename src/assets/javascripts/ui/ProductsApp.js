@@ -74,6 +74,14 @@ var app = new Vue({
       } finally {
         this.busy = false;
       }
+    },
+    topAncestorCategoryFor: function(category_id){
+      let cat = this.categories.find((c)=>{ return c.id === category_id; });
+      if(!cat) return null;
+      //has a parent?
+      if(cat.parent_id) return this.topAncestorCategoryFor(cat.parent_id);
+      //else this is it.
+      return cat;
     }
   }
 }).$mount('#app');
