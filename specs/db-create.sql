@@ -44,17 +44,17 @@ CREATE TABLE `t_certificate` (
 -- Create syntax for TABLE 't_custom_attribute'
 CREATE TABLE `t_custom_attribute` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `category_id` int(11) unsigned NOT NULL,
   `name_en` varchar(255) NOT NULL DEFAULT '',
   `name_zh` varchar(255) NOT NULL DEFAULT '',
-  `category_id` int(11) unsigned NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
--- Create syntax for TABLE 't_custom_attribute_option'
-CREATE TABLE `t_custom_attribute_option` (
+-- Create syntax for TABLE 't_product_custom_attribute'
+CREATE TABLE `t_product_custom_attribute` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `custom_attribute_id` int(11) unsigned NOT NULL,
   `product_id` int(11) NOT NULL,
@@ -238,16 +238,6 @@ CREATE TABLE `t_product_family_connect` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Create syntax for TABLE 't_product_filter'
-CREATE TABLE `t_product_filter` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `product_id` int(11) unsigned NOT NULL,
-  `filter_id` int(11) unsigned NOT NULL,
-  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `version` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Create syntax for TABLE 't_product_image'
 CREATE TABLE `t_product_image` (
@@ -273,8 +263,8 @@ CREATE TABLE `t_product_oem_reference` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- Create syntax for TABLE 't_product_option'
-CREATE TABLE `t_product_option` (
+-- Create syntax for TABLE 't_product_filter_option'
+CREATE TABLE `t_product_filter_option` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `product_id` int(11) unsigned NOT NULL,
   `filter_option_id` int(11) unsigned NOT NULL,
@@ -337,10 +327,10 @@ ALTER TABLE `t_custom_attribute`
   ADD CONSTRAINT `fk_custom_attribute_category` FOREIGN KEY (`category_id`) REFERENCES `t_category` (`id`);
 
 
-ALTER TABLE `t_custom_attribute_option` 
+ALTER TABLE `t_product_custom_attribute` 
   ADD CONSTRAINT `fk_custom_attribute_option` FOREIGN KEY (`custom_attribute_id`) REFERENCES `t_custom_attribute` (`id`);
 
-ALTER TABLE `t_custom_attribute_option` 
+ALTER TABLE `t_product_custom_attribute` 
   ADD CONSTRAINT `fk_custom_attribute_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
 
 
@@ -414,13 +404,6 @@ ALTER TABLE `t_product_family_connect`
   ADD CONSTRAINT `fk_product_family_connect_family` FOREIGN KEY (`family_id`) REFERENCES `t_family` (`id`);
 
 
-ALTER TABLE `t_product_filter` 
-  ADD CONSTRAINT `fk_product_filter_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
-
-ALTER TABLE `t_product_filter` 
-  ADD CONSTRAINT `fk_product_filter_filter` FOREIGN KEY (`filter_id`) REFERENCES `t_filter` (`id`);
-
-
 ALTER TABLE `t_product_image` 
   ADD CONSTRAINT `fk_product_image_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
 
@@ -435,10 +418,10 @@ ALTER TABLE `t_product_oem_reference`
   ADD CONSTRAINT `fk_product_oem_reference_brand` FOREIGN KEY (`brand_id`) REFERENCES `t_brand` (`id`);
 
 
-ALTER TABLE `t_product_option` 
+ALTER TABLE `t_product_filter_option` 
   ADD CONSTRAINT `fk_product_option_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
 
-ALTER TABLE `t_product_option` 
+ALTER TABLE `t_product_filter_option` 
   ADD CONSTRAINT `fk_product_option_option` FOREIGN KEY (`filter_option_id`) REFERENCES `t_filter_option` (`id`);
 
 

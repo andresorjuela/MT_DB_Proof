@@ -3,6 +3,15 @@ var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
 let { fetchMany, parseQueryOptions } = require('../middleware/db-api');
 
+router.get('/brands', function (req, res, next) {
+  let  q = parseQueryOptions(req, ['+name_en','+id'], ['name_en','+name_zh','id'], 1000);
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.Brand(),
+    query: q.query,
+    query_options: q.query_options
+  }
+  next();
+}, fetchMany);
 
 router.get('/categories', function (req, res, next) {
   let  q = parseQueryOptions(req, ['+name_en','+id'], ['name_en','id'], 1000);

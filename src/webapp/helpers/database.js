@@ -24,7 +24,7 @@ module.exports = function (pool) {
   factory.Category               = ()=>{ return create_dao('t_category', 'category', standard_opts, null); };
   factory.Certificate            = ()=>{ return create_dao('t_certificate', 'certificate', standard_opts, null); };
   factory.CustomAttribute        = ()=>{ return create_dao('t_custom_attribute', 'custom_attribute', standard_opts, null); };
-  factory.CustomAttributeOption  = ()=>{ return create_dao('t_custom_attribute_option', 'custom_attribute_option', standard_opts, null); };
+  factory.ProductCustomAttribute = ()=>{ return create_dao('t_product_custom_attribute', 'product_custom_attribute', standard_opts, null); };
   factory.Equipment              = ()=>{ return create_dao('t_equipment', 'equipment', standard_opts, null); };
   factory.EquipmentGroup         = ()=>{ return create_dao('t_equipment_group', 'equipment_group', standard_opts, null); };
   factory.EquipmentImage         = ()=>{ return create_dao('t_equipment_image', 'equipment_image', standard_opts, null); };
@@ -42,7 +42,7 @@ module.exports = function (pool) {
   factory.ProductFilter          = ()=>{ return create_dao('t_product_filter', 'product_filter', standard_opts, null); };
   factory.ProductImage           = ()=>{ return create_dao('t_product_image', 'product_image', standard_opts, null); };
   factory.ProductOemReference    = ()=>{ return create_dao('t_product_oem_reference', 'product_oem_reference', standard_opts, null); };
-  factory.ProductOption          = ()=>{ return create_dao('t_product_option', 'product_option', standard_opts, null); };
+  factory.ProductFilterOption    = ()=>{ return create_dao('t_product_filter_option', 'product_filter_option', standard_opts, null); };
   factory.ProductSet             = ()=>{ return create_dao('t_product_set', 'product_set', standard_opts, null); };
   factory.ProductType            = ()=>{ return create_dao('t_product_type', 'product_type', standard_opts, null); };
   factory.Supplier               = ()=>{ return create_dao('t_supplier', 'supplier', standard_opts, null); };

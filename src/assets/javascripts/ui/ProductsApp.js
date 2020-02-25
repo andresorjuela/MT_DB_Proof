@@ -13,6 +13,7 @@ var app = new Vue({
     lang: window.navigator.language.substr(0,2),
     error: null,
     selectedMenu: null,
+    brands: [],
     categories: [],
     certificates: [],
     lifecycles: [],
@@ -25,13 +26,19 @@ var app = new Vue({
       error = "This app uses browser local storage for better performance. Please enable local storage or use a different browser.";
       return;
     } else {
+      this.brands = JSON.parse( window.localStorage.getItem('brands') );
       this.categories = JSON.parse( window.localStorage.getItem('categories') );
       this.certificates = JSON.parse( window.localStorage.getItem('certificates') );
       this.lifecycles = JSON.parse( window.localStorage.getItem('lifecycles') );
       this.product_types = JSON.parse( window.localStorage.getItem('product_types') );
       this.suppliers = JSON.parse( window.localStorage.getItem('suppliers') );
     }
-    if(!this.categories || !this.certificates || !this.lifecycles || !this.product_types || !this.suppliers ){
+    if(!this.brands ||
+       !this.categories || 
+       !this.certificates || 
+       !this.lifecycles || 
+       !this.product_types || 
+       !this.suppliers ){
       this.reloadData();
     }
     
@@ -41,18 +48,21 @@ var app = new Vue({
       try{
         this.busy = false;
         let pr = await Promise.all([
+          Vue.mtapi.getBrands(),
           Vue.mtapi.getCategories(),
           Vue.mtapi.getCertificates(),
           Vue.mtapi.getLifecycles(),
           Vue.mtapi.getProductTypes(),
           Vue.mtapi.getSuppliers()
         ]);
-        this.categories = pr[0];
-        this.certificates = pr[1];
-        this.lifecycles = pr[2];
-        this.product_types = pr[3];
-        this.suppliers = pr[4];
+        this.brands = pr[0]
+        this.categories = pr[1];
+        this.certificates = pr[2];
+        this.lifecycles = pr[3];
+        this.product_types = pr[4];
+        this.suppliers = pr[5];
 
+        window.localStorage.setItem('brands', JSON.stringify(this.brands));
         window.localStorage.setItem('categories', JSON.stringify(this.categories));
         window.localStorage.setItem('certificates', JSON.stringify(this.certificates));
         window.localStorage.setItem('lifecycles', JSON.stringify(this.lifecycles));

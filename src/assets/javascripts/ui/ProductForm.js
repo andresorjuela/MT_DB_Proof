@@ -2,7 +2,7 @@
 import { ApiError } from "../Api.js";
 
 export default {
-  template:
+  template: /*html*/
   `
 <div class="mt-2">
   <b-alert v-if="!busy && error" variant="danger">{{ error }}</b-alert>
@@ -16,13 +16,27 @@ export default {
     </b-form-row>
 
     <b-form-row>
+      <b-col cols="5">
+        <b-form-group
+          id="g_p_category"
+          description=""
+          label="Category:"
+          label-for="p_category"
+          label-cols="4" >
+          <b-form-select id="p_category" v-model="product.category_id" :options="this.$router.app.categories" value-field="id" text-field="name_zh" v-if="this.$router.app.lang==='zh'" ></b-form-select>
+          <b-form-select id="p_category" v-model="product.category_id" :options="this.$router.app.categories" value-field="id" text-field="name_en" v-else></b-form-select>
+          
+        </b-form-group>
+      </b-col>
+
       <b-col cols="7">
         <b-form-group
           id="g_p_name_en"
           description=""
           label="Title (EN):"
           label-for="p_name_en"
-          label-cols="2" >
+          label-cols="2"
+          label-align="right" >
           <b-input-group>
             <b-form-input id="p_name_en" v-model="product.name_en" placeholder="derived by formula" trim></b-form-input>
             <b-input-group-append>
@@ -31,53 +45,38 @@ export default {
           </b-input-group>
         </b-form-group>
       </b-col>
-      <b-col cols="5">
-        <b-form-group
-          id="g_p_category"
-          description=""
-          label="Category:"
-          label-for="p_category"
-          label-align="right"
-          label-cols="4" >
-          <b-form-select id="p_category" v-model="product.category_id" :options="this.$router.app.categories" value-field="id" text-field="name_zh" v-if="this.$router.app.lang==='zh'" ></b-form-select>
-          <b-form-select id="p_category" v-model="product.category_id" :options="this.$router.app.categories" value-field="id" text-field="name_en" v-else></b-form-select>
-          
-        </b-form-group>
-      </b-col>
-
     </b-form-row>
 
     <b-form-row>
-      <b-col >
-        <b-form-group
-          id="g_p_name_zh"
-          description=""
-          label="Title:"
-          label-for="p_name_zh"
-          label-cols="2" >
-          <b-input-group>
-            <b-form-input id="p_name_zh" v-model="product.name_zh" placeholder="从公式得出" trim></b-form-input>
-            <b-input-group-append>
-              <b-button variant="outline-secondary">Create Title</b-button>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-      </b-col>
-   
       <b-col cols="5">
         <b-form-group
           id="g_p_product_type"
           description=""
           label="Product Type:"
           label-for="p_product_type"
-          label-align="right"
           label-cols="4" >
           
           <b-form-select id="p_product_type" v-model="product.product_type_id" :options="this.$router.app.product_types" value-field="id" text-field="name_zh" v-if="this.$router.app.lang==='zh'" ></b-form-select>
           <b-form-select id="p_product_type" v-model="product.product_type_id" :options="this.$router.app.product_types" value-field="id" text-field="name_en" v-else ></b-form-select>
         </b-form-group>
       </b-col>
-
+      <b-col >
+      <b-form-group
+        id="g_p_name_zh"
+        description=""
+        label="Title:"
+        label-for="p_name_zh"
+        label-cols="2" 
+        label-align="right" >
+        <b-input-group>
+          <b-form-input id="p_name_zh" v-model="product.name_zh" placeholder="从公式得出" trim></b-form-input>
+          <b-input-group-append>
+            <b-button variant="outline-secondary">Create Title</b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-form-group>
+    </b-col>
+ 
     </b-form-row>
 
     <b-form-row>
@@ -112,11 +111,12 @@ export default {
       <b-col cols="5">
         <b-form-group
           id="g_p_oem"
-          description="???"
           label="Manufacturer:"
           label-for="p_manufacturer"
           label-cols="4" >
-          <b-form-input disabled id="p_manufacturer" ></b-form-input>
+          <b-form-select id="p_manufacturer" v-model="product.brand_id" :options="this.$router.app.brands" value-field="id" text-field="name_zh" v-if="this.$router.app.lang==='zh'" ></b-form-select>
+          <b-form-select id="p_manufacturer" v-model="product.brand_id" :options="this.$router.app.brands" value-field="id" text-field="name_en" v-else ></b-form-select>
+          
         </b-form-group>
       </b-col>
       <b-col>
