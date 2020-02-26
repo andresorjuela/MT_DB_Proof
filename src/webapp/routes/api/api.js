@@ -33,10 +33,30 @@ router.get('/certificates', function (req, res, next) {
   next();
 }, fetchMany);
 
-router.get('/image_types', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['+name','+id'], ['name','id'], 1000);
+router.get('/filter_option_views', function (req, res, next) {
+  let  q = parseQueryOptions(req, ['+filter_id','+filter_option_id'], ['category_id','filter_id','filter_option_id','filter_en','filter_zh','option_en','option_zh'], 1000);
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.ImageType(),
+    dao: req.app.locals.Database.FilterOptionView(),
+    query: q.query,
+    query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
+router.get('/filters', function (req, res, next) {
+  let  q = parseQueryOptions(req, ['+name_en','+category_id','+id'], ['category_id','name_en','name_zh','id'], 1000);
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.Filter(),
+    query: q.query,
+    query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
+router.get('/filters/options', function (req, res, next) {
+  let  q = parseQueryOptions(req, ['filter_id','+option_en','+id'], ['filter_id','option_en','option_zh','id'], 1000);
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.FilterOption(),
     query: q.query,
     query_options: q.query_options
   }

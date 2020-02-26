@@ -28,6 +28,11 @@ export class Api{
     let result =  await this._get(`${this.base_url}/families/${id}`);
     return result;
   }
+  async getFilterOptionViewsForCategory(category_id){
+    let query = {category_id: category_id, limit:1000, order_by:'+category_id,+filter_id'};
+    let result = await this._get(`${this.base_url}/filter_option_views`, query);
+    return result.filter_option_views;
+  }
   async getImageTypes(){
     let result = await this._get(`${this.base_url}/image_types`, {limit:1000, order_by:'+name'});
     return result.image_types;
@@ -51,6 +56,10 @@ export class Api{
   async getProductFamilies(id){
     let result =  await this._get(`${this.base_url}/products/${id}/families`);
     return result.product_family_connects;
+  }
+  async getProductFilterOptions(id){
+    let result =  await this._get(`${this.base_url}/products/${id}/filter_options`);
+    return result.product_filter_options;
   }
   async getProductImages(id){
     let result =  await this._get(`${this.base_url}/products/${id}/images`);

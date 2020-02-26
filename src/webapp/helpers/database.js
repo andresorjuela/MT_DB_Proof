@@ -39,7 +39,6 @@ module.exports = function (pool) {
   factory.Product                = ()=>{ return create_dao('t_product', 'product', standard_opts, null); };
   factory.ProductCertificate     = ()=>{ return create_dao('t_product_certificate', 'product_certificate', standard_opts, null); };
   factory.ProductFamily          = ()=>{ return create_dao('t_product_family_connect', 'product_family_connect', standard_opts, null); };
-  factory.ProductFilter          = ()=>{ return create_dao('t_product_filter', 'product_filter', standard_opts, null); };
   factory.ProductImage           = ()=>{ return create_dao('t_product_image', 'product_image', standard_opts, null); };
   factory.ProductOemReference    = ()=>{ return create_dao('t_product_oem_reference', 'product_oem_reference', standard_opts, null); };
   factory.ProductFilterOption    = ()=>{ return create_dao('t_product_filter_option', 'product_filter_option', standard_opts, null); };
@@ -49,6 +48,7 @@ module.exports = function (pool) {
   factory.Technology             = ()=>{ return create_dao('t_technology', 'technology', standard_opts, null); };
 
   //views
+  factory.FilterOptionView       = ()=>{ return create_dao('v_filter_option', 'filter_option_view', null, null); };
   factory.ProductView            = ()=>{ return create_dao('v_product', 'product_view', null, null); };
 
   /**
