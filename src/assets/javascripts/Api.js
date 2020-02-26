@@ -59,7 +59,7 @@ export class Api{
   }
   async getProductFilterOptions(id){
     let result =  await this._get(`${this.base_url}/products/${id}/filter_options`);
-    return result.product_filter_options;
+    return result.product_filter_option_views;//this api method returns a view object
   }
   async getProductImages(id){
     let result =  await this._get(`${this.base_url}/products/${id}/images`);

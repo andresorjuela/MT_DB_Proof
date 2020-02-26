@@ -26,3 +26,10 @@ o.id as filter_option_id, o.option_en, o.option_zh
 from t_filter f 
 join t_filter_option o on o.filter_id = f.id
 order by filter_id asc, filter_option_id asc;
+
+-- filter_id is needed to render the dynamic elements properly.
+create view v_product_filter_option
+as select pfo.id, pfo.product_id, f.filter_id as filter_id, filter_option_id, pfo.created, pfo.updated, pfo.version
+from t_product_filter_option pfo
+join t_filter_option f on f.id = pfo.filter_option_id
+order by product_id asc, filter_id asc;

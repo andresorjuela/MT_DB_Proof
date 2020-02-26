@@ -18,7 +18,7 @@ export default {
     </span>
   </div>
 
-  <b-form @submit="onSubmit" >
+  <b-form @submit="onSubmit" v-if="product">
     <b-form-row>
       <b-col cols="5">
         <b-form-group id="g_p_category" description="" label="Category:" label-for="p_category" label-cols="4" >
@@ -215,7 +215,7 @@ export default {
   </b-form>
   
   <!-- 1:N relationships -->
-  <b-card v-cloak>
+  <b-card v-if="product">
     <b-tabs content-class="mt-3" card>
       <b-tab title="Images" active>
         <h5>Images</h5>
@@ -275,6 +275,19 @@ export default {
 
       <b-tab title="Filters">
         <h5>Filters</h5>
+        <b-form>
+          <b-form-row>
+            <b-col cols="6" v-for="(filter, idx) in filters" :key="filter.filter_id" >
+              <b-form-group :label="filter.name_en+':'" label-cols="4" >
+                <b-form-select v-model="getProductFilterOption(filter.filter_id).filter_option_id" :options="filter.options" value-field="filter_option_id" text-field="option_zh" v-if="$router.app.lang==='zh'" >
+                </b-form-select>
+                <b-form-select v-model="getProductFilterOption(filter.filter_id).filter_option_id" :options="filter.options" value-field="filter_option_id" text-field="option_en" v-else >
+                </b-form-select>
+              </b-form-group>
+            </b-col>
+
+          </b-form-row>
+        </b-form>
       </b-tab>
       
       <b-tab title="Custom Attributes">
@@ -344,6 +357,19 @@ export default {
     this.$router.app.selectedMenu="product";
   },
   methods: {
+    getProductFilterOption: function(filter_id){
+      let the_pfo = this.product_filter_options.find(pfo=>{ return pfo.filter_id == filter_id;});
+      if(!the_pfo){
+        //lazy init.
+        the_pfo = {
+          product_id: this.product.id,
+          filter_id: filter_id,
+          filter_option_id: null
+        };
+        this.product_filter_options.push(the_pfo);
+      }
+      return the_pfo;
+    },
     loadData : async function(){
       try{
         this.error = null;
@@ -397,7 +423,6 @@ export default {
         this.loading_dependencies = false;
       }
     },
-  
     loadProductFilterOptions : async function(){
       try{
         this.error = null;
@@ -407,7 +432,7 @@ export default {
 
       } catch (err){
         if(err instanceof ApiError){
-          this.error = `Couldn't get product filters. ${err.message}`;
+          this.error = `Couldn't get product filter options. ${err.message}`;
         } else {
           console.error(err);
         }
@@ -426,7 +451,6 @@ export default {
     removeProductFilterOption : function(idx){
       if(idx>=0) this.product_filter_options.splice(idx, 1);
     },
-
     loadProductImages : async function(){
       try{
         this.error = null;
