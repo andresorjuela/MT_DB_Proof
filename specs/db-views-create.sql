@@ -18,3 +18,11 @@ join t_family       f on f.id = p.family_id
 join t_supplier     u on u.id = p.supplier_id
 join t_lifecycle    l on l.id = p.lifecycle_id
 join t_brand        b on b.id = f.brand_id
+
+-- filters and filter options
+create view v_filter_option as 
+select f.category_id, f.id as filter_id, f.name_en as filter_en, f.name_zh as filter_zh, 
+o.id as filter_option_id, o.option_en, o.option_zh
+from t_filter f 
+join t_filter_option o on o.filter_id = f.id
+order by filter_id asc, filter_option_id asc;
