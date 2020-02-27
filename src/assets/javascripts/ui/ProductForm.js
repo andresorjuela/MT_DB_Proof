@@ -265,12 +265,12 @@ export default {
             </b-col>
 
             <b-col cols="2">
-              <b-button @click="removeOemReference(idx)" variant="outline-danger" size="sm">Delete</b-button>
+              <b-button @click="removeProductOemReference(idx)" variant="outline-danger" size="sm">Delete</b-button>
             </b-col>
           </b-form-row>
         </b-form>
         
-        <b-button variant="outline-success" @click="newOemReference" size="sm">Add OEM Reference</b-button>
+        <b-button variant="outline-success" @click="newProductOemReference" size="sm">Add OEM Reference</b-button>
       </b-tab>
 
       <b-tab title="Filters">
@@ -292,6 +292,17 @@ export default {
       
       <b-tab title="Custom Attributes">
         <h5>Custom Attributes</h5>
+        <b-form>
+          <b-form-row>
+            <b-col cols="6" v-for="(attr, idx) in custom_attributes" :key="attr.id" >
+              <b-form-group :label="attr.name_en+':'" label-cols="4" >
+                <b-form-input v-model="getProductCustomAttribute(attr.id).name_en" type="text">
+                </b-form-input>
+              </b-form-group>
+            </b-col>
+
+          </b-form-row>
+        </b-form>
       </b-tab>
 
       <b-tab title="Set">
@@ -309,9 +320,12 @@ export default {
       error: null,
       busy: false,
       loading_dependencies: false,
+
+      custom_attributes: [],
       filters: [], //options will also be loaded
       product: null,//actually a product-view
       product_certificates: [],
+      product_custom_attributes: [],
       product_filter_options: [],
       product_images: [],
       product_oem_refs: [],
@@ -348,13 +362,9 @@ export default {
     }
   },
   created: function(){
+    this.$router.app.selectedMenu="product";
     this.loadData();
 
-    //TODO: show tabs once they are all loaded.
-    this.loadProductImages();//default tab.
-    this.loadOemReferences();
-    this.loadProductFilterOptions();
-    this.$router.app.selectedMenu="product";
   },
   methods: {
     getProductFilterOption: function(filter_id){
@@ -370,6 +380,20 @@ export default {
       }
       return the_pfo;
     },
+    getProductCustomAttribute: function(attr_id){
+      let the_pca = this.product_custom_attributes.find(pca=>{ return pca.custom_attribute_id == attr_id;});
+      if(!the_pca){
+        //lazy init.
+        the_pca = {
+          product_id: this.product.id,
+          custom_attribute_id: attr_id,
+          name_en: null,
+          name_zh: null
+        };
+        this.product_custom_attributes.push(the_pca);
+      }
+      return the_pca;
+    },
     loadData : async function(){
       try{
         this.error = null;
@@ -383,9 +407,12 @@ export default {
           || !this.$router.app.product_types ){
           this.$emit('reload');
         }
-        this.families = await Vue.mtapi.getFamilies(this.product.family_id);
-
+        this.families = await Vue.mtapi.getFamiliesForBrand(this.product.brand_id);
+        this.custom_attributes = await Vue.mtapi.getCustomAttributesForCategory(this.product.category_id);
+        
         this.loading_dependencies = true;
+        
+
         
         let tempcerts = await Vue.mtapi.getProductCertificates(this.product.id);
         this.product_certificates = tempcerts.map(v=>{return v.certificate_id});//just the cert ids.
@@ -412,6 +439,12 @@ export default {
           });
         });
 
+        this.loadProductImages();//default tab.
+        this.loadProductOemReferences();
+        this.loadProductFilterOptions();
+        this.loadProductCustomAttributes();
+        
+
       } catch (err){
         if(err instanceof ApiError){
           this.error = `Couldn't get product. ${err.message}`;
@@ -421,6 +454,23 @@ export default {
       } finally {
         this.busy = false;
         this.loading_dependencies = false;
+      }
+    },
+    loadProductCustomAttributes : async function(){
+      try{
+        this.error = null;
+        this.message = null;
+        this.busy = true;
+        this.product_custom_attributes = await Vue.mtapi.getProductCustomAttributes(this.$route.params.id);
+
+      } catch (err){
+        if(err instanceof ApiError){
+          this.error = `Couldn't get product custom attributes. ${err.message}`;
+        } else {
+          console.error(err);
+        }
+      } finally {
+        this.busy = false;
       }
     },
     loadProductFilterOptions : async function(){
@@ -479,7 +529,7 @@ export default {
     removeProductImage : function(idx){
       if(idx>=0) this.product_images.splice(idx, 1);
     },
-    loadOemReferences : async function(){
+    loadProductOemReferences : async function(){
       try{
         this.error = null;
         this.message = null;
@@ -496,7 +546,7 @@ export default {
         this.busy = false;
       }
     },
-    newOemReference : function(){
+    newProductOemReference : function(){
       this.product_oem_refs.push({
         id: null,
         product_id: this.product.id,
@@ -504,7 +554,7 @@ export default {
         name: ""
       });
     },
-    removeOemReference : function(idx){
+    removeProductOemReference : function(idx){
       if(idx>=0) this.product_oem_refs.splice(idx, 1);
     },
     onSubmit: async function(){

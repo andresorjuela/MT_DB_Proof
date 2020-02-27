@@ -225,7 +225,7 @@ async function deleteMatching(req, res, next) {
  *  query_options: {limit: 10000, order_by: [...]}
  * }
  */
-function parseQueryOptions(req, default_orderby, allowed_query_fields, default_limit){
+function parseQueryOptions(req, allowed_query_fields, default_orderby, default_limit){
   let query = req.query;
   let query_options = {
     limit: default_limit || 10000,

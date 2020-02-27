@@ -5,9 +5,7 @@ let { fetchOne, fetchById, fetchMany, parseQueryOptions } = require('../middlewa
 
 
 router.get('/', function (req, res, next) {
-  let q = parseQueryOptions(req, 
-    ['+family_code', '+id'],['id', 'brand_id', 'technology_id', 'family_connector_code', 'family_code'],
-    1000);
+  let q = parseQueryOptions(req, ['id', 'brand_id', 'technology_id', 'family_connector_code', 'family_code'], ['+family_code', '+id'], 1000);
      
   res.locals.dbInstructions = {
     dao: req.app.locals.Database.Family(),

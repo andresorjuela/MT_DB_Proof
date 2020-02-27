@@ -20,8 +20,18 @@ export class Api{
     let result = await this._get(`${this.base_url}/certificates`, {limit:1000, order_by:'+name_en'});
     return result.certificates;
   }
+  async getCustomAttributesForCategory(category_id){
+    let query = {category_id: category_id, limit:1000, order_by:'+category_id,+name_en'};
+    let result = await this._get(`${this.base_url}/custom_attributes`, query);
+    return result.custom_attributes;
+  }
   async getFamilies(){
     let result = await this._get(`${this.base_url}/families`, {limit:10, order_by:'+family_code'});
+    return result.families;
+  }
+  async getFamiliesForBrand(brand_id){
+    let query = {brand_id: brand_id, limit:100, order_by:'+family_code'};
+    let result = await this._get(`${this.base_url}/families`, query);
     return result.families;
   }
   async getFamily(id){
@@ -52,6 +62,10 @@ export class Api{
   async getProductCertificates(id){
     let result =  await this._get(`${this.base_url}/products/${id}/certificates`);
     return result.product_certificates;
+  }
+  async getProductCustomAttributes(id){
+    let result =  await this._get(`${this.base_url}/products/${id}/custom_attributes`);
+    return result.product_custom_attributes;
   }
   async getProductFamilies(id){
     let result =  await this._get(`${this.base_url}/products/${id}/families`);

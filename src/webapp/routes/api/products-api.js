@@ -5,10 +5,7 @@ let { fetchOne, fetchById, fetchMany, deleteMatching, parseQueryOptions } = requ
 
 /* GET checks if service is online */
 router.get('/', function (req, res, next) {
-  let q = parseQueryOptions(req, 
-    ['+name_en', '+id'],
-    ['product_id', 'name_en', 'name_zh'],
-    1000);
+  let q = parseQueryOptions(req, ['product_id', 'name_en', 'name_zh'], ['+name_en', '+id'], 1000);
 
   res.locals.dbInstructions = {
     dao: req.app.locals.Database.Product(),
@@ -32,6 +29,15 @@ router.get('/:product_id', function (req, res, next) {
 router.get('/:product_id/certificates', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.Database.ProductCertificate(),
+    query: {product_id: req.params.product_id},
+    //query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
+router.get('/:product_id/custom_attributes', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductCustomAttribute(),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   }
