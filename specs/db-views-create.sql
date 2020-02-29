@@ -12,12 +12,12 @@ p.weight, p.warranty_duration_months, p.tags,
 p.lifecycle_id, l.name_en as lifecycle_en, l.name_zh as lifecycle_zh,
 p.created, p.updated, p.version
 from t_product p
-join t_product_type t on t.id = p.product_type_id
 join t_category     c on c.id = p.category_id
 join t_family       f on f.id = p.family_id
-join t_supplier     u on u.id = p.supplier_id
-join t_lifecycle    l on l.id = p.lifecycle_id
-join t_brand        b on b.id = f.brand_id
+left outer join t_product_type t on t.id = p.product_type_id
+left outer join t_supplier     u on u.id = p.supplier_id
+left outer join t_lifecycle    l on l.id = p.lifecycle_id
+left outer join t_brand        b on b.id = f.brand_id;
 
 -- filters and filter options
 create view v_filter_option as 
