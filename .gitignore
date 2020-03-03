@@ -75,3 +75,5 @@ development.env
 test.env
 
 src/assets/javascripts/env.js
+
+test.js
