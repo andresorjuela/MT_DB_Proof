@@ -1,6 +1,5 @@
 'use strict'
 import { ApiError } from "../Api.js";
-
 export default {
   template: /*html*/
   `
@@ -10,6 +9,7 @@ export default {
   <div class="p-1 pt-2 d-flex justify-content-between bg-light">
     <span>
       <span class="h5" v-cloak v-if="product">Editing Product: ID = {{product.id}}</span>
+      <span class="h5" v-cloak v-else-if="busy"></span>
       <span class="h5" v-cloak v-else >Adding new Product</span>
     </span>
     <span v-show="busy || loading_dependencies"  >
@@ -80,11 +80,9 @@ export default {
 
     <b-form-row>
       <b-col cols="5">
-        <b-form-group id="g_p_oem" label="Manufacturer:" label-for="p_manufacturer" label-cols="4" >
-          <b-form-select id="p_manufacturer" v-model="product.brand_id" :options="$router.app.brands" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" >
-          </b-form-select>
-          <b-form-select id="p_manufacturer" v-model="product.brand_id" :options="$router.app.brands" value-field="id" text-field="name_en" v-else >
-          </b-form-select>
+        <b-form-group id="g_p_oem" label="Manufacturer:"  label-cols="4" class="pb-1"  >
+          <b-form-input v-if="$router.app.lang==='zh'" v-model="product.brand_zh" readonly ></b-form-input>
+          <b-form-input v-else v-model="product.brand_en" readonly></b-form-input>
         </b-form-group>
       </b-col>
       <b-col>
@@ -107,6 +105,7 @@ export default {
           <b-form-select id="p_family" v-model="product.family_id" :options="this.families" value-field="id" text-field="family_code" :disabled="busy || loading_dependencies" >
           </b-form-select>
         </b-form-group>
+        <!-- <mt-family-search family_id="product.family_id"></mt-family-search> -->
       </b-col>
       <b-col cols="3">
         <b-form-group id="g_p_warranty" description="months duration" label="Warranty:" label-for="p_warranty" label-align="right" label-cols="4" >
@@ -124,7 +123,7 @@ export default {
 
     <b-form-row>
       <b-col cols="3">
-        <b-form-group id="g_p_lifecycle" label="Lifecycle:" label-for="p_lifecycle" label-align="right" label-cols="4" >
+        <b-form-group id="g_p_lifecycle" label="Lifecycle:" label-for="p_lifecycle" label-cols="4" >
           <b-form-select id="p_lifecycle" v-model="product.lifecycle_id" :options="$router.app.lifecycles" value-field="id" text-field="name_en">
           </b-form-select>
         </b-form-group>

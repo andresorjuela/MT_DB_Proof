@@ -2,6 +2,7 @@ import env from "../env.js";
 import {Api} from "../Api.js";
 import {storageAvailable} from "../Global.js";
 import router from  "./ProductsAppRouter.js";
+import FamilySearch from "./comp/FamilySearch.js";
 
 Vue.use(new Api(env().API_BASE_URL));
 
@@ -91,3 +92,5 @@ var app = new Vue({
     }
   }
 }).$mount('#app');
+
+Vue.component('mt-family-search', FamilySearch);
