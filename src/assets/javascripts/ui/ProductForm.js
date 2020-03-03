@@ -12,10 +12,12 @@ export default {
       <span class="h5" v-cloak v-else-if="busy"></span>
       <span class="h5" v-cloak v-else >Adding new Product</span>
     </span>
-    <span v-show="busy || loading_dependencies"  >
+    <span v-show="busy"  >
       <b-spinner small variant="secondary" />
       <span>loading...</span>
     </span>
+    <b-button small variant="outline-success" @click="saveProduct" :disabled="busy">Save</b-button>
+
   </div>
 
   <b-form @submit="onSubmit" v-if="product">
@@ -102,7 +104,7 @@ export default {
     <b-form-row>
       <b-col cols="4">
         <b-form-group id="g_p_family" label="Family:" label-for="p_family" label-cols="4" >
-          <b-form-select id="p_family" v-model="product.family_id" :options="this.families" value-field="id" text-field="family_code" :disabled="busy || loading_dependencies" >
+          <b-form-select id="p_family" v-model="product.family_id" :options="this.families" value-field="id" text-field="family_code" :disabled="busy" >
           </b-form-select>
         </b-form-group>
         <!-- <mt-family-search family_id="product.family_id"></mt-family-search> -->
@@ -115,7 +117,7 @@ export default {
       </b-col>
       <b-col cols="5">
         <b-form-group id="g_p_certificates" label="Certificates:" label-for="p_certificates" label-cols="3" >
-          <b-form-checkbox-group id="p_certficates" v-model="product_certificates" :options="$router.app.certificates" value-field="id" text-field="name_en" :disabled="busy || loading_dependencies" >
+          <b-form-checkbox-group id="p_certficates" v-model="product_certificates" :options="$router.app.certificates" value-field="id" text-field="name_en" :disabled="busy" >
           </b-form-checkbox-group>       
         </b-form-group>
       </b-col>
@@ -190,7 +192,7 @@ export default {
     <b-form-row>
       <b-col cols="6">
         <b-form-group id="g_p_family_connects" label="Related Families:" label-for="p_family_connects" label-align="left" label-cols="4" >
-          <b-form-select id="p_family_connects" v-model="family_connects" :disabled="busy || loading_dependencies" :options="families"  text-field="family_code" value-field="id"  :select-size="4" multiple>
+          <b-form-select id="p_family_connects" v-model="family_connects" :disabled="busy" :options="families"  text-field="family_code" value-field="id"  :select-size="4" multiple>
             <template v-slot:first>
               <b-form-select-option :value="null">-- choose --</b-form-select-option>
             </template>
@@ -317,9 +319,8 @@ export default {
     return {
       message: null,
       error: null,
-      busy: false,
-      loading_dependencies: false,
-
+      in_process: 0,
+     
       custom_attributes: [],
       filters: [], //options will also be loaded
       product: null,//actually a product-view
@@ -335,6 +336,9 @@ export default {
   },
   //props: {},
   computed: {
+    busy: function(){ return this.in_process > 0;},
+    hasError: function(){ return this.error?true:false; },
+    hasMessage: function(){ return this.message?true:false; },
     family_connections: function(){
       if(!this.family_connects) return "";
       return this.family_connects
@@ -397,8 +401,9 @@ export default {
       try{
         this.error = null;
         this.message = null;
-        this.busy = true;
+        this.in_process++;
         this.product = await Vue.mtapi.getProductView(this.$route.params.id);
+        
         this.product_tags = this.product.tags ? this.product.tags.split() : [];
         if(!this.$router.app.categories 
           || !this.$router.app.certificates
@@ -406,12 +411,9 @@ export default {
           || !this.$router.app.product_types ){
           this.$emit('reload');
         }
+        
         this.families = await Vue.mtapi.getFamiliesForBrand(this.product.brand_id);
         this.custom_attributes = await Vue.mtapi.getCustomAttributesForCategory(this.product.category_id);
-        
-        this.loading_dependencies = true;
-        
-
         
         let tempcerts = await Vue.mtapi.getProductCertificates(this.product.id);
         this.product_certificates = tempcerts.map(v=>{return v.certificate_id});//just the cert ids.
@@ -442,7 +444,7 @@ export default {
         this.loadProductOemReferences();
         this.loadProductFilterOptions();
         this.loadProductCustomAttributes();
-        
+        this.in_process--;
 
       } catch (err){
         if(err instanceof ApiError){
@@ -451,8 +453,7 @@ export default {
           console.error(err);
         }
       } finally {
-        this.busy = false;
-        this.loading_dependencies = false;
+        this.in_process = 0;
       }
     },
     loadProductCustomAttributes : async function(){
@@ -556,8 +557,17 @@ export default {
     removeProductOemReference : function(idx){
       if(idx>=0) this.product_oem_refs.splice(idx, 1);
     },
-    onSubmit: async function(){
-
+    saveProduct: async function(){
+      this.in_process++;
+      try{
+        
+        this.in_process--
+      }catch(ex){
+        this.message = "Error saving product.";
+        this.error = ex.message; 
+      }finally{
+        this.in_process = 0;
+      }
     }
   }
 };

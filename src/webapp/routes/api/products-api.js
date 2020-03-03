@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchOne, fetchById, fetchMany, deleteMatching, parseQueryOptions } = require('../middleware/db-api');
+let { fetchOne, fetchById, fetchMany, deleteMatching, parseQueryOptions, updateById, create, saveAll } = require('../middleware/db-api');
 
 /* GET checks if service is online */
 router.get('/', function (req, res, next) {
@@ -25,6 +25,33 @@ router.get('/:product_id', function (req, res, next) {
 
 }, fetchById);
 
+
+/** Create a product */
+router.post('/:product_id', function (req, res, next) {
+
+  let entity = req.body;
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.Product(),
+    toCreate: entity
+  }
+  next();
+
+}, create);
+
+
+/** Update a product */
+router.put('/:product_id', function (req, res, next) {
+
+  let entity = req.body;
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.Product(),
+    toUpdate: entity
+  }
+  next();
+
+}, updateById);
+
+
 // Get all product certificates
 router.get('/:product_id/certificates', function (req, res, next) {
   res.locals.dbInstructions = {
@@ -34,6 +61,18 @@ router.get('/:product_id/certificates', function (req, res, next) {
   }
   next();
 }, fetchMany);
+
+/** Saves product certificates */
+router.post('/:product_id/certificates', function (req, res, next) {
+  
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductCertificate(),
+    toSave: req.body, //assuming an array
+    query: {product_id: req.params.product_id},
+    comparison: function(v){ return v.certificate_id; }
+  };
+  next();
+}, saveAll);
 
 router.get('/:product_id/custom_attributes', function (req, res, next) {
   res.locals.dbInstructions = {

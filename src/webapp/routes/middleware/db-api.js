@@ -67,7 +67,7 @@ async function fetchMany(req, res, next) {
   try {
     let dbi = res.locals.dbInstructions;
     if (_.isEmpty(dbi)) {
-      res.status(400).end();
+      res.status(400).json({ message: "No db instructions given." });
       return;
     }
     if (_.isEmpty(dbi.query) &&
@@ -127,6 +127,57 @@ async function save(req, res, next) {
   } catch (ex) {
     next(ex);
   }
+}
+
+
+/**
+ * Handles a request to replace an array of entities with anew
+ * array of entities. This operation does NOT delete all old 
+ * insert all new. Instead, it determines which existing
+ * entries are different 
+ * 
+ * expected res.locals.dbInstructions:
+ * @example {
+ *   dao: {}            // the dao you're working with.
+ *   query: {}          // the query to find the entities
+ *   query_options: {}  // (optional) any query options
+ *   toSave: []         // the new array values that should replace the results of the query
+ *   comparison: function(v){ return v.product_id}  // comparison function that identifies new vs. existing records (parameter is the value of the array)
+ * }
+ */
+async function saveAll(req, res, next){
+  try{
+    let dbi = res.locals.dbInstructions;
+    if (_.isEmpty(dbi)) {
+      res.status(400).json({ message: "No db instructions given." });
+      return;
+    }
+    if (_.isEmpty(dbi.query) &&
+      (_.isEmpty(dbi.query_options)
+        || _.isEmpty(dbi.query_options.limit)
+        || (dbi.query_options.limit * 1 <= 0 || dbi.query_options.limit * 1 > 10000))) {
+      res.status(400).json({ message: "If no query criteria are provided, a valid limit parameter must be provided." });
+      return;
+    }
+    //Get array of existing entities
+    let existing = await dbi.dao.find(dbi.query, dbi.query_options);
+
+    //Determine what should be added or removed.
+    let shared = _.intersectionBy(existing, dbi.toSave, dbi.comparison );
+    let delete_these = _.xorBy(existing, shared, dbi.comparison );
+    let create_these = _.xorBy(dbi.toSave, shared, dbi.comparison );
+
+    //Deletes
+    let deleted = await Promise.all( delete_these.map( function(entity){ return dbi.dao.deleteOne(entity); } ) );
+    //Creates
+    let created = await Promise.all( create_these.map( function(entity){ return dbi.dao.create(entity);    } ) );
+
+    res.status(200).json(_.concat(shared, create_these));//return the objects which exist
+  } catch (ex){
+    next(ex);
+  }
+  
+
 }
 
 
@@ -254,6 +305,7 @@ module.exports.fetchMany = fetchMany;
 module.exports.create = create;
 module.exports.updateById = updateById;
 module.exports.save = save;
+module.exports.saveAll = saveAll;
 module.exports.deleteById = deleteById;
 module.exports.deleteMatching = deleteMatching;
 
