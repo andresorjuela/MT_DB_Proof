@@ -63,6 +63,16 @@ export class Api{
     let result =  await this._get(`${this.base_url}/products/${id}/certificates`);
     return result.product_certificates;
   }
+  async saveProductCertificates(product_id, certificate_ids){
+    let payload = certificate_ids.map(cid=>{ 
+      return {
+        product_id: product_id,
+        certificate_id: cid
+      };
+    });
+    return await this._post(`${this.base_url}/products/${product_id}/certificates`, payload);
+  }
+
   async getProductCustomAttributes(id){
     let result =  await this._get(`${this.base_url}/products/${id}/custom_attributes`);
     return result.product_custom_attributes;

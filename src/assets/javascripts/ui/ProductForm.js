@@ -641,11 +641,12 @@ export default {
         
         await this.saveProduct();
         
-        await this.saveProductFamilies();
-        // product_certificates: [],
+        await Promise.all([
+          this.saveProductFamilies(),
+          this.saveProductCertificates(),
+        ]) 
         // product_oem_refs: [],
-        // product_tags: [],
-      
+        
         // product_images: null, 
         // product_custom_attributes: null,
         // product_filter_options: null
@@ -664,6 +665,19 @@ export default {
         
       }catch(ex){
         this.message = "Error saving product.";
+        this.error = ex.message; 
+      }finally{
+        this.in_process--;
+        this.message="";
+      }
+    },
+    saveProductCertificates: async function(){
+      this.in_process++;
+      this.message="Saving certificates..."
+      try{
+        await Vue.mtapi.saveProductCertificates(this.product.id, this.product_certificates);
+      }catch(ex){
+        this.message = "Error saving certificates.";
         this.error = ex.message; 
       }finally{
         this.in_process--;
