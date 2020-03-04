@@ -4,8 +4,20 @@ export default {
   template: /*html*/
   `
 <div class="mt-1" v-cloak>
-  <b-alert :show="!busy && hasError" variant="danger">{{ error }}</b-alert>
   
+  <b-row no-gutters class="bg-light" align-v="center">
+    <b-col class="pl-2" >
+      <span v-cloak class="h5" v-if="product && product.id">Editing Product: ID = {{product.id}}</span>
+    </b-col>
+    <b-col>
+      <b-spinner small variant="secondary" v-if="busy"/>
+      <span class="p2 text-info" v-if="hasMessage" variant="info">{{ message }}</span>
+      <span class="p2 text-danger" v-if="!busy && hasError" variant="danger">{{ error }}</span>
+    </b-col>
+    <b-col class="text-right">
+      <b-button small variant="success" @click="saveAllProductData" :disabled="busy" v-show="!init_product">Save</b-button>
+    </b-col>
+  </b-row>
 
   <b-form v-if="init_product">
     <b-form-row>
@@ -20,30 +32,12 @@ export default {
           <b-form-select v-model="product.category_id" :options="$router.app.brands" value-field="id" text-field="name_en" ></b-form-select>
         </b-form-group>
       </b-col>
-    </b-form-row>
-    <b-form-row>
       <b-col>
-        <b-button variant="success" @click="selectProductCategory">Select</b-button>
+        <b-button variant="success" @click="selectProductCategory">Continue</b-button>
       </b-col>
     </b-form-row>
   </b-form>
-
-  <b-row no-gutters class="bg-light" v-if="!init_product" align-v="center">
-    <b-col class="pl-2" >
-      <span v-cloak class="h5" v-if="product && product.id">Editing Product: ID = {{product.id}}</span>
-      <span v-cloak class="h5" v-else-if="product" >Adding new Product</span>
-    </b-col>
-    <b-col>
-      <span v-if="hasMessage" variant="info">{{ message }}</span>
-      <b-spinner small variant="secondary" v-if="busy"/>
-    </b-col>
-    <b-col class="text-right">
-      <b-button small variant="success" @click="saveAllProductData" :disabled="busy">Save</b-button>
-    </b-col>
-  </b-row>
-
   
-
   <b-form v-if="product && !init_product">
     <b-form-row>
       <b-col cols="5">
@@ -399,7 +393,6 @@ export default {
   created: async function(){
     this.$router.app.selectedMenu="product";
     if(this.$route.params.id){
-      this.message = "Loading...";
       await this.loadData();
     } else {
       this.init_product = true;
@@ -449,11 +442,12 @@ export default {
     },
     loadData : async function(){
       try{
+        this.message = "Loading...";
         this.error = null;
         
         await this.loadProduct();
-        this.product_tags = this.product.tags ? this.product.tags.split(",") : [];
         
+        this.message = "Loading product dependencies...";
         await Promise.all([
           this.loadCustomAttributesForCategory(),
           this.loadProductCertificates(),
@@ -469,10 +463,8 @@ export default {
           this.$emit('reload');
         }
         
-        
         this.loadProductImages();//default tab.
-        this.in_process--;
-
+        
       } catch (err){
         if(err instanceof ApiError){
           this.error = `Couldn't load product data. ${err.message}`;
@@ -480,11 +472,13 @@ export default {
           this.error = `Couldn't load product data.`;
           console.error(err);
         }
-      } 
+      }
     },
     loadFilterOptionViewsForCategory : async function(){
       try{
         this.in_process++;
+        this.message = "Loading filter options...";
+
         let filter_option_views = await Vue.mtapi.getFilterOptionViewsForCategory(this.product.category_id);
         filter_option_views.forEach(fov=>{
           let filter = this.filters.find(f=>{ return f.filter_id == fov.filter_id; });
@@ -507,19 +501,24 @@ export default {
 
       }catch(ex){
         console.error(ex);
-        this.error="Couldn't load filter options for this category.";
+        this.error="Couldn't load filter options.";
       } finally {
+        this.message = null;
         this.in_process--;
       }
     },
     loadProduct : async function(){
       try{
         this.in_process++;
+        this.message="Loading...";
         this.product = await Vue.mtapi.getProductView(this.$route.params.id);
+        this.product_tags = this.product.tags ? this.product.tags.split(",") : [];
+        
       }catch(ex){
         console.error(ex);
         this.error="Couldn't load product.";
       } finally {
+        this.message = null;
         this.in_process--;
       }
     },
@@ -533,6 +532,7 @@ export default {
         console.error(ex);
         this.error="Couldn't load product certificates.";
       } finally {
+        this.message = null;
         this.in_process--;
       }
     },
@@ -540,7 +540,7 @@ export default {
       if(this.product_custom_attributes!==null) return;//Otherwise server overwrites work
       try{
         this.error = null;
-        this.message = null;
+        this.message = "Loading custom attributes...";
         this.in_process++;
         this.product_custom_attributes = await Vue.mtapi.getProductCustomAttributes(this.$route.params.id);
 
@@ -551,12 +551,14 @@ export default {
           console.error(err);
         }
       } finally {
+        this.message = null;
         this.in_process--;
       }
     },
     loadProductFamilies : async function(){
       try{
         this.in_process++;
+        this.message = "Loading families...";
         let tempfamilyconns = await Vue.mtapi.getProductFamilies(this.product.id);
         this.family_connects = tempfamilyconns.map(v=>{return v.family_id});//just the family ids.
 
@@ -564,6 +566,7 @@ export default {
         console.error(ex);
         this.error="Couldn't load product families.";
       } finally {
+        this.message = null;
         this.in_process--;
       }
     },
@@ -571,7 +574,7 @@ export default {
       if(this.product_filter_options!==null) return;//Otherwise server overwrites work
       try{
         this.error = null;
-        this.message = null;
+        this.message = "Loading filter options...";
         this.in_process++;
         this.product_filter_options = await Vue.mtapi.getProductFilterOptions(this.$route.params.id);
 
@@ -582,6 +585,7 @@ export default {
           console.error(err);
         }
       } finally {
+        this.message = null;
         this.in_process--;
       }
     },
@@ -589,7 +593,7 @@ export default {
       if(this.product_images!==null) return;//Otherwise server overwrites work
       try{
         this.error = null;
-        this.message = null;
+        this.message = "Loading images...";  
         this.in_process++;
         this.product_images = await Vue.mtapi.getProductImages(this.$route.params.id);
 
@@ -600,6 +604,7 @@ export default {
           console.error(err);
         }
       } finally {
+        this.message="";
         this.in_process--;
       }
     },
@@ -607,18 +612,19 @@ export default {
       if(this.product_oem_refs!==null) return;//Otherwise server overwrites work
       try{
         this.error = null;
-        this.message = null;
+        this.message = "Loading OEMs...";
         this.in_process++;
         this.product_oem_refs = await Vue.mtapi.getProductOemReferences(this.$route.params.id);
 
       } catch (err){
         if(err instanceof ApiError){
-          this.error = `Couldn't get product OEM references. ${err.message}`;
+          this.error = `Couldn't get product OEMs. ${err.message}`;
         } else {
           console.error(err);
         }
       } finally {
         this.in_process--;
+        this.message="";
       }
     },
     newProductFilterOption : function(){
@@ -674,27 +680,33 @@ export default {
     },
     saveProduct: async function(){
       this.in_process++;
+      this.message="Saving product..."
       try{
         this.product.tags = this.product_tags && this.product_tags.length > 0 ? this.product_tags.join(",") : "";
-        await Vue.mtapi.saveProduct(this.product);
+        this.product = await Vue.mtapi.saveProduct(this.product);
         
       }catch(ex){
         this.message = "Error saving product.";
         this.error = ex.message; 
       }finally{
         this.in_process--;
+        this.message="";
       }
     },
     selectProductCategory : async function(){
       this.in_process++;
+      this.message="Saving..."
       try{
         this.product = await this.saveProduct()
         this.init_product=false;
+        await this.loadData();
+
       }catch(ex){
         this.message = "Error saving initial product.";
         this.error = ex.message; 
       }finally{
         this.in_process--;
+        this.message="";
       }
     }
   }

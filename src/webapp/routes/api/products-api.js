@@ -93,6 +93,16 @@ router.get('/:product_id/families', function (req, res, next) {
   next();
 }, fetchMany);
 
+/** Save all product family connections. */
+router.post('/:product_id/families', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductFamily(),
+    query: {product_id: req.params.product_id},
+    //query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
 router.get('/:product_id/filter_options', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.Database.ProductFilterOptionView(),

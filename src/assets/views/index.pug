@@ -7,10 +7,10 @@ block content
           img(src=`${process.env.STATIC_ASSETS_PATH}/images/logo_1.jpg` width="200px")
       b-col(cols="8")
         b-nav(variant="light" justified tabs)
-          b-nav-item(href="#" to="/product" :active="selectedMenu==='product'") Product
-          b-nav-item(href="#" to="/family" :active="selectedMenu==='family'") Family
-          b-nav-item(href="#" to="/equipment" :active="selectedMenu==='equipment'") Equipment
-          b-nav-item(href="#" to="/group" :active="selectedMenu==='group'") Group
+          b-nav-item(to="/product" :active="selectedMenu==='product'") Product
+          b-nav-item(to="/family" :active="selectedMenu==='family'") Family
+          b-nav-item(to="/equipment" :active="selectedMenu==='equipment'") Equipment
+          b-nav-item(to="/group" :active="selectedMenu==='group'") Group
         b-form
           b-form-input#primary_search(placeholder="Search")
         
@@ -19,9 +19,9 @@ block content
     b-row
       b-col
         b-nav(variant="light" vertical class="w-100")
-          b-nav-item(href="#" to="/product/add") Add Product
-          b-nav-item(href="#" to="/family/add") Add Family
-          b-nav-item(href="#" to="/equipment/add") Add Equipment
+          b-nav-item(to="/product/new" active) Add Product
+          b-nav-item(to="/family/new" active) Add Family
+          b-nav-item(to="/equipment/new" active) Add Equipment
       b-col(cols="10")
         //- route outlet
         //- component matched by the route will render here
