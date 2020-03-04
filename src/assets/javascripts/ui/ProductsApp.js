@@ -20,6 +20,7 @@ var app = new Vue({
     brands: [],
     categories: [],
     certificates: [],
+    families: [],
     image_types: [],
     lifecycles: [],
     product_types: [],
@@ -36,6 +37,7 @@ var app = new Vue({
     this.brands = Vue.storage.getBrands();
     this.categories = Vue.storage.getCategories();
     this.certificates = Vue.storage.getCertificates();
+    this.families = Vue.storage.getFamilies();
     this.image_types = Vue.storage.getImageTypes();
     this.lifecycles = Vue.storage.getLifecycles();
     this.product_types = Vue.storage.getProductTypes()
@@ -44,6 +46,7 @@ var app = new Vue({
     if(this.brands.length===0 ||
        this.categories.length===0 || 
        this.certificates.length===0 || 
+       this.families.length===0 || 
        this.image_types.length===0 || 
        this.lifecycles.length===0 || 
        this.product_types.length===0 || 
@@ -86,11 +89,25 @@ var app = new Vue({
       try{
         this.certificates = await Vue.mtapi.getCertificates();
         if(this.certificates){
-          Vue.storage.setCategories(this.certificates);
+          Vue.storage.setCertificates(this.certificates);
         }
       }catch(ex){
         console.error(ex);
         this.error = "Error loading certificates.";
+      } finally{
+        this.in_process--;
+      }
+    },
+    loadFamilies: async function(){
+      this.in_process++;
+      try{
+        this.families = await Vue.mtapi.getFamilies();
+        if(this.families){
+          Vue.storage.setFamilies(this.families);
+        }
+      }catch(ex){
+        console.error(ex);
+        this.error = "Error loading families.";
       } finally{
         this.in_process--;
       }
@@ -100,7 +117,7 @@ var app = new Vue({
       try{
         this.image_types = await Vue.mtapi.getImageTypes();
         if(this.image_types){
-          Vue.storage.setCategories(this.image_types);
+          Vue.storage.setImageTypes(this.image_types);
         }
       }catch(ex){
         console.error(ex);
@@ -142,7 +159,7 @@ var app = new Vue({
       try{
         this.suppliers = await Vue.mtapi.getSuppliers();
         if(this.suppliers){
-          Vue.storage.setCategories(this.suppliers);
+          Vue.storage.setSuppliers(this.suppliers);
         }
       }catch(ex){
         console.error(ex);
@@ -157,6 +174,7 @@ var app = new Vue({
           this.loadBrands(),
           this.loadCategories(),
           this.loadCertificates(),
+          this.loadFamilies(),
           this.loadImageTypes(),
           this.loadLifecycles(),
           this.loadProductTypes(),

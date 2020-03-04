@@ -32,7 +32,7 @@ router.post('/', function (req, res, next) {
   let entity = req.body;
   res.locals.dbInstructions = {
     dao: req.app.locals.Database.Product(),
-    toCreate: entity
+    toSave: entity
   }
   next();
 

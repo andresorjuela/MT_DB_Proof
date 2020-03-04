@@ -98,9 +98,9 @@ export class Api{
   
   async saveProduct(product){
     if(product.id){
-      return await this._put(`${this.base_url}/product/${product.id}`,product);
+      return await this._put(`${this.base_url}/products/${product.id}`,product);
     } else {
-      return await this._post(`${this.base_url}/product/`,product);
+      return await this._post(`${this.base_url}/products`,product);
     }
   }
   //common methods.

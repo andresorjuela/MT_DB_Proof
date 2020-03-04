@@ -6,7 +6,29 @@ export default {
 <div class="mt-1" v-cloak>
   <b-alert v-if="!busy && error" variant="danger">{{ error }}</b-alert>
   <b-alert v-if="!busy && message" variant="info">{{ message }}</b-alert>
-  <div class="p-1 pt-2 d-flex justify-content-between bg-light">
+
+  <b-form v-if="init_product">
+    <b-form-row>
+      <b-col>
+        <h3>Adding a new product.</h3>
+        <p>To add a new product you must first select a Category.</p>
+      </b-col>
+    </b-form-row>
+    <b-form-row>
+      <b-col>
+        <b-form-group label="Category:"  label-cols="4" class="pb-1"  >
+          <b-form-select v-model="product.category_id" :options="$router.app.brands" value-field="id" text-field="name_en" ></b-form-select>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
+    <b-form-row>
+      <b-col>
+        <b-button variant="success" @click="selectProductCategory">Select</b-button>
+      </b-col>
+    </b-form-row>
+  </b-form>
+
+  <div class="p-1 pt-2 d-flex justify-content-between bg-light" v-if="!init_product">
     <span>
       <span class="h5" v-cloak v-if="product">Editing Product: ID = {{product.id}}</span>
       <span class="h5" v-cloak v-else-if="busy"></span>
@@ -20,29 +42,7 @@ export default {
 
   </div>
 
-  <b-form v-if="init_product">
-    <b-form-row>
-      <b-col>
-        <h3>Adding a new product.</h3>
-        <p>To add a new product you must first select a Category and a Family.</p>
-      </b-col>
-    </b-form-row>
-    <b-form-row>
-      <b-col>
-        <b-form-group label="Category:"  label-cols="4" class="pb-1"  >
-          <b-form-select v-model="product.category_id" :options="$router.app.brands" value-field="id" text-field="name_en" ></b-form-input>
-        </b-form-group>
-      </b-col>
-    </b-form-row>
-    <b-form-row>
-      <b-col>
-        <b-form-group label="Family:"  label-cols="4" class="pb-1"  >
-          <b-form-select v-model="product.family_id" :options="$router.app.families" value-field="id" text-field="family_code" ></b-form-input>
-        </b-form-group>
-      </b-col>
-    </b-form-row>
-    
-  </b-form>
+  
 
   <b-form v-if="product && !init_product">
     <b-form-row>
@@ -128,7 +128,7 @@ export default {
     <b-form-row>
       <b-col cols="4">
         <b-form-group id="g_p_family" label="Family:" label-for="p_family" label-cols="4" >
-          <b-form-select id="p_family" v-model="product.family_id" :options="this.families" value-field="id" text-field="family_code" :disabled="busy" >
+          <b-form-select id="p_family" v-model="product.family_id" :options="$router.app.families" value-field="id" text-field="family_code" :disabled="busy" >
           </b-form-select>
         </b-form-group>
         <!-- <mt-family-search family_id="product.family_id"></mt-family-search> -->
@@ -216,7 +216,7 @@ export default {
     <b-form-row>
       <b-col cols="6">
         <b-form-group id="g_p_family_connects" label="Related Families:" label-for="p_family_connects" label-align="left" label-cols="4" >
-          <b-form-select id="p_family_connects" v-model="family_connects" :disabled="busy" :options="families"  text-field="family_code" value-field="id"  :select-size="4" multiple>
+          <b-form-select id="p_family_connects" v-model="family_connects" :disabled="busy" :options="$router.app.families"  text-field="family_code" value-field="id"  :select-size="4" multiple>
             <template v-slot:first>
               <b-form-select-option :value="null">-- choose --</b-form-select-option>
             </template>
@@ -349,7 +349,6 @@ export default {
 
       custom_attributes: [],
       filters: [], //options will also be loaded
-      families: [],
       family_connects: [],//family ids only
     
       product: null,//actually a product-view
@@ -377,7 +376,7 @@ export default {
       return this.family_connects
         .filter(fid=>{return fid!="";})
         .map(fid=>{
-          let f = this.families.find(v=>{ return v.id === fid });
+          let f = this.$router.app.families.find(v=>{ return v.id === fid });
           if(f) return f.family_code;
         })
         .join(",");
@@ -404,8 +403,7 @@ export default {
     } else {
       this.init_product = true;
       this.product = {
-        category_id: 0,
-        family_id: 0,
+        category_id: 0
       };
     }
   },
@@ -456,7 +454,6 @@ export default {
         await this.loadProduct();
 
         await Promise.all([
-          this.loadFamiliesForBrand(),
           this.loadCustomAttributesForCategory(),
           this.loadProductCertificates(),
           this.loadProductFamilies(),
@@ -484,17 +481,6 @@ export default {
           console.error(err);
         }
       } 
-    },
-    loadFamiliesForBrand: async function(){
-      try{
-        this.in_process++;
-        this.families = await Vue.mtapi.getFamiliesForBrand(this.product.brand_id);
-      }catch(ex){
-        console.error(ex);
-        this.error="Couldn't load families for brand.";
-      } finally {
-        this.in_process--;
-      }
     },
     loadFilterOptionViewsForCategory : async function(){
       try{
@@ -689,10 +675,22 @@ export default {
     saveProduct: async function(){
       this.in_process++;
       try{
-        await Vue.mtapi.saveProduct();
+        await Vue.mtapi.saveProduct(this.product);
         
       }catch(ex){
         this.message = "Error saving product.";
+        this.error = ex.message; 
+      }finally{
+        this.in_process--
+      }
+    },
+    selectProductCategory : async function(){
+      this.in_process++;
+      try{
+        this.product = await this.saveProduct()
+        this.init_product=false;
+      }catch(ex){
+        this.message = "Error saving initial product.";
         this.error = ex.message; 
       }finally{
         this.in_process--
