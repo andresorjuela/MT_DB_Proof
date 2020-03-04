@@ -8,30 +8,53 @@
 require('dotenv').config();
 const path = require('path');
 const fs = require('fs');
-var envslug = process.env.NODE_ENV;
-if(envslug==='production'){
-  envslug = '';
-} else {
-  envslug = '-'+envslug;
+const pug = require('pug');
+
+try{
+
+  generateIndexFile();
+  generateEnvFile();
+  process.exit(0);
+
+} catch(ex){
+  console.error(ex);
+  process.exit(1);
 }
-let outfile = path.join( path.dirname("."), "src", "assets", "javascripts", `env.js`);
 
-//Should NEVER contain sensitive info.
-let these_vars = ["NODE_ENV","API_BASE_URL","STATIC_ASSETS_PATH"];
-let varcontent = ``;
-these_vars.forEach(vname=>{
-  varcontent += `${vname}: "${process.env[vname]}", `
-});
 
-let content =`
-/** Generated environment file **/
+function generateEnvFile(){
+  //Should NEVER contain sensitive info.
+  let allowed_vars = [
+    "NODE_ENV",
+    "API_BASE_URL",
+    "STATIC_ASSETS_PATH"
+  ];
+
+  let outfile = path.join( path.dirname("."), "src", "assets", "javascripts", `env.js`);
+
+  let varcontent = ``;
+  allowed_vars.forEach(vname=>{
+    varcontent += `\t\t${vname}: "${process.env[vname]}",\n`
+  });
+  
+  let content =`
+/** Environment-specific global settings (generated) **/
 export default function(){
-return {
-${varcontent}
+\treturn { 
+${varcontent} 
+\t}
+}`;
+  fs.writeFileSync(outfile,content);
 }
-}
-`;
 
-console.log(content);
-fs.writeFileSync(outfile,content);
-process.exit(0);
+function generateIndexFile(){
+  let templatefile = path.join( path.dirname("."), "src", "assets", "views", `index.pug`);
+  
+  let compiledFunction = pug.compileFile(templatefile);
+  
+  let context = {};
+  
+  let outfile = path.join( path.dirname("."), "src", "assets", `index.html`);
+
+  fs.writeFileSync(outfile, compiledFunction(context) ); 
+}

@@ -1,19 +1,22 @@
 import env from "../env.js";
 import {Api} from "../Api.js";
-import {storageAvailable} from "../Global.js";
+import {Storage} from "../Storage.js"; 
 import router from  "./ProductsAppRouter.js";
 import FamilySearch from "./comp/FamilySearch.js";
 
 Vue.use(new Api(env().API_BASE_URL));
+Vue.use(new Storage());
 
 var app = new Vue({
   el: "#app",
   router: router,
   data:{
-    busy: false,
+    in_process: 0,
     lang: window.navigator.language.substr(0,2),
     error: null,
+    message: null,
     selectedMenu: null,
+
     brands: [],
     categories: [],
     certificates: [],
@@ -22,64 +25,146 @@ var app = new Vue({
     product_types: [],
     suppliers: [],
     warranties: [],
+
   },
-  created: function(){
-    if(!storageAvailable("localStorage")){
-      error = "This app uses browser local storage for better performance. Please enable local storage or use a different browser.";
-      return;
-    } else {
-      this.brands = JSON.parse( window.localStorage.getItem('brands') );
-      this.categories = JSON.parse( window.localStorage.getItem('categories') );
-      this.certificates = JSON.parse( window.localStorage.getItem('certificates') );
-      this.image_types = JSON.parse( window.localStorage.getItem('image_types') );
-      this.lifecycles = JSON.parse( window.localStorage.getItem('lifecycles') );
-      this.product_types = JSON.parse( window.localStorage.getItem('product_types') );
-      this.suppliers = JSON.parse( window.localStorage.getItem('suppliers') );
-    }
-    if(!this.brands ||
-       !this.categories || 
-       !this.certificates || 
-       !this.image_types || 
-       !this.lifecycles || 
-       !this.product_types || 
-       !this.suppliers ){
-      this.reloadData();
+  computed:{
+    busy: function(){return this.in_process>0;},
+    hasError: function(){return this.error?true:false;},
+    hasMessage: function(){return this.message?true:false;},
+  },
+  created: async function(){
+    this.brands = Vue.storage.getBrands();
+    this.categories = Vue.storage.getCategories();
+    this.certificates = Vue.storage.getCertificates();
+    this.image_types = Vue.storage.getImageTypes();
+    this.lifecycles = Vue.storage.getLifecycles();
+    this.product_types = Vue.storage.getProductTypes()
+    this.suppliers = Vue.storage.getSuppliers();
+    
+    if(this.brands.length===0 ||
+       this.categories.length===0 || 
+       this.certificates.length===0 || 
+       this.image_types.length===0 || 
+       this.lifecycles.length===0 || 
+       this.product_types.length===0 || 
+       this.suppliers.length===0 ){
+      await this.reloadData();
     }
     
   },
   methods:{
+    loadBrands: async function(){
+      this.in_process++;
+      try{
+        this.brands = await Vue.mtapi.getBrands();
+        if(this.brands){
+          Vue.storage.setBrands(this.brands);
+        }
+      }catch(ex){
+        console.error(ex);
+        this.error = "Error loading brands.";
+      } finally{
+        this.in_process--;
+      }
+    },
+    loadCategories: async function(){
+      this.in_process++;
+      try{
+        this.categories = await Vue.mtapi.getCategories();
+        if(this.categories){
+          Vue.storage.setCategories(this.categories);
+        }
+      }catch(ex){
+        console.error(ex);
+        this.error = "Error loading categories.";
+      } finally{
+        this.in_process--;
+      }
+    },
+    loadCertificates: async function(){
+      this.in_process++;
+      try{
+        this.certificates = await Vue.mtapi.getCertificates();
+        if(this.certificates){
+          Vue.storage.setCategories(this.certificates);
+        }
+      }catch(ex){
+        console.error(ex);
+        this.error = "Error loading certificates.";
+      } finally{
+        this.in_process--;
+      }
+    },
+    loadImageTypes: async function(){
+      this.in_process++;
+      try{
+        this.image_types = await Vue.mtapi.getImageTypes();
+        if(this.image_types){
+          Vue.storage.setCategories(this.image_types);
+        }
+      }catch(ex){
+        console.error(ex);
+        this.error = "Error loading image type.";
+      } finally{
+        this.in_process--;
+      }
+    },
+    loadLifecycles: async function(){
+      this.in_process++;
+      try{
+        this.lifecycles = await Vue.mtapi.getLifecycles();
+        if(this.lifecycles){
+          Vue.storage.setCategories(this.lifecycles);
+        }
+      }catch(ex){
+        console.error(ex);
+        this.error = "Error loading lifecycles.";
+      } finally{
+        this.in_process--;
+      }
+    },
+    loadProductTypes: async function(){
+      this.in_process++;
+      try{
+        this.product_types = await Vue.mtapi.getProductTypes();
+        if(this.product_types){
+          Vue.storage.setCategories(this.product_types);
+        }
+      }catch(ex){
+        console.error(ex);
+        this.error = "Error loading product types.";
+      } finally{
+        this.in_process--;
+      }
+    },
+    loadSuppliers: async function(){
+      this.in_process++;
+      try{
+        this.suppliers = await Vue.mtapi.getSuppliers();
+        if(this.suppliers){
+          Vue.storage.setCategories(this.suppliers);
+        }
+      }catch(ex){
+        console.error(ex);
+        this.error = "Error loading suppliers.";
+      } finally{
+        this.in_process--;
+      }
+    },
     reloadData: async function(){
       try{
-        this.busy = false;
         let pr = await Promise.all([
-          Vue.mtapi.getBrands(),
-          Vue.mtapi.getCategories(),
-          Vue.mtapi.getCertificates(),
-          Vue.mtapi.getImageTypes(),
-          Vue.mtapi.getLifecycles(),
-          Vue.mtapi.getProductTypes(),
-          Vue.mtapi.getSuppliers()
+          this.loadBrands(),
+          this.loadCategories(),
+          this.loadCertificates(),
+          this.loadImageTypes(),
+          this.loadLifecycles(),
+          this.loadProductTypes(),
+          this.loadSuppliers()
         ]);
-        this.brands = pr.shift();
-        this.categories = pr.shift();
-        this.certificates = pr.shift();
-        this.image_types = pr.shift();
-        this.lifecycles = pr.shift();
-        this.product_types = pr.shift();
-        this.suppliers = pr.shift();
-
-        window.localStorage.setItem('brands', JSON.stringify(this.brands));
-        window.localStorage.setItem('categories', JSON.stringify(this.categories));
-        window.localStorage.setItem('certificates', JSON.stringify(this.certificates));
-        window.localStorage.setItem('image_types', JSON.stringify(this.image_types));
-        window.localStorage.setItem('lifecycles', JSON.stringify(this.lifecycles));
-        window.localStorage.setItem('product_types', JSON.stringify(this.product_types));
-        window.localStorage.setItem('suppliers', JSON.stringify(this.suppliers));
-
+       
       }catch(err){
         console.error(err);
-      } finally {
-        this.busy = false;
       }
     },
     topAncestorCategoryFor: function(category_id){

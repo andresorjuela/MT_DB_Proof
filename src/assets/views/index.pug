@@ -4,7 +4,7 @@ block content
     b-row
       b-col
         b-link(href="#" to="/")
-          img(src=`${assetspath}/images/logo_1.jpg` width="200px")
+          img(src=`${process.env.STATIC_ASSETS_PATH}/images/logo_1.jpg` width="200px")
       b-col(cols="8")
         b-nav(variant="light" justified tabs)
           b-nav-item(href="#" to="/product" :active="selectedMenu==='product'") Product
@@ -12,7 +12,7 @@ block content
           b-nav-item(href="#" to="/equipment" :active="selectedMenu==='equipment'") Equipment
           b-nav-item(href="#" to="/group" :active="selectedMenu==='group'") Group
         b-form
-              b-form-input#primary_search(placeholder="Search")
+          b-form-input#primary_search(placeholder="Search")
         
       b-col
     
@@ -28,4 +28,4 @@ block content
         router-view
 
 append endbody
-  script(src=`${assetspath}/javascripts/ui/ProductsApp.js` type="module")
+  script(src=`${process.env.STATIC_ASSETS_PATH}/javascripts/ui/ProductsApp.js` type="module")

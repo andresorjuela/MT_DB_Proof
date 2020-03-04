@@ -27,7 +27,7 @@ router.get('/:product_id', function (req, res, next) {
 
 
 /** Create a product */
-router.post('/:product_id', function (req, res, next) {
+router.post('/', function (req, res, next) {
 
   let entity = req.body;
   res.locals.dbInstructions = {

@@ -16,11 +16,35 @@ export default {
       <b-spinner small variant="secondary" />
       <span>loading...</span>
     </span>
-    <b-button small variant="outline-success" @click="saveProduct" :disabled="busy">Save</b-button>
+    <b-button small variant="success" @click="saveProduct" :disabled="busy">Save</b-button>
 
   </div>
 
-  <b-form @submit="onSubmit" v-if="product">
+  <b-form v-if="init_product">
+    <b-form-row>
+      <b-col>
+        <h3>Adding a new product.</h3>
+        <p>To add a new product you must first select a Category and a Family.</p>
+      </b-col>
+    </b-form-row>
+    <b-form-row>
+      <b-col>
+        <b-form-group label="Category:"  label-cols="4" class="pb-1"  >
+          <b-form-select v-model="product.category_id" :options="$router.app.brands" value-field="id" text-field="name_en" ></b-form-input>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
+    <b-form-row>
+      <b-col>
+        <b-form-group label="Family:"  label-cols="4" class="pb-1"  >
+          <b-form-select v-model="product.family_id" :options="$router.app.families" value-field="id" text-field="family_code" ></b-form-input>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
+    
+  </b-form>
+
+  <b-form v-if="product && !init_product">
     <b-form-row>
       <b-col cols="5">
         <b-form-group id="g_p_category" description="" label="Category:" label-for="p_category" label-cols="4" >
@@ -216,11 +240,11 @@ export default {
   </b-form>
   
   <!-- 1:N relationships -->
-  <b-card v-if="product">
+  <b-card v-if="product && !init_product">
     <b-tabs content-class="mt-3" card>
       <b-tab title="Images" active>
         <h5>Images</h5>
-        <b-form v-for="(pimage, idx) in product_images" key="pimage.id">
+        <b-form v-for="(pimage, idx) in product_images" key="pimage.id" v-if="product_images">
           <b-form-row>
             <b-col cols="5">
               <b-form-group label="Image Type:" label-cols="4" >
@@ -243,9 +267,9 @@ export default {
         <b-button variant="outline-success" @click="newProductImage" size="sm">Add Image</b-button>
       </b-tab>
       
-      <b-tab title="OEM References">
+      <b-tab title="OEM References" @click="loadProductOemReferences">
         <h5>OEM References</h5>
-        <b-form v-for="(oemref, idx) in product_oem_refs" key="oemref.id">
+        <b-form v-for="(oemref, idx) in product_oem_refs" :key="oemref.brand_id" v-if="product_oem_refs">
           <b-form-row>
             <b-col cols="5">
               <b-form-group label="OEM:" label-cols="4" >
@@ -274,9 +298,9 @@ export default {
         <b-button variant="outline-success" @click="newProductOemReference" size="sm">Add OEM Reference</b-button>
       </b-tab>
 
-      <b-tab title="Filters">
+      <b-tab title="Filters" @click="loadProductFilterOptions">
         <h5>Filters</h5>
-        <b-form>
+        <b-form v-if="product_filter_options">
           <b-form-row>
             <b-col cols="6" v-for="(filter, idx) in filters" :key="filter.filter_id" >
               <b-form-group :label="filter.name_en+':'" label-cols="4" >
@@ -291,9 +315,9 @@ export default {
         </b-form>
       </b-tab>
       
-      <b-tab title="Custom Attributes">
+      <b-tab title="Custom Attributes" @click="loadProductCustomAttributes">
         <h5>Custom Attributes</h5>
-        <b-form>
+        <b-form v-if="product_custom_attributes">
           <b-form-row>
             <b-col cols="6" v-for="(attr, idx) in custom_attributes" :key="attr.id" >
               <b-form-group :label="attr.name_en+':'" label-cols="4" >
@@ -321,17 +345,26 @@ export default {
       error: null,
       in_process: 0,
      
+      init_product: false,
+
       custom_attributes: [],
       filters: [], //options will also be loaded
+      families: [],
+      family_connects: [],//family ids only
+    
       product: null,//actually a product-view
       product_certificates: [],
-      product_custom_attributes: [],
-      product_filter_options: [],
-      product_images: [],
       product_oem_refs: [],
       product_tags: [],
-      families: [],
-      family_connects: []//family ids only
+      
+      /*
+        Initialized to null intentionally. Load from server only loads
+        when null, not when empty.
+      */
+      product_images: null, 
+      product_custom_attributes: null,
+      product_filter_options: null
+      
     }
   },
   //props: {},
@@ -364,25 +397,19 @@ export default {
       return units;
     }
   },
-  created: function(){
+  created: async function(){
     this.$router.app.selectedMenu="product";
-    this.loadData();
-
+    if(this.$route.params.id){
+      await this.loadData();
+    } else {
+      this.init_product = true;
+      this.product = {
+        category_id: 0,
+        family_id: 0,
+      };
+    }
   },
   methods: {
-    getProductFilterOption: function(filter_id){
-      let the_pfo = this.product_filter_options.find(pfo=>{ return pfo.filter_id == filter_id;});
-      if(!the_pfo){
-        //lazy init.
-        the_pfo = {
-          product_id: this.product.id,
-          filter_id: filter_id,
-          filter_option_id: null
-        };
-        this.product_filter_options.push(the_pfo);
-      }
-      return the_pfo;
-    },
     getProductCustomAttribute: function(attr_id){
       let the_pca = this.product_custom_attributes.find(pca=>{ return pca.custom_attribute_id == attr_id;});
       if(!the_pca){
@@ -397,30 +424,81 @@ export default {
       }
       return the_pca;
     },
+    getProductFilterOption: function(filter_id){
+      let the_pfo = this.product_filter_options.find(pfo=>{ return pfo.filter_id == filter_id;});
+      if(!the_pfo){
+        //lazy init.
+        the_pfo = {
+          product_id: this.product.id,
+          filter_id: filter_id,
+          filter_option_id: null
+        };
+        this.product_filter_options.push(the_pfo);
+      }
+      return the_pfo;
+    },
+    loadCustomAttributesForCategory : async function(){
+      try{
+        this.in_process++;
+        this.custom_attributes = await Vue.mtapi.getCustomAttributesForCategory(this.product.category_id);
+      }catch(ex){
+        console.error(ex);
+        this.error="Couldn't load custom attributes for the category.";
+      } finally {
+        this.in_process--;
+      }
+    },
     loadData : async function(){
       try{
         this.error = null;
         this.message = null;
-        this.in_process++;
-        this.product = await Vue.mtapi.getProductView(this.$route.params.id);
         
+        await this.loadProduct();
+
+        await Promise.all([
+          this.loadFamiliesForBrand(),
+          this.loadCustomAttributesForCategory(),
+          this.loadProductCertificates(),
+          this.loadProductFamilies(),
+          this.loadFilterOptionViewsForCategory()
+        ]);
         this.product_tags = this.product.tags ? this.product.tags.split() : [];
-        if(!this.$router.app.categories 
-          || !this.$router.app.certificates
-          || !this.$router.app.lifecycles
-          || !this.$router.app.product_types ){
+        
+        //If master data is missing, emit a reload request from the master app.
+        if(this.$router.app.categories.length===0 
+          || !this.$router.app.certificates.length===0
+          || !this.$router.app.lifecycles.length===0
+          || !this.$router.app.product_types.length===0 ){
           this.$emit('reload');
         }
         
-        this.families = await Vue.mtapi.getFamiliesForBrand(this.product.brand_id);
-        this.custom_attributes = await Vue.mtapi.getCustomAttributesForCategory(this.product.category_id);
         
-        let tempcerts = await Vue.mtapi.getProductCertificates(this.product.id);
-        this.product_certificates = tempcerts.map(v=>{return v.certificate_id});//just the cert ids.
-        
-        let tempfamilyconns = await Vue.mtapi.getProductFamilies(this.product.id);
-        this.family_connects = tempfamilyconns.map(v=>{return v.family_id});//just the family ids.
+        this.loadProductImages();//default tab.
+        this.in_process--;
 
+      } catch (err){
+        if(err instanceof ApiError){
+          this.error = `Couldn't load product data. ${err.message}`;
+        } else {
+          this.error = `Couldn't load product data.`;
+          console.error(err);
+        }
+      } 
+    },
+    loadFamiliesForBrand: async function(){
+      try{
+        this.in_process++;
+        this.families = await Vue.mtapi.getFamiliesForBrand(this.product.brand_id);
+      }catch(ex){
+        console.error(ex);
+        this.error="Couldn't load families for brand.";
+      } finally {
+        this.in_process--;
+      }
+    },
+    loadFilterOptionViewsForCategory : async function(){
+      try{
+        this.in_process++;
         let filter_option_views = await Vue.mtapi.getFilterOptionViewsForCategory(this.product.category_id);
         filter_option_views.forEach(fov=>{
           let filter = this.filters.find(f=>{ return f.filter_id == fov.filter_id; });
@@ -440,27 +518,44 @@ export default {
           });
         });
 
-        this.loadProductImages();//default tab.
-        this.loadProductOemReferences();
-        this.loadProductFilterOptions();
-        this.loadProductCustomAttributes();
-        this.in_process--;
 
-      } catch (err){
-        if(err instanceof ApiError){
-          this.error = `Couldn't get product. ${err.message}`;
-        } else {
-          console.error(err);
-        }
+      }catch(ex){
+        console.error(ex);
+        this.error="Couldn't load filter options for this category.";
       } finally {
-        this.in_process = 0;
+        this.in_process--;
+      }
+    },
+    loadProduct : async function(){
+      try{
+        this.in_process++;
+        this.product = await Vue.mtapi.getProductView(this.$route.params.id);
+      }catch(ex){
+        console.error(ex);
+        this.error="Couldn't load product.";
+      } finally {
+        this.in_process--;
+      }
+    },
+    loadProductCertificates : async function(){
+      try{
+        this.in_process++;
+        let tempcerts = await Vue.mtapi.getProductCertificates(this.product.id);
+        this.product_certificates = tempcerts.map(v=>{return v.certificate_id});//just the cert ids.
+        
+      }catch(ex){
+        console.error(ex);
+        this.error="Couldn't load product certificates.";
+      } finally {
+        this.in_process--;
       }
     },
     loadProductCustomAttributes : async function(){
+      if(this.product_custom_attributes!==null) return;//Otherwise server overwrites work
       try{
         this.error = null;
         this.message = null;
-        this.busy = true;
+        this.in_process++;
         this.product_custom_attributes = await Vue.mtapi.getProductCustomAttributes(this.$route.params.id);
 
       } catch (err){
@@ -470,14 +565,28 @@ export default {
           console.error(err);
         }
       } finally {
-        this.busy = false;
+        this.in_process--;
+      }
+    },
+    loadProductFamilies : async function(){
+      try{
+        this.in_process++;
+        let tempfamilyconns = await Vue.mtapi.getProductFamilies(this.product.id);
+        this.family_connects = tempfamilyconns.map(v=>{return v.family_id});//just the family ids.
+
+      }catch(ex){
+        console.error(ex);
+        this.error="Couldn't load product families.";
+      } finally {
+        this.in_process--;
       }
     },
     loadProductFilterOptions : async function(){
+      if(this.product_filter_options!==null) return;//Otherwise server overwrites work
       try{
         this.error = null;
         this.message = null;
-        this.busy = true;
+        this.in_process++;
         this.product_filter_options = await Vue.mtapi.getProductFilterOptions(this.$route.params.id);
 
       } catch (err){
@@ -487,7 +596,43 @@ export default {
           console.error(err);
         }
       } finally {
-        this.busy = false;
+        this.in_process--;
+      }
+    },
+    loadProductImages : async function(){
+      if(this.product_images!==null) return;//Otherwise server overwrites work
+      try{
+        this.error = null;
+        this.message = null;
+        this.in_process++;
+        this.product_images = await Vue.mtapi.getProductImages(this.$route.params.id);
+
+      } catch (err){
+        if(err instanceof ApiError){
+          this.error = `Couldn't get product images. ${err.message}`;
+        } else {
+          console.error(err);
+        }
+      } finally {
+        this.in_process--;
+      }
+    },
+    loadProductOemReferences : async function(){
+      if(this.product_oem_refs!==null) return;//Otherwise server overwrites work
+      try{
+        this.error = null;
+        this.message = null;
+        this.in_process++;
+        this.product_oem_refs = await Vue.mtapi.getProductOemReferences(this.$route.params.id);
+
+      } catch (err){
+        if(err instanceof ApiError){
+          this.error = `Couldn't get product OEM references. ${err.message}`;
+        } else {
+          console.error(err);
+        }
+      } finally {
+        this.in_process--;
       }
     },
     newProductFilterOption : function(){
@@ -498,26 +643,6 @@ export default {
         image_link: null
       });
     },
-    removeProductFilterOption : function(idx){
-      if(idx>=0) this.product_filter_options.splice(idx, 1);
-    },
-    loadProductImages : async function(){
-      try{
-        this.error = null;
-        this.message = null;
-        this.busy = true;
-        this.product_images = await Vue.mtapi.getProductImages(this.$route.params.id);
-
-      } catch (err){
-        if(err instanceof ApiError){
-          this.error = `Couldn't get product images. ${err.message}`;
-        } else {
-          console.error(err);
-        }
-      } finally {
-        this.busy = false;
-      }
-    },
     newProductImage : function(){
       this.product_images.push({
         id: null,
@@ -525,26 +650,6 @@ export default {
         image_type_id: null,
         image_link: null
       });
-    },
-    removeProductImage : function(idx){
-      if(idx>=0) this.product_images.splice(idx, 1);
-    },
-    loadProductOemReferences : async function(){
-      try{
-        this.error = null;
-        this.message = null;
-        this.busy = true;
-        this.product_oem_refs = await Vue.mtapi.getProductOemReferences(this.$route.params.id);
-
-      } catch (err){
-        if(err instanceof ApiError){
-          this.error = `Couldn't get product OEM references. ${err.message}`;
-        } else {
-          console.error(err);
-        }
-      } finally {
-        this.busy = false;
-      }
     },
     newProductOemReference : function(){
       this.product_oem_refs.push({
@@ -554,19 +659,43 @@ export default {
         name: ""
       });
     },
+    removeProductFilterOption : function(idx){
+      if(idx>=0) this.product_filter_options.splice(idx, 1);
+    },
+    removeProductImage : function(idx){
+      if(idx>=0) this.product_images.splice(idx, 1);
+    },
     removeProductOemReference : function(idx){
       if(idx>=0) this.product_oem_refs.splice(idx, 1);
+    },
+    saveAllProductData: async function(){
+      try{
+        
+        await this.saveProduct();
+        
+        // product_certificates: [],
+        // product_oem_refs: [],
+        // product_tags: [],
+      
+        // product_images: null, 
+        // product_custom_attributes: null,
+        // product_filter_options: null
+
+      }catch(ex){
+        this.message = "Error saving product.";
+        this.error = ex.message; 
+      }
     },
     saveProduct: async function(){
       this.in_process++;
       try{
+        await Vue.mtapi.saveProduct();
         
-        this.in_process--
       }catch(ex){
         this.message = "Error saving product.";
         this.error = ex.message; 
       }finally{
-        this.in_process = 0;
+        this.in_process--
       }
     }
   }

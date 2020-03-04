@@ -47,33 +47,33 @@ if(process.env.NODE_ENV==="production"){
 }
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'pug');
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-let assetspath = process.env.STATIC_ASSETS_PATH;
-//Make available to all view components.
-app.use((req,res,next)=>{ res.locals.assetspath = assetspath; next() })
-if(process.env.NODE_ENV==="production"){
-  //Not serving static files...
-} else {
-  //In non-production environments, serve static files from express.
-  app.use(assetspath, express.static(path.join(__dirname, '..', 'assets')));
-}
+// let assetspath = process.env.STATIC_ASSETS_PATH
+// //Make available to all view components.
+// app.use((req,res,next)=>{ res.locals.assetspath = assetspath; next() })
+// if(process.env.NODE_ENV==="production"){
+//   //Not serving static files...
+// } else {
+//   //In non-production environments, serve static files from express.
+//   app.use(assetspath, express.static(path.join(__dirname, '..', 'assets')));
+// }
 
 // Routing .....................................................................
-var indexRouter = require('./routes/index');
-var productsRouter = require('../../products');
+// var indexRouter = require('./routes/index');
+// var productsRouter = require('../../products');
 var productsApiRouter = require('./routes/api/products-api');
 var familiesApiRouter = require('./routes/api/families-api');
 var apiRouter = require('./routes/api/api');
 
-app.use('/', indexRouter);
-app.use('/products', productsRouter);
+// app.use('/', indexRouter);
+// app.use('/products', productsRouter);
 
 // api related
 app.use('/api/v1/products', productsApiRouter);

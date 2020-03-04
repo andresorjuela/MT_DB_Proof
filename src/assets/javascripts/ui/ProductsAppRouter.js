@@ -8,6 +8,7 @@ let router = new VueRouter({
   routes: [
     { path: '/', component: Home },
     { path: '/product', component: ProductList},
+    { path: '/product/new', component: ProductForm},
     { path: '/product/:id', component: ProductForm},
     { path: '/family', component: FamilyList},
     { path: '/equipment', component: Home},

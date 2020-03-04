@@ -2,12 +2,14 @@
 import { ApiError } from "../Api.js";
 
 export default {
-  template:
-  `
+  template: /* html */`
 <div>
   <b-alert v-if="!busy && error" variant="danger">{{ error }}</b-alert>
   <b-alert v-if="!busy && message" variant="info">{{ message }}</b-alert>
   <b-table hover :items="products" :fields="fields" selectable @row-selected="onRowSelected" ></b-table>
+  <b-row>
+    <b-button variant="success" @click="addProduct">Add Product</b-button>
+  </b-row>
   <b-spinner v-if="busy" variant="secondary" />
 </div>
   `,
@@ -32,6 +34,9 @@ export default {
     this.$router.app.selectedMenu="product";
   },
   methods: {
+    addProduct : function(){
+      this.$router.push({ path: `/product/new` })
+    },
     getProducts : async function(){
       try{
         this.error = null;
@@ -50,7 +55,7 @@ export default {
     },
     onRowSelected(items) {
       let selected = items[0];
-      this.$router.push({ path: `/product/${selected.id}` })
+      this.$router.push({ path: `/product/${selected.id}` });
     }
     
   }

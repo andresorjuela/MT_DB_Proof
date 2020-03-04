@@ -96,6 +96,13 @@ export class Api{
     return result.suppliers;
   }
   
+  async saveProduct(product){
+    if(product.id){
+      return await this._put(`${this.base_url}/product/${product.id}`,product);
+    } else {
+      return await this._post(`${this.base_url}/product/`,product);
+    }
+  }
   //common methods.
   async _get(url, parms){
     return await this.doFetch('GET', url, {parms: parms});
