@@ -131,7 +131,7 @@ var app = new Vue({
       try{
         this.lifecycles = await Vue.mtapi.getLifecycles();
         if(this.lifecycles){
-          Vue.storage.setCategories(this.lifecycles);
+          Vue.storage.setLifecycles(this.lifecycles);
         }
       }catch(ex){
         console.error(ex);
@@ -145,7 +145,7 @@ var app = new Vue({
       try{
         this.product_types = await Vue.mtapi.getProductTypes();
         if(this.product_types){
-          Vue.storage.setCategories(this.product_types);
+          Vue.storage.setProductTypes(this.product_types);
         }
       }catch(ex){
         console.error(ex);
