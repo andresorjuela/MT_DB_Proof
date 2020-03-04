@@ -4,8 +4,8 @@ export default {
   template: /*html*/
   `
 <div class="mt-1" v-cloak>
-  <b-alert v-if="!busy && error" variant="danger">{{ error }}</b-alert>
-  <b-alert v-if="!busy && message" variant="info">{{ message }}</b-alert>
+  <b-alert :show="!busy && hasError" variant="danger">{{ error }}</b-alert>
+  
 
   <b-form v-if="init_product">
     <b-form-row>
@@ -28,19 +28,19 @@ export default {
     </b-form-row>
   </b-form>
 
-  <div class="p-1 pt-2 d-flex justify-content-between bg-light" v-if="!init_product">
-    <span>
-      <span class="h5" v-cloak v-if="product">Editing Product: ID = {{product.id}}</span>
-      <span class="h5" v-cloak v-else-if="busy"></span>
-      <span class="h5" v-cloak v-else >Adding new Product</span>
-    </span>
-    <span v-show="busy"  >
-      <b-spinner small variant="secondary" />
-      <span>loading...</span>
-    </span>
-    <b-button small variant="success" @click="saveProduct" :disabled="busy">Save</b-button>
-
-  </div>
+  <b-row no-gutters class="bg-light" v-if="!init_product" align-v="center">
+    <b-col class="pl-2" >
+      <span v-cloak class="h5" v-if="product && product.id">Editing Product: ID = {{product.id}}</span>
+      <span v-cloak class="h5" v-else-if="product" >Adding new Product</span>
+    </b-col>
+    <b-col>
+      <span v-if="hasMessage" variant="info">{{ message }}</span>
+      <b-spinner small variant="secondary" v-if="busy"/>
+    </b-col>
+    <b-col class="text-right">
+      <b-button small variant="success" @click="saveAllProductData" :disabled="busy">Save</b-button>
+    </b-col>
+  </b-row>
 
   
 
@@ -181,7 +181,7 @@ export default {
 
       <b-col cols="3">
         <b-form-group id="g_p_unit" label="Unit:" label-for="p_unit" label-align="right" label-cols="4" >
-          <b-form-select id="p_unit" v-model="product.lifecycle_id" :options="valid_units">
+          <b-form-select id="p_unit" v-model="product.packaging_factor" :options="valid_units">
             <template v-slot:first>
               <b-form-select-option value="" >Choose</b-form-select-option>
             </template>
@@ -399,6 +399,7 @@ export default {
   created: async function(){
     this.$router.app.selectedMenu="product";
     if(this.$route.params.id){
+      this.message = "Loading...";
       await this.loadData();
     } else {
       this.init_product = true;
@@ -449,17 +450,16 @@ export default {
     loadData : async function(){
       try{
         this.error = null;
-        this.message = null;
         
         await this.loadProduct();
-
+        this.product_tags = this.product.tags ? this.product.tags.split(",") : [];
+        
         await Promise.all([
           this.loadCustomAttributesForCategory(),
           this.loadProductCertificates(),
           this.loadProductFamilies(),
           this.loadFilterOptionViewsForCategory()
         ]);
-        this.product_tags = this.product.tags ? this.product.tags.split() : [];
         
         //If master data is missing, emit a reload request from the master app.
         if(this.$router.app.categories.length===0 
@@ -675,13 +675,14 @@ export default {
     saveProduct: async function(){
       this.in_process++;
       try{
+        this.product.tags = this.product_tags && this.product_tags.length > 0 ? this.product_tags.join(",") : "";
         await Vue.mtapi.saveProduct(this.product);
         
       }catch(ex){
         this.message = "Error saving product.";
         this.error = ex.message; 
       }finally{
-        this.in_process--
+        this.in_process--;
       }
     },
     selectProductCategory : async function(){
@@ -693,7 +694,7 @@ export default {
         this.message = "Error saving initial product.";
         this.error = ex.message; 
       }finally{
-        this.in_process--
+        this.in_process--;
       }
     }
   }
