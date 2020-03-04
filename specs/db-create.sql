@@ -115,6 +115,7 @@ CREATE TABLE `t_equipment_type` (
 CREATE TABLE `t_family` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `family_code` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  `group_id` int(11) unsigned NOT NULL,
   `brand_id` int(11) unsigned DEFAULT NULL,
   `technology_id` int(11) unsigned DEFAULT NULL,
   `family_connector_code` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
@@ -125,16 +126,6 @@ CREATE TABLE `t_family` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- Create syntax for TABLE 't_family_group'
-CREATE TABLE `t_family_group` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `family_id` int(11) unsigned NOT NULL,
-  `group_id` int(11) unsigned NOT NULL,
-  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `version` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Create syntax for TABLE 't_filter'
 CREATE TABLE `t_filter` (
@@ -358,12 +349,8 @@ ALTER TABLE `t_family`
 ALTER TABLE `t_family` 
   ADD CONSTRAINT `fk_family_technology` FOREIGN KEY (`technology_id`) REFERENCES `t_technology` (`id`);
 
-
-ALTER TABLE `t_family_group` 
-  ADD CONSTRAINT `fk_family_group_family` FOREIGN KEY (`family_id`) REFERENCES `t_family` (`id`);  
-
-ALTER TABLE `t_family_group` 
-  ADD CONSTRAINT `fk_family_group_group` FOREIGN KEY (`group_id`) REFERENCES `t_group` (`id`);
+ALTER TABLE `t_family` 
+  ADD CONSTRAINT `fk_family_group` FOREIGN KEY (`group_id`) REFERENCES `t_group` (`id`);
 
 
 ALTER TABLE `t_filter` 
