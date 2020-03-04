@@ -290,7 +290,7 @@ function parseQueryOptions(req, allowed_query_fields, default_orderby, default_l
       query_options.limit = query[key];
     }
     if (key === 'order_by') {
-      query_options.order_by = query[key].split(',');
+      query_options.orderBy = query[key].split(',');
     }
 
     delete query[key];
