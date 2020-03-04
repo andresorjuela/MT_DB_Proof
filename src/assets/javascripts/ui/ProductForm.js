@@ -5,7 +5,7 @@ export default {
   `
 <div class="mt-1" v-cloak>
   
-  <b-row no-gutters class="bg-light" align-v="center">
+  <b-row no-gutters class="bg-light mb-2" align-v="center">
     <b-col class="pl-2" >
       <span v-cloak class="h5" v-if="product && product.id">Editing Product: ID = {{product.id}}</span>
     </b-col>
@@ -15,30 +15,11 @@ export default {
       <span class="p2 text-danger" v-if="!busy && hasError" variant="danger">{{ error }}</span>
     </b-col>
     <b-col class="text-right">
-      <b-button small variant="success" @click="saveAllProductData" :disabled="busy" v-show="!init_product">Save</b-button>
+      <b-button small variant="success" @click="saveAllProductData" :disabled="busy">Save Product</b-button>
     </b-col>
   </b-row>
-
-  <b-form v-if="init_product">
-    <b-form-row>
-      <b-col>
-        <h3>Adding a new product.</h3>
-        <p>To add a new product you must first select a Category.</p>
-      </b-col>
-    </b-form-row>
-    <b-form-row>
-      <b-col>
-        <b-form-group label="Category:"  label-cols="4" class="pb-1"  >
-          <b-form-select v-model="product.category_id" :options="$router.app.brands" value-field="id" text-field="name_en" ></b-form-select>
-        </b-form-group>
-      </b-col>
-      <b-col>
-        <b-button variant="success" @click="selectProductCategory">Continue</b-button>
-      </b-col>
-    </b-form-row>
-  </b-form>
   
-  <b-form v-if="product && !init_product">
+  <b-form v-if="product">
     <b-form-row>
       <b-col cols="5">
         <b-form-group id="g_p_category" description="" label="Category:" label-for="p_category" label-cols="4" >
@@ -209,8 +190,8 @@ export default {
     
     <b-form-row>
       <b-col cols="6">
-        <b-form-group id="g_p_family_connects" label="Related Families:" label-for="p_family_connects" label-align="left" label-cols="4" >
-          <b-form-select id="p_family_connects" v-model="family_connects" :disabled="busy" :options="$router.app.families"  text-field="family_code" value-field="id"  :select-size="4" multiple>
+        <b-form-group id="g_p_related_families" label="Related Families:" label-for="p_related_families" label-align="left" label-cols="4" >
+          <b-form-select id="p_related_families" v-model="related_families" :disabled="busy" :options="$router.app.families"  text-field="family_code" value-field="id"  :select-size="4" multiple>
             <template v-slot:first>
               <b-form-select-option :value="null">-- choose --</b-form-select-option>
             </template>
@@ -234,7 +215,7 @@ export default {
   </b-form>
   
   <!-- 1:N relationships -->
-  <b-card v-if="product && !init_product">
+  <b-card v-if="product">
     <b-tabs content-class="mt-3" card>
       <b-tab title="Images" active>
         <h5>Images</h5>
@@ -339,11 +320,9 @@ export default {
       error: null,
       in_process: 0,
      
-      init_product: false,
-
       custom_attributes: [],
       filters: [], //options will also be loaded
-      family_connects: [],//family ids only
+      related_families: [],//family ids only
     
       product: null,//actually a product-view
       product_certificates: [],
@@ -366,8 +345,8 @@ export default {
     hasError: function(){ return this.error?true:false; },
     hasMessage: function(){ return this.message?true:false; },
     family_connections: function(){
-      if(!this.family_connects) return "";
-      return this.family_connects
+      if(!this.related_families) return "";
+      return this.related_families
         .filter(fid=>{return fid!="";})
         .map(fid=>{
           let f = this.$router.app.families.find(v=>{ return v.id === fid });
@@ -395,10 +374,7 @@ export default {
     if(this.$route.params.id){
       await this.loadData();
     } else {
-      this.init_product = true;
-      this.product = {
-        category_id: 0
-      };
+      this.error="No product specified."
     }
   },
   methods: {
@@ -560,7 +536,7 @@ export default {
         this.in_process++;
         this.message = "Loading families...";
         let tempfamilyconns = await Vue.mtapi.getProductFamilies(this.product.id);
-        this.family_connects = tempfamilyconns.map(v=>{return v.family_id});//just the family ids.
+        this.related_families = tempfamilyconns.map(v=>{return v.family_id});//just the family ids.
 
       }catch(ex){
         console.error(ex);
@@ -665,6 +641,7 @@ export default {
         
         await this.saveProduct();
         
+        await this.saveProductFamilies();
         // product_certificates: [],
         // product_oem_refs: [],
         // product_tags: [],
@@ -693,16 +670,13 @@ export default {
         this.message="";
       }
     },
-    selectProductCategory : async function(){
+    saveProductFamilies: async function(){
       this.in_process++;
-      this.message="Saving..."
+      this.message="Saving related families..."
       try{
-        this.product = await this.saveProduct()
-        this.init_product=false;
-        await this.loadData();
-
+        await Vue.mtapi.saveProductFamilies(this.product.id, this.related_families);
       }catch(ex){
-        this.message = "Error saving initial product.";
+        this.message = "Error saving related families.";
         this.error = ex.message; 
       }finally{
         this.in_process--;

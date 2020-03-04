@@ -168,8 +168,10 @@ async function saveAll(req, res, next){
     let create_these = _.xorBy(dbi.toSave, shared, dbi.comparison );
 
     //Deletes
+    console.log(`${delete_these.length} to delete.`)
     let deleted = await Promise.all( delete_these.map( function(entity){ return dbi.dao.deleteOne(entity); } ) );
     //Creates
+    console.log(`${create_these.length} to create.`)
     let created = await Promise.all( create_these.map( function(entity){ return dbi.dao.create(entity);    } ) );
 
     res.status(200).json(_.concat(shared, create_these));//return the objects which exist

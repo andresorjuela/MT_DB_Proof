@@ -67,10 +67,30 @@ export class Api{
     let result =  await this._get(`${this.base_url}/products/${id}/custom_attributes`);
     return result.product_custom_attributes;
   }
+
+  /**
+   * 
+   * @param {number} id product id
+   */
   async getProductFamilies(id){
     let result =  await this._get(`${this.base_url}/products/${id}/families`);
     return result.product_family_connects;
   }
+  /**
+   * 
+   * @param {number} product_id 
+   * @param {array} family_ids 
+   */
+  async saveProductFamilies(product_id, family_ids){
+    let payload = family_ids.map(fid=>{ 
+      return {
+        product_id: product_id,
+        family_id: fid
+      };
+    });
+    return await this._post(`${this.base_url}/products/${product_id}/families`, payload);
+  }
+
   async getProductFilterOptions(id){
     let result =  await this._get(`${this.base_url}/products/${id}/filter_options`);
     return result.product_filter_option_views;//this api method returns a view object
@@ -103,6 +123,8 @@ export class Api{
       return await this._post(`${this.base_url}/products`,product);
     }
   }
+
+
   //common methods.
   async _get(url, parms){
     return await this.doFetch('GET', url, {parms: parms});

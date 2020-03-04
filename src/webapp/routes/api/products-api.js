@@ -97,11 +97,13 @@ router.get('/:product_id/families', function (req, res, next) {
 router.post('/:product_id/families', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.Database.ProductFamily(),
+    toSave: req.body, //assuming an array
     query: {product_id: req.params.product_id},
-    //query_options: q.query_options
-  }
+    comparison: function(obj){ return obj.family_id; }
+  };
+
   next();
-}, fetchMany);
+}, saveAll);
 
 router.get('/:product_id/filter_options', function (req, res, next) {
   res.locals.dbInstructions = {
