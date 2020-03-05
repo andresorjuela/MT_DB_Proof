@@ -83,6 +83,18 @@ router.get('/:product_id/custom_attributes', function (req, res, next) {
   next();
 }, fetchMany);
 
+/** Save all product custom attributes. */
+router.post('/:product_id/custom_attributes', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductCustomAttribute(),
+    toSave: req.body, //assuming an array of objects
+    query: {product_id: req.params.product_id},
+    comparison: function(obj){ return `${obj.custom_attribute_id}|${obj.name_en}|${obj.name_zh}`; }
+  };
+  next();
+}, saveAll);
+
+
 // Get all product family connections
 router.get('/:product_id/families', function (req, res, next) {
   res.locals.dbInstructions = {
@@ -142,7 +154,6 @@ router.post('/:product_id/images', function (req, res, next) {
     query: {product_id: req.params.product_id},
     comparison: function(obj){ return `${obj.image_link}|${obj.image_type_id}`; }
   };
-
   next();
 }, saveAll);
 

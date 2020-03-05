@@ -82,6 +82,14 @@ export class Api{
     let result =  await this._get(`${this.base_url}/products/${id}/custom_attributes`);
     return result.product_custom_attributes;
   }
+/**
+   * 
+   * @param {number} product_id 
+   * @param {array} cust_attr array of custom attribute objects
+   */
+  async saveProductCustomAttributes(product_id, cust_attr){
+    return await this._post(`${this.base_url}/products/${product_id}/custom_attributes`, cust_attr);
+  }
 
   /**
    * 

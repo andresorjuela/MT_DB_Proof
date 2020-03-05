@@ -646,9 +646,8 @@ export default {
           this.saveProductImages(),
           this.saveProductOemReferences(),
           this.saveProductFilterOptions(),
-        ]) 
-         
-        // product_custom_attributes: null
+          this.saveProductCustomAttributes(),
+        ]);
 
       }catch(ex){
         this.message = "Error saving product.";
@@ -718,6 +717,20 @@ export default {
         await Vue.mtapi.saveProductImages(this.product.id, this.product_images);
       }catch(ex){
         this.message = "Error saving images.";
+        this.error = ex.message; 
+      }finally{
+        this.in_process--;
+        this.message="";
+      }
+    },
+    saveProductCustomAttributes: async function(){
+      if(this.product_custom_attributes === null) return;
+      this.in_process++;
+      this.message="Saving custom attributes..."
+      try{
+        await Vue.mtapi.saveProductCustomAttributes(this.product.id, this.product_custom_attributes);
+      }catch(ex){
+        this.message = "Error saving custom attributes.";
         this.error = ex.message; 
       }finally{
         this.in_process--;
