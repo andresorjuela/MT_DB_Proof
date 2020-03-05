@@ -63,6 +63,11 @@ export class Api{
     let result =  await this._get(`${this.base_url}/products/${id}/certificates`);
     return result.product_certificates;
   }
+  /**
+   * 
+   * @param {number} product_id 
+   * @param {array} certificate_ids array of certificate ids
+   */
   async saveProductCertificates(product_id, certificate_ids){
     let payload = certificate_ids.map(cid=>{ 
       return {
@@ -89,7 +94,7 @@ export class Api{
   /**
    * 
    * @param {number} product_id 
-   * @param {array} family_ids 
+   * @param {array} family_ids array of family ids
    */
   async saveProductFamilies(product_id, family_ids){
     let payload = family_ids.map(fid=>{ 
@@ -105,14 +110,42 @@ export class Api{
     let result =  await this._get(`${this.base_url}/products/${id}/filter_options`);
     return result.product_filter_option_views;//this api method returns a view object
   }
+  /**
+   * 
+   * @param {number} product_id 
+   * @param {array} filter_options array of filter option objects
+   */
+  async saveProductFilterOptions(product_id, filter_options){
+    let with_ids = filter_options.filter(obj=>{return obj.filter_option_id ? true : false; });
+    return await this._post(`${this.base_url}/products/${product_id}/filter_options`, with_ids);
+  }
+
   async getProductImages(id){
     let result =  await this._get(`${this.base_url}/products/${id}/images`);
     return result.product_images;
   }
+  /**
+   * 
+   * @param {number} product_id 
+   * @param {array} images array of image objects
+   */
+  async saveProductImages(product_id, images){
+    return await this._post(`${this.base_url}/products/${product_id}/images`, images);
+  }
+
   async getProductOemReferences(id){
     let result =  await this._get(`${this.base_url}/products/${id}/oem_references`);
     return result.product_oem_references;
   }
+  /**
+   * 
+   * @param {number} product_id 
+   * @param {array} oem_refs array of oem ref objects
+   */
+  async saveProductOemReferences(product_id, oem_refs){
+    return await this._post(`${this.base_url}/products/${product_id}/oem_references`, oem_refs);
+  }
+
   async getProductTypes(){
     let result = await this._get(`${this.base_url}/product-types`, {limit:1000, order_by:'+name_en'});
     return result.product_types;

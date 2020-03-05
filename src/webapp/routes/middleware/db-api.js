@@ -173,7 +173,9 @@ async function saveAll(req, res, next){
     //Creates
     console.log(`${create_these.length} to create.`)
     let created = await Promise.all( create_these.map( function(entity){ return dbi.dao.create(entity);    } ) );
-
+    created.forEach((result, idx)=>{
+      create_these[idx].id = result.id;
+    });
     res.status(200).json(_.concat(shared, create_these));//return the objects which exist
   } catch (ex){
     next(ex);

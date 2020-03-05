@@ -219,7 +219,7 @@ export default {
     <b-tabs content-class="mt-3" card>
       <b-tab title="Images" active>
         <h5>Images</h5>
-        <b-form v-for="(pimage, idx) in product_images" key="pimage.id" v-if="product_images">
+        <b-form v-for="(pimage, idx) in product_images" :key="idx" v-if="product_images">
           <b-form-row>
             <b-col cols="5">
               <b-form-group label="Image Type:" label-cols="4" >
@@ -613,7 +613,6 @@ export default {
     },
     newProductImage : function(){
       this.product_images.push({
-        id: null,
         product_id: this.product.id,
         image_type_id: null,
         image_link: null
@@ -644,12 +643,12 @@ export default {
         await Promise.all([
           this.saveProductFamilies(),
           this.saveProductCertificates(),
+          this.saveProductImages(),
+          this.saveProductOemReferences(),
+          this.saveProductFilterOptions(),
         ]) 
-        // product_oem_refs: [],
-        
-        // product_images: null, 
-        // product_custom_attributes: null,
-        // product_filter_options: null
+         
+        // product_custom_attributes: null
 
       }catch(ex){
         this.message = "Error saving product.";
@@ -696,6 +695,48 @@ export default {
         this.in_process--;
         this.message="";
       }
-    }
+    },
+    saveProductFilterOptions: async function(){
+      if(this.product_filter_options === null) return;
+      this.in_process++;
+      this.message="Saving OEM references..."
+      try{
+        await Vue.mtapi.saveProductFilterOptions(this.product.id, this.product_filter_options);
+      }catch(ex){
+        this.message = "Error OEM references.";
+        this.error = ex.message; 
+      }finally{
+        this.in_process--;
+        this.message="";
+      }
+    },
+    saveProductImages: async function(){
+      if(this.product_images === null) return;
+      this.in_process++;
+      this.message="Saving images..."
+      try{
+        await Vue.mtapi.saveProductImages(this.product.id, this.product_images);
+      }catch(ex){
+        this.message = "Error saving images.";
+        this.error = ex.message; 
+      }finally{
+        this.in_process--;
+        this.message="";
+      }
+    },
+    saveProductOemReferences: async function(){
+      if(this.product_oem_refs === null) return;
+      this.in_process++;
+      this.message="Saving OEM references..."
+      try{
+        await Vue.mtapi.saveProductOemReferences(this.product.id, this.product_oem_refs);
+      }catch(ex){
+        this.message = "Error OEM references.";
+        this.error = ex.message; 
+      }finally{
+        this.in_process--;
+        this.message="";
+      }
+    },
   }
 };

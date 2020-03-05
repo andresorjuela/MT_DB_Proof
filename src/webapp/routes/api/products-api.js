@@ -101,7 +101,6 @@ router.post('/:product_id/families', function (req, res, next) {
     query: {product_id: req.params.product_id},
     comparison: function(obj){ return obj.family_id; }
   };
-
   next();
 }, saveAll);
 
@@ -114,6 +113,16 @@ router.get('/:product_id/filter_options', function (req, res, next) {
   next();
 }, fetchMany);
 
+/** Save all product filter options. */
+router.post('/:product_id/filter_options', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductFilterOption(),
+    toSave: req.body, //assuming an array
+    query: {product_id: req.params.product_id},
+    comparison: function(obj){ return obj.filter_option_id; }
+  };
+  next();
+}, saveAll);
 
 // Get all product family connections
 router.get('/:product_id/images', function (req, res, next) {
@@ -125,6 +134,19 @@ router.get('/:product_id/images', function (req, res, next) {
   next();
 }, fetchMany);
 
+/** Save all product images. */
+router.post('/:product_id/images', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductImage(),
+    toSave: req.body, //assuming an array of objects
+    query: {product_id: req.params.product_id},
+    comparison: function(obj){ return `${obj.image_link}|${obj.image_type_id}`; }
+  };
+
+  next();
+}, saveAll);
+
+
 // Get all product oem references
 router.get('/:product_id/oem_references', function (req, res, next) {
   res.locals.dbInstructions = {
@@ -134,6 +156,17 @@ router.get('/:product_id/oem_references', function (req, res, next) {
   }
   next();
 }, fetchMany);
+
+/** Save all product oem references */
+router.post('/:product_id/oem_references', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductOemReference(),
+    toSave: req.body, //assuming an array of objects
+    query: {product_id: req.params.product_id},
+    comparison: function(obj){ return `${obj.brand_id}|${obj.name}`; }
+  };
+  next();
+}, saveAll);
 
 router.get('/view/:product_id', function (req, res, next) {
 
