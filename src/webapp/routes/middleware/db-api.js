@@ -87,6 +87,21 @@ async function fetchMany(req, res, next) {
   }
 }
 
+async function fetchCount(req, res, next) {
+  try {
+    let dbi = res.locals.dbInstructions;
+    if (_.isEmpty(dbi)) {
+      res.status(400).json({ message: "No db instructions given." });
+      return;
+    }
+    let result = await dbi.dao.count(dbi.query);
+    res.status(200).json(result);
+    return;
+  } catch (ex) {
+    next(ex);
+  }
+}
+
 /**
   Handles a request to create an entity.
   @returns response handled as follows
@@ -293,6 +308,9 @@ function parseQueryOptions(req, allowed_query_fields, default_orderby, default_l
     if (key === 'limit') {
       query_options.limit = query[key];
     }
+    if (key === 'offset') {
+      query_options.offset = query[key];
+    }
     if (key === 'order_by') {
       query_options.orderBy = query[key].split(',');
     }
@@ -304,6 +322,7 @@ function parseQueryOptions(req, allowed_query_fields, default_orderby, default_l
 
 
 module.exports.fetchById = fetchById;
+module.exports.fetchCount = fetchCount;
 module.exports.fetchOne = fetchOne;
 module.exports.fetchMany = fetchMany;
 module.exports.create = create;

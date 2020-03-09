@@ -7,7 +7,7 @@ import FamilyList from './FamilyList.js';
 let router = new VueRouter({
   routes: [
     { path: '/', component: Home },
-    { path: '/product', component: ProductList},
+    { path: '/product', component: ProductList, props: (route) => ({ page: parseInt(route.query.page) }) },
     { path: '/product/new', component: ProductAdd},
     { path: '/product/:id', component: ProductForm},
     { path: '/family', component: FamilyList},

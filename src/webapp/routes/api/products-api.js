@@ -1,19 +1,58 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchOne, fetchById, fetchMany, deleteMatching, parseQueryOptions, updateById, create, saveAll } = require('../middleware/db-api');
+let { fetchOne, fetchById, fetchCount, fetchMany, deleteMatching, parseQueryOptions, updateById, create, saveAll } = require('../middleware/db-api');
 
 /* GET checks if service is online */
 router.get('/', function (req, res, next) {
-  let q = parseQueryOptions(req, ['product_id', 'name_en', 'name_zh'], ['+name_en', '+id'], 1000);
+  let q = parseQueryOptions(req, 
+    [
+      'product_id',
+      'oem', 
+      'sku',
+      'brand_id',
+      'brand_en',
+      'brand_zh',
+      'category_id',
+      'category_en',
+      'category_zh',
+      'name_en', 
+      'name_zh'
+    ], 
+    ['+name_en', '+id'], 1000);
 
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.Product(),
+    dao: req.app.locals.Database.ProductView(),
     query: q.query,
     query_options: q.query_options
   }
   next();
 }, fetchMany);
+
+router.get('/count', function (req, res, next) {
+  let q = parseQueryOptions(req, 
+    [
+      'product_id',
+      'oem', 
+      'sku',
+      'brand_id',
+      'brand_en',
+      'brand_zh',
+      'category_id',
+      'category_en',
+      'category_zh',
+      'name_en', 
+      'name_zh'
+    ], 
+    ['+name_en', '+id'], 1000);
+
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductView(),
+    query: q.query
+  }
+  next();
+}, fetchCount);
+
 
 router.get('/:product_id', function (req, res, next) {
 
