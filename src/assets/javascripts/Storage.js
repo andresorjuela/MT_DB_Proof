@@ -35,6 +35,9 @@ export class Storage {
   getCertificates(){ return this.getObjectFromStorage('certificates'); }
   setCertificates(arr){ return this.putObjectInStorage('certificates', arr); }
 
+  getEquipmentTypes(){ return this.getObjectFromStorage('equipment_types'); }
+  setEquipmentTypes(arr){ return this.putObjectInStorage('equipment_types', arr); }
+
   getFamilies(){ return this.getObjectFromStorage('families'); }
   setFamilies(arr){ return this.putObjectInStorage('families', arr); }
 

@@ -26,7 +26,7 @@ export class Api{
     return result.custom_attributes;
   }
   async getEquipmentList(qopts){
-    if(!qopts) qopts = {limit:10, order_by:'+model'};
+    if(!qopts) qopts = {limit:100, order_by:'+model'};
     let result = await this._get(`${this.base_url}/equipment`, qopts);
     return result.equipment_views;
   }
@@ -36,6 +36,16 @@ export class Api{
   }
   async getEquipmentCount(qopts){
     return await this._get(`${this.base_url}/equipment/count`, qopts);
+  }
+  async getEquipmentGroups(qopts){
+    if(!qopts) qopts={limit: 100, order_by: "+model,+group_code"};
+    let result =  await this._get(`${this.base_url}/equipment_groups`, qopts);
+    return result.equipment_group_views;
+  }
+  async getEquipmentTypes(qopts){
+    if(!qopts) qopts = {limit:100, order_by:'+name_en'};
+    let result = await this._get(`${this.base_url}/equipment_types`, qopts);
+    return result.equipment_types;
   }
   async getFamilies(qopts){
     if(!qopts) qopts = {limit:10, order_by:'+family_code'};

@@ -7,7 +7,7 @@ import FamilyForm from './FamilyForm.js';
 import GroupList from './GroupList.js';
 import GroupForm from './GroupForm.js';
 import EquipmentList from './EquipmentList.js';
-// import EquipmentForm from './EquipmentForm.js';
+import EquipmentForm from './EquipmentForm.js';
 
 let router = new VueRouter({
   routes: [
@@ -22,8 +22,8 @@ let router = new VueRouter({
     { path: '/family/:id', component: FamilyForm},
     
     { path: '/equipment', component: EquipmentList, props: (route) => ({ page: parseInt(route.query.page) }) },
-    // { path: '/equipment/new', component: EquipmentForm},
-    // { path: '/equipment/:id', component: EquipmentForm},
+    { path: '/equipment/new', component: EquipmentForm},
+    { path: '/equipment/:id', component: EquipmentForm},
     
     { path: '/group', component: GroupList, props: (route) => ({ page: parseInt(route.query.page) }) },
     { path: '/group/new', component: GroupForm},

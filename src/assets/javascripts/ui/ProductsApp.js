@@ -20,6 +20,7 @@ var app = new Vue({
     brands: [],
     categories: [],
     certificates: [],
+    equipment_types: [],
     families: [],
     groups: [],
     image_types: [],
@@ -39,6 +40,7 @@ var app = new Vue({
     this.brands = Vue.storage.getBrands();
     this.categories = Vue.storage.getCategories();
     this.certificates = Vue.storage.getCertificates();
+    this.equipment_types = Vue.storage.getEquipmentTypes();
     this.families = Vue.storage.getFamilies();
     this.groups = Vue.storage.getGroups();
     this.image_types = Vue.storage.getImageTypes();
@@ -50,6 +52,7 @@ var app = new Vue({
     if(this.brands.length===0 ||
        this.categories.length===0 || 
        this.certificates.length===0 || 
+       this.equipment_types.length===0 || 
        this.families.length===0 || 
        this.groups.length===0 || 
        this.image_types.length===0 || 
@@ -101,6 +104,20 @@ var app = new Vue({
       }catch(ex){
         console.error(ex);
         this.error = "Error loading certificates.";
+      } finally{
+        this.in_process--;
+      }
+    },
+    loadEquipmentTypes: async function(){
+      this.in_process++;
+      try{
+        this.equipment_types = await Vue.mtapi.getEquipmentTypes();
+        if(this.equipment_types){
+          Vue.storage.setEquipmentTypes(this.equipment_types);
+        }
+      }catch(ex){
+        console.error(ex);
+        this.error = "Error loading equipment types.";
       } finally{
         this.in_process--;
       }
@@ -209,6 +226,7 @@ var app = new Vue({
           this.loadBrands(),
           this.loadCategories(),
           this.loadCertificates(),
+          this.loadEquipmentTypes(),
           this.loadFamilies(),
           this.loadGroups(),
           this.loadImageTypes(),

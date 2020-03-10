@@ -43,6 +43,26 @@ router.get('/custom_attributes', function (req, res, next) {
   next();
 }, fetchMany);
 
+router.get('/equipment_groups', function (req, res, next) {
+  let  q = parseQueryOptions(req, ['id','equipment_id','model','group_id','group_code', 'created','updated'], ['+model','+group_code'], 1000);
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.EquipmentGroupView(),
+    query: q.query,
+    query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
+router.get('/equipment_types', function (req, res, next) {
+  let  q = parseQueryOptions(req, ['id','name_en','name_zh'], ['+name_en','+name_zh'], 1000);
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.EquipmentType(),
+    query: q.query,
+    query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
 router.get('/filter_option_views', function (req, res, next) {
   let  q = parseQueryOptions(req, ['category_id','filter_id','filter_option_id','filter_en','filter_zh','option_en','option_zh'], ['+filter_id','+filter_option_id'],  1000);
   res.locals.dbInstructions = {
