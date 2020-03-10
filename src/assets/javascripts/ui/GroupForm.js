@@ -71,11 +71,7 @@ export default {
   },
   created: async function(){
     this.$router.app.selectedMenu="group";
-    if(this.$route.params.id){
-      await this.loadData();
-    } else {
-      this.error="No group specified."
-    }
+    await this.loadData();
   },
   methods: {
     filter_as_typed: function(v){
