@@ -58,14 +58,14 @@ export default {
 
     <b-form-row>
       <b-col >
-        <b-form-group label="Family Connector Code:" label-cols="4" >
+        <b-form-group label="Family Connector Code:" label-cols="6" >
           <b-form-input v-model="family.family_connector_code" />
         </b-form-group>
       </b-col>
     </b-form-row>
 
     <b-form-row>
-      <b-col cols="8" >
+      <b-col cols="6" >
         <b-form-group label="Image link connector distal:" label-cols="4" >
           <b-form-input v-model="family.image_link_connector_distal" />
         </b-form-group>
@@ -126,7 +126,7 @@ export default {
   },
   methods: {
     loadProducts: async function(){
-      if(!this.family) return;
+      if(!this.family || !this.family.id) return;
       try{
         this.in_process++;
         this.products = await Vue.mtapi.getProducts({
@@ -170,6 +170,10 @@ export default {
     },
     loadFamily : async function(){
       try{
+        if(!this.$route.params.id || this.$route.params.id === 'new'){
+          this.family = {};
+          return;
+        }
         this.in_process++;
         this.message="Loading...";
         this.family = await Vue.mtapi.getFamily(this.$route.params.id);
@@ -185,11 +189,11 @@ export default {
     saveAllFamilyData: async function(){
       try{
         this.message="Saving...";
-        await this.saveProduct();
+        await this.saveFamily();
         
-        await Promise.all([
-          this.saveFamilyGroups(),
-        ]);
+        // await Promise.all([
+          
+        // ]);
 
       }catch(ex){
         this.message = "Error saving family.";
@@ -210,19 +214,7 @@ export default {
         this.message="";
       }
     },
-    saveFamilyGroups: async function(){
-      this.in_process++;
-      this.message="Saving groups..."
-      try{
-        await Vue.mtapi.saveFamilyGroups(this.family.id, this.family_groups);
-      }catch(ex){
-        this.message = "Error saving family groups.";
-        this.error = ex.message; 
-      }finally{
-        this.in_process--;
-        this.message="";
-      }
-    },
+   
     setProductSkus: function(){ this.product_skus = this.product_skus; return; } //readonly
   }
 };

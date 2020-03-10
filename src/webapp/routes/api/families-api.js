@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchOne, fetchById, fetchMany, parseQueryOptions, fetchCount } = require('../middleware/db-api');
+let { fetchOne, fetchById, fetchMany, parseQueryOptions, fetchCount, create, updateById } = require('../middleware/db-api');
 const FAMILY_QUERY_FIELDS = [
   'id', 'family_connector_code', 'family_code', 'image_link_connector_distal', 'created', 'updated',
   'brand_id', 'brand_en', 'brand_zh',
@@ -47,6 +47,32 @@ router.get('/:family_id', function (req, res, next) {
   next();
 
 }, fetchById);
+
+
+/** Create a family */
+router.post('/', function (req, res, next) {
+
+  let entity = req.body;
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.Family(),
+    toSave: entity
+  }
+  next();
+
+}, create);
+
+
+/** Update a family */
+router.put('/:family_id', function (req, res, next) {
+
+  let entity = req.body;
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.Family(),
+    toUpdate: entity
+  }
+  next();
+
+}, updateById);
 
 
 //Default error handling

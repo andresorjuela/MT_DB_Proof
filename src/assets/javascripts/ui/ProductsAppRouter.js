@@ -13,6 +13,7 @@ let router = new VueRouter({
     { path: '/product/:id', component: ProductForm},
     { path: '/family', component: FamilyList, props: (route) => ({ page: parseInt(route.query.page) }) },
     { path: '/family/:id', component: FamilyForm},
+    { path: '/product/new', component: FamilyForm},
     { path: '/equipment', component: Home},
     { path: '/group', component: Home},
     // { path: '/family', component: Family},

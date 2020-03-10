@@ -78,6 +78,13 @@ export class Api{
     let result =  await this._get(`${this.base_url}/products/${id}/certificates`);
     return result.product_certificates;
   }
+  async saveFamily(family){
+    if(family.id){
+      return await this._put(`${this.base_url}/families/${family.id}`,family);
+    } else {
+      return await this._post(`${this.base_url}/families`,family);
+    }
+  }
   /**
    * 
    * @param {number} product_id 

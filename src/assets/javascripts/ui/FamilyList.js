@@ -34,7 +34,7 @@ export default {
       families: [],
       fields: [
         {key: "family_code", label: "Family Code", sortable: true},
-        {key: "brand_id", label: "Brand ID", sortable: true},
+        {key: "brand_en", label: "Brand", sortable: true},
         {key: "family_connector_code", label: "Connector Code", sortable: true}
       ],
       pages:[],
