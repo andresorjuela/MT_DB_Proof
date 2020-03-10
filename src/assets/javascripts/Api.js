@@ -25,18 +25,28 @@ export class Api{
     let result = await this._get(`${this.base_url}/custom_attributes`, query);
     return result.custom_attributes;
   }
-  async getFamilies(){
-    let result = await this._get(`${this.base_url}/families`, {limit:10, order_by:'+family_code'});
-    return result.families;
+  async getFamilies(qopts){
+    if(!qopts) qopts = {limit:10, order_by:'+family_code'};
+    let result = await this._get(`${this.base_url}/families`, qopts);
+    return result.family_views;
   }
   async getFamiliesForBrand(brand_id){
     let query = {brand_id: brand_id, limit:100, order_by:'+family_code'};
     let result = await this._get(`${this.base_url}/families`, query);
-    return result.families;
+    return result.family_views;
   }
   async getFamily(id){
     let result =  await this._get(`${this.base_url}/families/${id}`);
     return result;
+  }
+  async getFamilyCount(qopts){
+    let result =  await this._get(`${this.base_url}/families/count`, qopts);
+    return result;
+  }
+  async getGroups(qopts){
+    if(!qopts) qopts={limit: 100, order_by: "+group_code"};
+    let result =  await this._get(`${this.base_url}/groups`, qopts);
+    return result.groups
   }
   async getFilterOptionViewsForCategory(category_id){
     let query = {category_id: category_id, limit:1000, order_by:'+category_id,+filter_id'};
@@ -60,7 +70,7 @@ export class Api{
     let result =  await this._get(`${this.base_url}/products/${id}`);
     return result;
   }
-  async getProductCount(id){
+  async getProductCount(){
     let result =  await this._get(`${this.base_url}/products/count`);
     return result;
   }
@@ -160,7 +170,7 @@ export class Api{
   }
 
   async getProductTypes(){
-    let result = await this._get(`${this.base_url}/product-types`, {limit:1000, order_by:'+name_en'});
+    let result = await this._get(`${this.base_url}/product-types`, {limit:100, order_by:'+name_en'});
     return result.product_types;
   }
   async getProductView(id){
@@ -168,8 +178,12 @@ export class Api{
     return result;
   }
   async getSuppliers(){
-    let result = await this._get(`${this.base_url}/suppliers`, {limit:10, order_by:'+name_en'});
+    let result = await this._get(`${this.base_url}/suppliers`, {limit:100, order_by:'+name_en'});
     return result.suppliers;
+  }
+  async getTechnologies(){
+    let result = await this._get(`${this.base_url}/technologies`, {limit:100, order_by:'+name'});
+    return result.technologies;
   }
   
   async saveProduct(product){

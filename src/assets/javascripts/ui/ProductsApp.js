@@ -21,10 +21,12 @@ var app = new Vue({
     categories: [],
     certificates: [],
     families: [],
+    groups: [],
     image_types: [],
     lifecycles: [],
     product_types: [],
     suppliers: [],
+    technologies: [],
     warranties: [],
 
   },
@@ -38,19 +40,24 @@ var app = new Vue({
     this.categories = Vue.storage.getCategories();
     this.certificates = Vue.storage.getCertificates();
     this.families = Vue.storage.getFamilies();
+    this.groups = Vue.storage.getGroups();
     this.image_types = Vue.storage.getImageTypes();
     this.lifecycles = Vue.storage.getLifecycles();
     this.product_types = Vue.storage.getProductTypes()
     this.suppliers = Vue.storage.getSuppliers();
-    
+    this.technologies = Vue.storage.getTechnologies();
+
     if(this.brands.length===0 ||
        this.categories.length===0 || 
        this.certificates.length===0 || 
        this.families.length===0 || 
+       this.groups.length===0 || 
        this.image_types.length===0 || 
        this.lifecycles.length===0 || 
        this.product_types.length===0 || 
-       this.suppliers.length===0 ){
+       this.suppliers.length===0 ||
+       this.technologies.length===0 ){
+
       await this.reloadData();
     }
     
@@ -112,6 +119,20 @@ var app = new Vue({
         this.in_process--;
       }
     },
+    loadGroups: async function(){
+      this.in_process++;
+      try{
+        this.groups = await Vue.mtapi.getGroups();
+        if(this.groups){
+          Vue.storage.setGroups(this.groups);
+        }
+      }catch(ex){
+        console.error(ex);
+        this.error = "Error loading groups.";
+      } finally{
+        this.in_process--;
+      }
+    },
     loadImageTypes: async function(){
       this.in_process++;
       try{
@@ -168,6 +189,20 @@ var app = new Vue({
         this.in_process--;
       }
     },
+    loadTechnologies: async function(){
+      this.in_process++;
+      try{
+        this.technologies = await Vue.mtapi.getTechnologies();
+        if(this.technologies){
+          Vue.storage.setTechnologies(this.technologies);
+        }
+      }catch(ex){
+        console.error(ex);
+        this.error = "Error loading technologies.";
+      } finally{
+        this.in_process--;
+      }
+    },
     reloadData: async function(){
       try{
         let pr = await Promise.all([
@@ -175,10 +210,12 @@ var app = new Vue({
           this.loadCategories(),
           this.loadCertificates(),
           this.loadFamilies(),
+          this.loadGroups(),
           this.loadImageTypes(),
           this.loadLifecycles(),
           this.loadProductTypes(),
-          this.loadSuppliers()
+          this.loadSuppliers(),
+          this.loadTechnologies()
         ]);
        
       }catch(err){

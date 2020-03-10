@@ -74,6 +74,17 @@ router.get('/filters/options', function (req, res, next) {
 }, fetchMany);
 
 
+router.get('/groups', function (req, res, next) {
+  let  q = parseQueryOptions(req, ['id','group_code','created','updated'], ['+group_code','+id'], 1000);
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.Group(),
+    query: q.query,
+    query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
+
 router.get('/image_types', function (req, res, next) {
   let  q = parseQueryOptions(req, ['name','id'], ['+name','+id'], 1000);
   res.locals.dbInstructions = {
@@ -109,6 +120,16 @@ router.get('/suppliers', function (req, res, next) {
   let  q = parseQueryOptions(req, ['name_en','name_zh','id'], ['+name_en','+id'], 1000);
   res.locals.dbInstructions = {
     dao: req.app.locals.Database.Supplier(),
+    query: q.query,
+    query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
+router.get('/technologies', function (req, res, next) {
+  let  q = parseQueryOptions(req, ['name','id'], ['+name','+id'], 1000);
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.Technology(),
     query: q.query,
     query_options: q.query_options
   }

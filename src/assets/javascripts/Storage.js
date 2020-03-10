@@ -38,6 +38,9 @@ export class Storage {
   getFamilies(){ return this.getObjectFromStorage('families'); }
   setFamilies(arr){ return this.putObjectInStorage('families', arr); }
 
+  getGroups(){ return this.getObjectFromStorage('groups'); }
+  setGroups(arr){ return this.putObjectInStorage('groups', arr); }
+
   getImageTypes(){ return this.getObjectFromStorage('image_types'); }
   setImageTypes(arr){ return this.putObjectInStorage('image_types', arr); }
 
@@ -49,6 +52,9 @@ export class Storage {
 
   getSuppliers(){ return this.getObjectFromStorage('suppliers'); }
   setSuppliers(arr){ return this.putObjectInStorage('suppliers', arr); }
+
+  getTechnologies(){ return this.getObjectFromStorage('technologies'); }
+  setTechnologies(arr){ return this.putObjectInStorage('technologies', arr); }
 
   getObjectFromStorage(key){ let str = window.localStorage.getItem(key); return str ? JSON.parse(str) : []; };
   putObjectInStorage(key, obj){ if(!obj){return;} window.localStorage.setItem(key,JSON.stringify(obj)); };

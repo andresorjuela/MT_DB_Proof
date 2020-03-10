@@ -4,11 +4,25 @@ import { ApiError } from "../Api.js";
 export default {
   template: /* html */`
 <div>
-  <b-alert v-if="!busy && hasError" variant="danger">{{ error }}</b-alert>
-  <b-alert v-if="!busy && hasMessage" variant="info">{{ message }}</b-alert>
-  <b-table hover :items="products" :fields="fields" selectable @row-selected="onRowSelected" ></b-table>
-  <b-spinner v-if="busy" variant="secondary" />
-  <b-pagination-nav v-if="!busy" :pages="pages" use-router></b-pagination-nav>
+  <b-row>
+    <b-col>
+      <b-alert v-if="!busy && hasError" variant="danger">{{ error }}</b-alert>
+      <b-alert v-if="!busy && hasMessage" variant="info">{{ message }}</b-alert>
+    </b-col>
+  </b-row>
+  <b-row>
+    <b-col>
+      <b-table hover :items="products" :fields="fields" selectable @row-selected="onRowSelected" ></b-table>
+      <b-spinner v-if="busy" variant="secondary" />
+      <b-alert v-if="!busy && !products" variant="info">No products found.</b-alert>
+    </b-col>
+  </b-row>
+  <b-row>
+    <b-col class="text-center">
+      <b-pagination-nav v-if="!busy" :pages="pages" use-router></b-pagination-nav>
+    </b-col>
+  </b-row>
+  
 </div>
   `,
   data (){
@@ -70,7 +84,7 @@ export default {
         await this.getProductCount();
     
         this.products = await Vue.mtapi.getProducts({
-          offset: (this.page-1)*this.limit,
+          offset: this.page && this.page > 0? (this.page-1)*this.limit : 0,
           limit: this.limit,
           order_by: '+sku'
         });

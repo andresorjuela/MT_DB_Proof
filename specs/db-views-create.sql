@@ -33,3 +33,14 @@ as select pfo.id, pfo.product_id, f.filter_id as filter_id, filter_option_id, pf
 from t_product_filter_option pfo
 join t_filter_option f on f.id = pfo.filter_option_id
 order by product_id asc, filter_id asc;
+
+-- family with brand, group and technology info
+create view v_family as select f.`id`, f.`family_code`, f.`family_connector_code`, 
+f.`brand_id`, b.`name_en` as brand_en, b.`name_zh` as brand_zh,
+f.`group_id`, g.`group_code`,
+f.`technology_id`, t.`name` as technology,
+f.`image_link_connector_distal`, f.`created`, f.`updated`
+from t_family f
+left outer join t_brand b on b.id=f.brand_id 
+left outer join t_group g on g.id=f.group_id 
+left outer join t_technology t on t.id=f.technology_id;
