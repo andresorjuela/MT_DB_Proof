@@ -45,13 +45,25 @@ export default {
     <b-form-row>
       <b-col cols="6">
         <b-form-group label="Brand:" label-cols="4" >
-          <b-form-select v-model="family.brand_id" :options="$router.app.brands" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'"  />
-          <b-form-select v-model="family.brand_id" :options="$router.app.brands" value-field="id" text-field="name_en" v-else />
+          <b-form-select v-model="family.brand_id" :options="$router.app.brands" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'">
+            <template v-slot:first>
+              <b-form-select-option value="" >Choose</b-form-select-option>
+            </template>
+          </b-form-select>
+          <b-form-select v-model="family.brand_id" :options="$router.app.brands" value-field="id" text-field="name_en" v-else >
+            <template v-slot:first>
+              <b-form-select-option value="" >Choose</b-form-select-option>
+            </template>
+          </b-form-select>
         </b-form-group>
       </b-col>
       <b-col cols="6">
         <b-form-group label="Technology:" label-cols="4" label-align="right" >
-          <b-form-select v-model="family.technology_id" :options="$router.app.technologies" value-field="id" text-field="name" />
+          <b-form-select v-model="family.technology_id" :options="$router.app.technologies" value-field="id" text-field="name" >
+            <template v-slot:first>
+              <b-form-select-option value="" >Choose</b-form-select-option>
+            </template>
+          </b-form-select>
         </b-form-group>
       </b-col>
     </b-form-row>
@@ -78,7 +90,11 @@ export default {
     <b-form-row>
       <b-col>
         <b-form-group label="Associated Equipment Group:" label-cols="4" >
-          <b-form-select v-model="family.group_id" :options="$router.app.groups" value-field="id" text-field="group_code" />
+          <b-form-select v-model="family.group_id" :options="$router.app.groups" value-field="id" text-field="group_code" >
+            <template v-slot:first>
+              <b-form-select-option value="" >Choose</b-form-select-option>
+            </template>
+          </b-form-select>
         </b-form-group>
       </b-col>
     </b-form-row>

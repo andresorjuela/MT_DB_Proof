@@ -25,6 +25,18 @@ export class Api{
     let result = await this._get(`${this.base_url}/custom_attributes`, query);
     return result.custom_attributes;
   }
+  async getEquipmentList(qopts){
+    if(!qopts) qopts = {limit:10, order_by:'+model'};
+    let result = await this._get(`${this.base_url}/equipment`, qopts);
+    return result.equipment_views;
+  }
+  async getEquipment(id){
+    let result =  await this._get(`${this.base_url}/equipment/${id}`);
+    return result;
+  }
+  async getEquipmentCount(qopts){
+    return await this._get(`${this.base_url}/equipment/count`, qopts);
+  }
   async getFamilies(qopts){
     if(!qopts) qopts = {limit:10, order_by:'+family_code'};
     let result = await this._get(`${this.base_url}/families`, qopts);
@@ -40,13 +52,24 @@ export class Api{
     return result;
   }
   async getFamilyCount(qopts){
-    let result =  await this._get(`${this.base_url}/families/count`, qopts);
+    return await this._get(`${this.base_url}/families/count`, qopts);
+  }
+  async getGroup(id){
+    let result =  await this._get(`${this.base_url}/groups/${id}`);
     return result;
+  }
+  async getGroupCount(qopts){
+    return await this._get(`${this.base_url}/groups/count`, qopts);
   }
   async getGroups(qopts){
     if(!qopts) qopts={limit: 100, order_by: "+group_code"};
     let result =  await this._get(`${this.base_url}/groups`, qopts);
     return result.groups
+  }
+  async getGroupEquipment(group_id, qopts){
+    if(!qopts) qopts={limit: 100, order_by: "+group_id,+model"};
+    let result =  await this._get(`${this.base_url}/groups/${group_id}/equipment`, qopts);
+    return result.equipment_group_views;
   }
   async getFilterOptionViewsForCategory(category_id){
     let query = {category_id: category_id, limit:1000, order_by:'+category_id,+filter_id'};
@@ -78,6 +101,31 @@ export class Api{
     let result =  await this._get(`${this.base_url}/products/${id}/certificates`);
     return result.product_certificates;
   }
+
+  async saveEquipment(equipment){
+    if(equipment.id){
+      return await this._put(`${this.base_url}/equipment/${equipment.id}`, equipment);
+    } else {
+      return await this._post(`${this.base_url}/equipment`, equipment);
+    }
+  }
+  async saveGroup(group){
+    if(group.id){
+      return await this._put(`${this.base_url}/groups/${group.id}`, group);
+    } else {
+      return await this._post(`${this.base_url}/groups`, group);
+    }
+  }
+  async saveGroupEquipment(group_id, equipment_ids){
+    let payload = equipment_ids.map(eqid=>{ 
+      return {
+        group_id: product_id,
+        equipment_id: eqid
+      };
+    });
+    return await this._post(`${this.base_url}/groups/${group_id}/equipment`, payload);
+  }
+
   async saveFamily(family){
     if(family.id){
       return await this._put(`${this.base_url}/families/${family.id}`,family);

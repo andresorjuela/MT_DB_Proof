@@ -48,6 +48,8 @@ module.exports = function (pool) {
   factory.Technology             = ()=>{ return create_dao('t_technology', 'technology', standard_opts, null); };
 
   //views
+  factory.EquipmentGroupView       = ()=>{ return create_dao('v_equipment_group', 'equipment_group_view', null, null); };
+  factory.EquipmentView            = ()=>{ return create_dao('v_equipment', 'equipment_view', null, null); };
   factory.FamilyView               = ()=>{ return create_dao('v_family', 'family_view', null, null); };
   factory.FilterOptionView         = ()=>{ return create_dao('v_filter_option', 'filter_option_view', null, null); };
   factory.ProductFilterOptionView  = ()=>{ return create_dao('v_product_filter_option', 'product_filter_option_view', null, null); };

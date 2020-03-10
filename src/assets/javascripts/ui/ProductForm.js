@@ -23,8 +23,16 @@ export default {
     <b-form-row>
       <b-col cols="5">
         <b-form-group id="g_p_category" description="" label="Category:" label-for="p_category" label-cols="4" >
-          <b-form-select id="p_category" v-model="product.category_id" :options="$router.app.categories" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" ></b-form-select>
-          <b-form-select id="p_category" v-model="product.category_id" :options="$router.app.categories" value-field="id" text-field="name_en" v-else></b-form-select>
+          <b-form-select id="p_category" v-model="product.category_id" :options="$router.app.categories" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" >
+            <template v-slot:first>
+              <b-form-select-option value="" >选择</b-form-select-option>
+            </template>
+          </b-form-select>
+          <b-form-select id="p_category" v-model="product.category_id" :options="$router.app.categories" value-field="id" text-field="name_en" v-else> 
+            <template v-slot:first>
+              <b-form-select-option value="" >Choose</b-form-select-option>
+            </template>
+          </b-form-select>
         </b-form-group>
       </b-col>
 
@@ -43,8 +51,16 @@ export default {
     <b-form-row>
       <b-col cols="5">
         <b-form-group id="g_p_product_type" label="Product Type:" label-for="p_product_type" label-cols="4">
-          <b-form-select id="p_product_type" v-model="product.product_type_id" :options="$router.app.product_types" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" ></b-form-select>
-          <b-form-select id="p_product_type" v-model="product.product_type_id" :options="$router.app.product_types" value-field="id" text-field="name_en" v-else ></b-form-select>
+          <b-form-select id="p_product_type" v-model="product.product_type_id" :options="$router.app.product_types" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" >
+            <template v-slot:first>
+              <b-form-select-option value="" >选择</b-form-select-option>
+            </template>
+          </b-form-select>
+          <b-form-select id="p_product_type" v-model="product.product_type_id" :options="$router.app.product_types" value-field="id" text-field="name_en" v-else > 
+            <template v-slot:first>
+              <b-form-select-option value="" >Choose</b-form-select-option>
+            </template>
+          </b-form-select>
         </b-form-group>
       </b-col>
 
@@ -92,8 +108,14 @@ export default {
       <b-col cols="5">
         <b-form-group id="g_p_supplier" label="Supplier:" label-for="p_supplier" label-align="right" label-cols="4" >
           <b-form-select id="p_supplier" v-model="product.supplier_id" :options="$router.app.suppliers" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" >
+            <template v-slot:first>
+              <b-form-select-option value="" >选择</b-form-select-option>
+            </template>
           </b-form-select>
           <b-form-select id="p_supplier" v-model="product.supplier_id" :options="$router.app.suppliers" value-field="id" text-field="name_en" v-else >
+            <template v-slot:first>
+              <b-form-select-option value="" >Choose</b-form-select-option>
+            </template>
           </b-form-select>
         </b-form-group>
       </b-col>
@@ -104,6 +126,9 @@ export default {
       <b-col cols="4">
         <b-form-group id="g_p_family" label="Family:" label-for="p_family" label-cols="4" >
           <b-form-select id="p_family" v-model="product.family_id" :options="$router.app.families" value-field="id" text-field="family_code" :disabled="busy" >
+            <template v-slot:first>
+              <b-form-select-option value="" >选择/Choose</b-form-select-option>
+            </template>
           </b-form-select>
         </b-form-group>
         <!-- <mt-family-search family_id="product.family_id"></mt-family-search> -->
@@ -126,6 +151,9 @@ export default {
       <b-col cols="3">
         <b-form-group id="g_p_lifecycle" label="Lifecycle:" label-for="p_lifecycle" label-cols="4" >
           <b-form-select id="p_lifecycle" v-model="product.lifecycle_id" :options="$router.app.lifecycles" value-field="id" text-field="name_en">
+            <template v-slot:first>
+              <b-form-select-option value="" >选择/Choose</b-form-select-option>
+            </template>
           </b-form-select>
         </b-form-group>
       </b-col>
@@ -158,7 +186,7 @@ export default {
         <b-form-group id="g_p_unit" label="Unit:" label-for="p_unit" label-align="right" label-cols="4" >
           <b-form-select id="p_unit" v-model="product.packaging_factor" :options="valid_units">
             <template v-slot:first>
-              <b-form-select-option value="" >Choose</b-form-select-option>
+              <b-form-select-option value="" >选择/Choose</b-form-select-option>
             </template>
           </b-form-select>
         </b-form-group>
@@ -193,7 +221,7 @@ export default {
         <b-form-group id="g_p_related_families" label="Related Families:" label-for="p_related_families" label-align="left" label-cols="4" >
           <b-form-select id="p_related_families" v-model="related_families" :disabled="busy" :options="$router.app.families"  text-field="family_code" value-field="id"  :select-size="4" multiple>
             <template v-slot:first>
-              <b-form-select-option :value="null">-- choose --</b-form-select-option>
+              <b-form-select-option :value="null">选择/Choose</b-form-select-option>
             </template>
           </b-form-select>
         </b-form-group>
@@ -223,7 +251,11 @@ export default {
           <b-form-row>
             <b-col cols="5">
               <b-form-group label="Image Type:" label-cols="4" >
-                <b-form-select v-model="pimage.image_type_id" :options="$router.app.image_types" value-field="id" text-field="name"></b-form-select>
+                <b-form-select v-model="pimage.image_type_id" :options="$router.app.image_types" value-field="id" text-field="name">
+                  <template v-slot:first>
+                    <b-form-select-option :value="null">选择/Choose</b-form-select-option>
+                  </template>
+                </b-form-select>
               </b-form-group>
             </b-col>
           
@@ -249,8 +281,14 @@ export default {
             <b-col cols="5">
               <b-form-group label="OEM:" label-cols="4" >
                 <b-form-select v-model="oemref.brand_id" :options="$router.app.brands" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" >
+                  <template v-slot:first>
+                    <b-form-select-option :value="null">选择</b-form-select-option>
+                  </template>
                 </b-form-select>
-                <b-form-select v-model="oemref.brand_id" :options="$router.app.brands" value-field="id" text-field="name_en" v-else >
+                <b-form-select v-model="oemref.brand_id" :options="$router.app.brands" value-field="id" text-field="name_en" v-else>
+                  <template v-slot:first>
+                    <b-form-select-option :value="null">Choose</b-form-select-option>
+                  </template>
                 </b-form-select>
               </b-form-group>
             </b-col>
@@ -280,8 +318,14 @@ export default {
             <b-col cols="6" v-for="(filter, idx) in filters" :key="filter.filter_id" >
               <b-form-group :label="filter.name_en+':'" label-cols="4" >
                 <b-form-select v-model="getProductFilterOption(filter.filter_id).filter_option_id" :options="filter.options" value-field="filter_option_id" text-field="option_zh" v-if="$router.app.lang==='zh'" >
+                  <template v-slot:first>
+                    <b-form-select-option :value="null">选择</b-form-select-option>
+                  </template>
                 </b-form-select>
                 <b-form-select v-model="getProductFilterOption(filter.filter_id).filter_option_id" :options="filter.options" value-field="filter_option_id" text-field="option_en" v-else >
+                  <template v-slot:first>
+                    <b-form-select-option :value="null">选择/Choose</b-form-select-option>
+                  </template>
                 </b-form-select>
               </b-form-group>
             </b-col>

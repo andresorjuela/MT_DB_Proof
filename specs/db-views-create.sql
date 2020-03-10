@@ -44,3 +44,21 @@ from t_family f
 left outer join t_brand b on b.id=f.brand_id 
 left outer join t_group g on g.id=f.group_id 
 left outer join t_technology t on t.id=f.technology_id;
+
+-- equipment view, includes brand info.
+create view v_equipment as select e.id, e.model, 
+e.equipment_type_id, t.name_en as type_en, t.name_zh as type_zh,
+e.brand_id, b.name_en as brand_en, b.name_zh as brand_zh,
+e.created, e.updated
+from t_equipment e  
+left outer join t_equipment_type t on t.id = e.equipment_type_id 
+left outer join t_brand b on b.id = e.brand_id;
+
+-- equipment group view
+create view v_equipment_group as select j.id, j.equipment_id,
+e.model,
+j.group_id, g.group_code,
+j.created, j.updated
+from t_equipment_group j
+left outer join t_equipment e on e.id = j.equipment_id 
+left outer join t_group g on g.id = j.group_id;

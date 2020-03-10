@@ -70,6 +70,8 @@ app.use(cookieParser());
 // var productsRouter = require('../../products');
 var productsApiRouter = require('./routes/api/products-api');
 var familiesApiRouter = require('./routes/api/families-api');
+var equipmentApiRouter = require('./routes/api/equipment-api');
+var groupsApiRouter = require('./routes/api/groups-api');
 var apiRouter = require('./routes/api/api');
 
 // app.use('/', indexRouter);
@@ -78,6 +80,8 @@ var apiRouter = require('./routes/api/api');
 // api related
 app.use('/api/v1/products', productsApiRouter);
 app.use('/api/v1/families', familiesApiRouter);
+app.use('/api/v1/equipment', equipmentApiRouter);
+app.use('/api/v1/groups', groupsApiRouter);
 app.use('/api/v1', apiRouter);
 
 // catch 404 and forward to error handler
