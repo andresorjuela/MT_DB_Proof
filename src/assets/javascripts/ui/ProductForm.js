@@ -240,7 +240,7 @@ export default {
         <h5>Images</h5>
         <b-form v-for="(pimage, idx) in product_images" :key="idx" v-if="product_images">
           <b-form-row>
-            <b-col cols="5">
+            <b-col cols="4">
               <b-form-group label="Image Type:" label-cols="4" >
                 <b-form-select v-model="pimage.image_type_id" :options="$router.app.image_types" value-field="id" text-field="name">
                   <template v-slot:first>
@@ -250,13 +250,14 @@ export default {
               </b-form-group>
             </b-col>
           
-            <b-col cols="5">
+            <b-col cols="4">
               <b-form-group label="Link:" label-align="right" label-cols="4" >
                 <b-form-input v-model="pimage.image_link" type="text" placeholder="url for the image" ></b-form-input>
               </b-form-group>
             </b-col>
 
-            <b-col cols="2">
+            <b-col cols="4">
+              <b-img :src="validateImage(pimage.image_link)" fluid/>
               <b-button @click="removeProductImage(idx)"  variant="outline-danger" size="sm">Delete</b-button>
             </b-col>
           </b-form-row>
@@ -823,5 +824,12 @@ export default {
         this.message="";
       }
     },
+    validateImage : function(img){
+      let VALID_IMG = /http[s]?:\/\/[\w-\.\/]*\.(gif|jpeg|jpg|png)/;
+      if(VALID_IMG.test(img)){
+        return img;
+      }
+      return '';
+    }
   }
 };
