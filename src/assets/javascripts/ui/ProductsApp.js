@@ -2,7 +2,8 @@ import env from "../env.js";
 import {Api} from "../Api.js";
 import {Storage} from "../Storage.js"; 
 import router from  "./ProductsAppRouter.js";
-import FamilySearch from "./comp/FamilySearch.js";
+import TreeSelector from "./comp/TreeSelector.js";
+import TreeSelectorInput from "./comp/TreeSelectorInput.js";
 
 Vue.use(new Api(env().API_BASE_URL));
 Vue.use(new Storage());
@@ -19,6 +20,7 @@ var app = new Vue({
 
     brands: [],
     categories: [],
+    
     certificates: [],
     equipment_types: [],
     families: [],
@@ -63,7 +65,7 @@ var app = new Vue({
 
       await this.reloadData();
     }
-    
+
   },
   methods:{
     loadBrands: async function(){
@@ -247,8 +249,13 @@ var app = new Vue({
       if(cat.parent_id) return this.topAncestorCategoryFor(cat.parent_id);
       //else this is it.
       return cat;
-    }
-  }
+    },
+    
+  },
+  // components:{
+  //   TreeSelector
+  // }
 }).$mount('#app');
 
-Vue.component('mt-family-search', FamilySearch);
+Vue.component("tree-selector", TreeSelector);
+Vue.component("tree-selector-input", TreeSelectorInput);

@@ -11,3 +11,21 @@ body {
 a {
   color: #00B7FF;
 }
+.mt-ts-input{
+  scroll-behavior: inherit;
+}
+.mt-ts-list,.mt-ts-list-root {
+  padding: 2px;
+  background-color: #E9ECEF;
+}
+.mt-ts-list li {
+  list-style-type: none;
+  padding-left: 1em;
+}
+.mt-ts-list-root li {
+  list-style-type: none;
+  padding-left: 1em;
+}
+.mt-ts-actionable {
+  cursor: pointer
+}

@@ -23,16 +23,7 @@ export default {
     <b-form-row>
       <b-col cols="5">
         <b-form-group id="g_p_category" description="" label="Category:" label-for="p_category" label-cols="4" >
-          <b-form-select id="p_category" v-model="product.category_id" :options="$router.app.categories" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" >
-            <template v-slot:first>
-              <b-form-select-option value="" >选择</b-form-select-option>
-            </template>
-          </b-form-select>
-          <b-form-select id="p_category" v-model="product.category_id" :options="$router.app.categories" value-field="id" text-field="name_en" v-else> 
-            <template v-slot:first>
-              <b-form-select-option value="" >Choose</b-form-select-option>
-            </template>
-          </b-form-select>
+          <tree-selector-input :list="$router.app.categories" v-model="product.category_id"></tree-selector-input>
         </b-form-group>
       </b-col>
 
