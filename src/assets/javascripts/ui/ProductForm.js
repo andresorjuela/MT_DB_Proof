@@ -41,7 +41,7 @@ export default {
           <b-input-group>
             <b-form-input id="p_name_en" v-model="product.name_en" placeholder="derived by formula" trim></b-form-input>
             <b-input-group-append>
-              <b-button variant="outline-secondary">Create Title</b-button>
+              <b-button variant="outline-secondary" @click="generateName('en')" :disabled="!hasNameFormula">Create Title</b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
@@ -69,7 +69,7 @@ export default {
           <b-input-group>
             <b-form-input id="p_name_zh" v-model="product.name_zh" placeholder="从公式得出" trim></b-form-input>
             <b-input-group-append>
-              <b-button variant="outline-secondary">Create Title</b-button>
+              <b-button variant="outline-secondary" @click="generateName('zh')" :disabled="!hasNameFormula">Create Title</b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
@@ -201,7 +201,7 @@ export default {
         </b-form-group>
       </b-col>
       <b-col>
-        <b-button variant="outline-secondary" small>Create Description</b-button>
+        <b-button variant="outline-secondary" @click="generateDescription('en')" :disabled="!hasDescriptionFormula" small>Create Description</b-button>
       </b-col>
     </b-form-row>
 
@@ -212,7 +212,7 @@ export default {
         </b-form-group>
       </b-col>
       <b-col>
-        <b-button variant="outline-secondary" small>Create Description</b-button>
+        <b-button variant="outline-secondary" @click="generateDescription('zh')" :disabled="!hasDescriptionFormula" small>Create Description</b-button>
       </b-col>
     </b-form-row>
     
@@ -388,6 +388,8 @@ export default {
     busy: function(){ return this.in_process > 0;},
     hasError: function(){ return this.error?true:false; },
     hasMessage: function(){ return this.message?true:false; },
+    hasNameFormula: function(){ return this.category && this.category.product_name_formula; },
+    hasDescriptionFormula: function(){ return this.category && this.category.product_description_formula; },
     family_connections: function(){
       if(!this.related_families) return "";
       return this.related_families
@@ -397,6 +399,9 @@ export default {
           if(f) return f.family_code;
         })
         .join(",");
+    },
+    category: function(){
+      return this.$router.app.categories.find(c=>{ return c.id == this.product.category_id; });
     },
     /**
      * The highest-level ancestor of the current category.
@@ -448,6 +453,38 @@ export default {
         this.product_filter_options.push(the_pfo);
       }
       return the_pfo;
+    },
+    generateName(locale){
+      if(this.category.product_name_formula){
+        try{
+          let generator = {
+            generate: eval(this.category.product_name_formula)
+          };
+          if(locale === 'en'){
+            this.product.name_en = generator.generate({product: this.product}, 'en');
+          } else {
+            this.product.name_zh = generator.generate({product: this.product}, 'zh');
+          }
+        }catch(ex){
+          console.error(ex);
+        }
+      }
+    },
+    generateDescription(locale){
+      if(this.category.product_description_formula){
+        try{
+          let generator = {
+            generate: eval(this.category.product_description_formula)
+          };
+          if(locale === 'en'){
+            this.product.description_en = generator.generate({product: this.product}, 'en');
+          } else {
+            this.product.description_zh = generator.generate({product: this.product}, 'zh');
+          }
+        }catch(ex){
+          console.error(ex);
+        }
+      }
     },
     loadCustomAttributesForCategory : async function(){
       try{
