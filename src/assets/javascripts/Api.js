@@ -160,7 +160,7 @@ export class Api{
 
   async getProductCustomAttributes(id){
     let result =  await this._get(`${this.base_url}/products/${id}/custom_attributes`);
-    return result.product_custom_attributes;
+    return result.product_custom_attribute_views;
   }
 /**
    * 

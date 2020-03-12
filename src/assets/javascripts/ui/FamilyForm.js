@@ -15,8 +15,9 @@ export default {
       <span class="p2 text-danger" v-if="!busy && hasError" variant="danger">{{ error }}</span>
     </b-col>
     <b-col class="text-right">
-      <b-button small variant="success" @click="saveAllFamilyData" :disabled="busy">Save Family</b-button>
-    </b-col>
+      <b-button small variant="success" @click="saveAllFamilyData" :disabled="busy">
+      <b-icon-cloud-upload />&nbsp;Save
+    </b-button>
   </b-row>
   
   <b-form v-if="family">

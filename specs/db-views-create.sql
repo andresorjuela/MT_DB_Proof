@@ -29,10 +29,14 @@ order by filter_id asc, filter_option_id asc;
 
 -- filter_id is needed to render the dynamic elements properly.
 create view v_product_filter_option
-as select pfo.id, pfo.product_id, f.filter_id as filter_id, filter_option_id, pfo.created, pfo.updated, pfo.version
+as select pfo.id, pfo.product_id, 
+f.id as filter_id, f.name_en as filter_en, f.name_zh as filter_zh,
+fo.id as filter_option_id, fo.option_en, fo.option_zh,
+pfo.created, pfo.updated, pfo.version
 from t_product_filter_option pfo
-join t_filter_option f on f.id = pfo.filter_option_id
-order by product_id asc, filter_id asc;
+left outer join t_filter_option fo on fo.id = pfo.filter_option_id
+left outer join t_filter f on f.id = fo.filter_id
+order by pfo.product_id asc, fo.filter_id asc;
 
 -- family with brand, group and technology info
 create view v_family as select f.`id`, f.`family_code`, f.`family_connector_code`, 
@@ -62,3 +66,11 @@ j.created, j.updated
 from t_equipment_group j
 left outer join t_equipment e on e.id = j.equipment_id 
 left outer join t_group g on g.id = j.group_id;
+
+-- product custom attribute view
+create view v_product_custom_attribute as
+select pca.id, 
+pca.custom_attribute_id, ca.name_en as custom_attribute_en, ca.name_zh as custom_attribute_zh,
+pca.name_en as value_en, pca.name_zh as value_zh, pca.created, pca.updated, pca.version
+from t_product_custom_attribute pca
+left outer join t_custom_attribute ca on ca.id = pca.custom_attribute_id;

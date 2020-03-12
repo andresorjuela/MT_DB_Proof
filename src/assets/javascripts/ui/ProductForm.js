@@ -15,7 +15,12 @@ export default {
       <span class="p2 text-danger" v-if="!busy && hasError" variant="danger">{{ error }}</span>
     </b-col>
     <b-col class="text-right">
-      <b-button small variant="success" @click="saveAllProductData" :disabled="busy">Save Product</b-button>
+      <b-button small variant="outline-secondary" @click="saveAllProductData" :disabled="busy" :to="'/view/product/'+product.id">
+        <b-icon-eye-fill />&nbsp;Preview
+      </b-button>
+      <b-button small variant="success" @click="saveAllProductData" :disabled="busy" >
+        <b-icon-cloud-upload />&nbsp;Save
+      </b-button>
     </b-col>
   </b-row>
   

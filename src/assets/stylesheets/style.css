@@ -29,3 +29,11 @@ a {
 .mt-ts-actionable {
   cursor: pointer
 }
+.tlabel {
+  float: left;
+  padding: 2px;
+}
+.tvalue {
+  float: right;
+  padding: 2px;
+}

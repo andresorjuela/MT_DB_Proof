@@ -2,6 +2,7 @@ import Home from './Home.js';
 import ProductAdd from './ProductAdd.js';
 import ProductList from './ProductList.js';
 import ProductForm from './ProductForm.js';
+import ProductDisplay from './ProductDisplay.js';
 import FamilyList from './FamilyList.js';
 import FamilyForm from './FamilyForm.js';
 import GroupList from './GroupList.js';
@@ -27,7 +28,9 @@ let router = new VueRouter({
     
     { path: '/group', component: GroupList, props: (route) => ({ page: parseInt(route.query.page) }) },
     { path: '/group/new', component: GroupForm},
-    { path: '/group/:id', component: GroupForm}, 
+    { path: '/group/:id', component: GroupForm},
+
+    { path: '/view/product/:id', component: ProductDisplay},
   ]
 });
 

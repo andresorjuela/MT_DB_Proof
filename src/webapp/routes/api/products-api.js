@@ -113,9 +113,10 @@ router.post('/:product_id/certificates', function (req, res, next) {
   next();
 }, saveAll);
 
+/** Get all custom attribute values for a product. */
 router.get('/:product_id/custom_attributes', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.ProductCustomAttribute(),
+    dao: req.app.locals.Database.ProductCustomAttributeView(),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   }
