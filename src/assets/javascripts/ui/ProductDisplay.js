@@ -19,32 +19,14 @@ export default {
     </b-row>
     
     <b-row>
-      <b-col cols="4">
-        <span class="tvalue text-info" v-if="$router.app.lang==='zh'">{{product.description_zh||'(no description yet)'}}</span>
-        <span class="tvalue text-info" v-else>{{product.description_en||'(no description yet)'}}</span>
+      <b-col cols="8">
+        <span class="text-info" v-if="$router.app.lang==='zh'">{{product.description_zh||'(no description yet)'}}</span>
+        <span class="text-info" v-else>{{product.description_en||'(no description yet)'}}</span>
       </b-col>
-      <b-col v-if="product_images" cols="8" class="text-right">
-        <b-row>
-          <b-col>
-            <b-img v-if="product_images.length>0" :src="product_images[0].image_link" height="200px"></b-img>
-            <b-icon-image v-else />
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col>
-            <b-icon-image />
-          </b-col>
-          <b-col>
-            <b-icon-image />
-          </b-col>
-          <b-col>
-            <b-icon-image />
-          </b-col>
-          <b-col>
-            <b-icon-image />
-          </b-col>
-        </b-row>
-
+      <b-col v-if="product_images" cols="4" >
+        <b-carousel controls indicators background="#0c0c0c" img-width="400" img-height="300" style="text-shadow: 1px 1px 2px #333;">
+          <b-carousel-slide v-for="(img,idx) in product_images" :key="idx" :caption="img.image_type" :img-src="img.image_link"></b-carousel-slide>
+        </b-carousel>
       </b-col>
     </b-row>
 
@@ -92,17 +74,21 @@ export default {
         <span class="tlabel">Warranty:</span>
         <span class="tvalue text-info" >{{product.warranty_duration_months}} months</span>
       </b-col>
-      <b-col>
-        <span class="tlabel">Certificates:</span>
-        <span class="tvalue text-info" >{{ certificates || '(none)' }}</span>
-      </b-col>
+      
     </b-row>
 
     <b-row>
       <b-col>
+        <span class="tlabel">Certificates:</span>
+        <span class="tvalue text-info" >{{ certificates || '(none)' }}</span>
+      </b-col>
+      <b-col>
         <span class="tlabel">Lifecycle:</span>
         <span class="tvalue text-info" >{{product.lifecycle_en}}</span>
       </b-col>
+    </b-row>
+
+    <b-row>
       <b-col>
         <span class="tlabel">Price:</span>
         <span class="tvalue text-info">{{ product.price+' ￥' }}</span>
@@ -111,10 +97,14 @@ export default {
         <span class="tlabel">Weight:</span>
         <span class="tvalue text-info">{{ product.weight ? product.weight+' g' : '' }}</span>
       </b-col>
+    </b-row>
+
+    <b-row>
       <b-col>
         <span class="tlabel">Unit:</span>
         <span class="tvalue text-info">{{ product.packaging_factor }}</span>
       </b-col>
+      <b-col></b-col>
     </b-row>
 
     <b-row>
@@ -122,6 +112,7 @@ export default {
         <span class="tlabel">Connects To:</span>
         <span class="tvalue text-info">{{ connects_to || '(none)' }}</span>
       </b-col>
+      <b-col></b-col>
     </b-row>
 
     <b-row>
@@ -129,6 +120,7 @@ export default {
         <span class="tlabel">Tags:</span>
         <span class="tvalue text-info" >{{ product.tags || '(none)' }}</span>
       </b-col>
+      <b-col></b-col>
     </b-row>
    
 

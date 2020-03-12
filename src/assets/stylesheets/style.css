@@ -35,5 +35,5 @@ a {
 }
 .tvalue {
   float: right;
-  padding: 2px;
+  padding-left: 1em;
 }

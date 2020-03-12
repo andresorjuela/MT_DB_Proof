@@ -74,3 +74,10 @@ pca.custom_attribute_id, ca.name_en as custom_attribute_en, ca.name_zh as custom
 pca.name_en as value_en, pca.name_zh as value_zh, pca.created, pca.updated, pca.version
 from t_product_custom_attribute pca
 left outer join t_custom_attribute ca on ca.id = pca.custom_attribute_id;
+
+-- product iamge view
+create view v_product_image as select pi.id, pi.product_id, pi.image_type_id,
+it.name as image_type, 
+pi.image_link, pi.created, pi.updated, pi.version 
+from t_product_image pi 
+left outer join t_image_type it on it.id = pi.image_type_id;

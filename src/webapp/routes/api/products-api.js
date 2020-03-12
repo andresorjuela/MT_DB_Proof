@@ -179,7 +179,7 @@ router.post('/:product_id/filter_options', function (req, res, next) {
 // Get all product family connections
 router.get('/:product_id/images', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.ProductImage(),
+    dao: req.app.locals.Database.ProductImageView(),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   }

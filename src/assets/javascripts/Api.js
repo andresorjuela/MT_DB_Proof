@@ -210,7 +210,7 @@ export class Api{
 
   async getProductImages(id){
     let result =  await this._get(`${this.base_url}/products/${id}/images`);
-    return result.product_images;
+    return result.product_image_views;
   }
   /**
    * 

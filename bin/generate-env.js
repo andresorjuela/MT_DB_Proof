@@ -12,8 +12,10 @@ const pug = require('pug');
 
 try{
 
-  generateIndexFile();
   generateEnvFile();
+  generateIndexFile();
+  generateBrowseFile();
+
   process.exit(0);
 
 } catch(ex){
@@ -55,6 +57,18 @@ function generateIndexFile(){
   let context = {};
   
   let outfile = path.join( path.dirname("."), "src", "assets", `index.html`);
+
+  fs.writeFileSync(outfile, compiledFunction(context) ); 
+}
+
+function generateBrowseFile(){
+  let templatefile = path.join( path.dirname("."), "src", "assets", "views", `browse.pug`);
+  
+  let compiledFunction = pug.compileFile(templatefile);
+  
+  let context = {};
+  
+  let outfile = path.join( path.dirname("."), "src", "assets", `browse.html`);
 
   fs.writeFileSync(outfile, compiledFunction(context) ); 
 }

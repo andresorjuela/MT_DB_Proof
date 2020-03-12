@@ -1,5 +1,6 @@
 'use strict'
 import { ApiError } from "../Api.js";
+import env from "../env.js";
 export default {
   template: /*html*/
   `
@@ -15,7 +16,7 @@ export default {
       <span class="p2 text-danger" v-if="!busy && hasError" variant="danger">{{ error }}</span>
     </b-col>
     <b-col class="text-right">
-      <b-button small variant="outline-secondary" @click="saveAllProductData" :disabled="busy" :to="'/view/product/'+product.id">
+      <b-button small variant="outline-secondary" @click="saveAllProductData" :disabled="busy" :href="browse_url">
         <b-icon-eye-fill />&nbsp;Preview
       </b-button>
       <b-button small variant="success" @click="saveAllProductData" :disabled="busy" >
@@ -382,6 +383,7 @@ export default {
   },
   //props: {},
   computed: {
+    browse_url: function(){ return this.product ? `${env().STATIC_ASSETS_PATH}/browse.html#/${this.product.id}`: ''; },
     busy: function(){ return this.in_process > 0;},
     hasError: function(){ return this.error?true:false; },
     hasMessage: function(){ return this.message?true:false; },
