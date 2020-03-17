@@ -22,8 +22,8 @@ export default {
     </b-form-row>
     <b-form-row>
       <b-col>
-        <b-form-group label="Category:"  label-cols="4" class="pb-1"  >
-          <b-form-select v-model="product.category_id" :options="$router.app.categories" value-field="id" text-field="name_en" ></b-form-select>
+        <b-form-group id="g_p_category" description="" label="Category:" label-for="p_category" label-cols="4" >
+          <tree-selector-input :list="$router.app.categories" v-model="product.category_id"></tree-selector-input>
         </b-form-group>
       </b-col>
       <b-col>
@@ -39,7 +39,9 @@ export default {
       message: null,
       error: null,
       in_process: 0,
-      product: null,
+      product: {
+        category_id: 0
+      },
     }
   },
   //props: {},
@@ -48,11 +50,8 @@ export default {
     hasError: function(){ return this.error?true:false; },
     hasMessage: function(){ return this.message?true:false; }
   },
-  created: async function(){
+  create: async function(){
     this.$router.app.selectedMenu="product";
-    this.product = {
-      category_id: 0
-    };
   },
   methods: {
     selectProductCategory : async function(){

@@ -16,7 +16,7 @@ export default {
       <span class="p2 text-danger" v-if="!busy && hasError" variant="danger">{{ error }}</span>
     </b-col>
     <b-col class="text-right">
-      <b-button small variant="outline-secondary" @click="saveAllProductData" :disabled="busy" :href="browse_url">
+      <b-button small variant="outline-secondary" @click="saveAllProductData" :disabled="busy" :href="browse_url" target="_blank">
         <b-icon-eye-fill />&nbsp;Preview
       </b-button>
       <b-button small variant="success" @click="saveAllProductData" :disabled="busy" >
@@ -75,7 +75,7 @@ export default {
     </b-form-row>
 
     <b-form-row>
-      <b-col cols="5">
+      <b-col cols="5" v-if="isAccessory||isPart">
         <b-form-group id="g_p_oem" label="OEM:" label-for="p_oem" label-cols="4" >
           <b-form-input id="p_oem" v-model="product.oem" trim></b-form-input>
         </b-form-group>
@@ -93,7 +93,7 @@ export default {
     </b-form-row>
 
     <b-form-row>
-      <b-col cols="5">
+      <b-col cols="5" v-if="isAccessory||isPart">
         <b-form-group id="g_p_oem" label="Manufacturer:"  label-cols="4" class="pb-1"  >
           <b-form-input v-if="$router.app.lang==='zh'" v-model="product.brand_zh" readonly ></b-form-input>
           <b-form-input v-else v-model="product.brand_en" readonly></b-form-input>
@@ -120,7 +120,7 @@ export default {
     </b-form-row>
 
     <b-form-row>
-      <b-col cols="4">
+      <b-col v-if="isAccessory||isPart" >
         <b-form-group id="g_p_family" label="Family:" label-for="p_family" label-cols="4" >
           <b-form-select id="p_family" v-model="product.family_id" :options="$router.app.families" value-field="id" text-field="family_code" :disabled="busy" >
             <template v-slot:first>
@@ -130,13 +130,13 @@ export default {
         </b-form-group>
         <!-- <mt-family-search family_id="product.family_id"></mt-family-search> -->
       </b-col>
-      <b-col cols="3">
+      <b-col >
         <b-form-group id="g_p_warranty" description="months duration" label="Warranty:" label-for="p_warranty" label-align="right" label-cols="4" >
           <b-form-input id="p_warranty" v-model="product.warranty_duration_months" type="number" min=0 max=120 step=1>
           </b-form-input>
         </b-form-group>
       </b-col>
-      <b-col cols="5">
+      <b-col v-if="isAccessory">
         <b-form-group id="g_p_certificates" label="Certificates:" label-for="p_certificates" label-cols="3" >
           <b-form-checkbox-group id="p_certficates" v-model="product_certificates" :options="$router.app.certificates" value-field="id" text-field="name_en" :disabled="busy" >
           </b-form-checkbox-group>       
@@ -145,7 +145,7 @@ export default {
     </b-form-row>
 
     <b-form-row>
-      <b-col cols="3">
+      <b-col cols="3" v-if="isAccessory">
         <b-form-group id="g_p_lifecycle" label="Lifecycle:" label-for="p_lifecycle" label-cols="4" >
           <b-form-select id="p_lifecycle" v-model="product.lifecycle_id" :options="$router.app.lifecycles" value-field="id" text-field="name_en">
             <template v-slot:first>
@@ -167,7 +167,7 @@ export default {
         </b-form-group>
       </b-col>
       
-      <b-col cols="3">
+      <b-col cols="3" v-if="isAccessory||isPart" >
         <b-form-group id="g_p_weight" label="Weight:" label-for="p_weight" label-align="right" label-cols="4" >
           <b-input-group>
             <b-form-input id="p_weight" v-model="product.weight" type="number" :number="true" min=0 step=0.01 >
@@ -179,7 +179,7 @@ export default {
         </b-form-group>
       </b-col>
 
-      <b-col cols="3">
+      <b-col cols="3" v-if="isAccessory||isPart" >
         <b-form-group id="g_p_unit" label="Unit:" label-for="p_unit" label-align="right" label-cols="4" >
           <b-form-select id="p_unit" v-model="product.packaging_factor" :options="valid_units">
             <template v-slot:first>
@@ -213,7 +213,7 @@ export default {
       </b-col>
     </b-form-row>
     
-    <b-form-row>
+    <b-form-row v-if="isAccessory">
       <b-col cols="6">
         <b-form-group id="g_p_related_families" label="Related Families:" label-for="p_related_families" label-align="left" label-cols="4" >
           <b-form-select id="p_related_families" v-model="related_families" :disabled="busy" :options="$router.app.families"  text-field="family_code" value-field="id"  :select-size="4" multiple>
@@ -272,7 +272,7 @@ export default {
         <b-button variant="outline-success" @click="newProductImage" size="sm">Add Image</b-button>
       </b-tab>
       
-      <b-tab title="OEM References" @click="loadProductOemReferences">
+      <b-tab title="OEM References" @click="loadProductOemReferences" v-if="isAccessory" >
         <h5>OEM References</h5>
         <b-form v-for="(oemref, idx) in product_oem_refs" :key="oemref.brand_id" v-if="product_oem_refs">
           <b-form-row>
@@ -332,7 +332,7 @@ export default {
         </b-form>
       </b-tab>
       
-      <b-tab title="Custom Attributes" @click="loadProductCustomAttributes">
+      <b-tab title="Custom Attributes" @click="loadProductCustomAttributes" v-if="isAccessory||isRepairService">
         <h5>Custom Attributes</h5>
         <b-form v-if="product_custom_attributes">
           <b-form-row>
@@ -347,7 +347,7 @@ export default {
         </b-form>
       </b-tab>
 
-      <b-tab title="Set">
+      <b-tab title="Set" v-if="isPart">
         <h5>Set</h5>
       </b-tab>
     </b-tabs>
@@ -385,10 +385,9 @@ export default {
   computed: {
     browse_url: function(){ return this.product ? `${env().STATIC_ASSETS_PATH}/browse.html#/${this.product.id}`: ''; },
     busy: function(){ return this.in_process > 0;},
-    hasError: function(){ return this.error?true:false; },
-    hasMessage: function(){ return this.message?true:false; },
-    hasNameFormula: function(){ return this.category && this.category.product_name_formula; },
-    hasDescriptionFormula: function(){ return this.category && this.category.product_description_formula; },
+    category: function(){
+      return this.$router.app.categories.find(c=>{ return c.id == this.product.category_id; });
+    },
     family_connections: function(){
       if(!this.related_families) return "";
       return this.related_families
@@ -399,15 +398,19 @@ export default {
         })
         .join(",");
     },
-    category: function(){
-      return this.$router.app.categories.find(c=>{ return c.id == this.product.category_id; });
-    },
     /**
      * The highest-level ancestor of the current category.
      */
     general_category: function(){
       return this.$router.app.topAncestorCategoryFor(this.product.category_id);
     },
+    hasError: function(){ return this.error?true:false; },
+    hasMessage: function(){ return this.message?true:false; },
+    hasNameFormula: function(){ return this.category && this.category.product_name_formula; },
+    hasDescriptionFormula: function(){ return this.category && this.category.product_description_formula; },
+    isPart: function(){ return this.general_category.id==2; },
+    isAccessory: function(){ return this.general_category.id==1; },
+    isRepairService: function(){ return this.general_category.id==3; },
     valid_units: function(){
       let units = [1, 5, 6, 10, 12, 16, 20, 24, 25, 50, 100];
       let ancestor = this.general_category;
