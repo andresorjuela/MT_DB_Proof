@@ -1,5 +1,6 @@
 'use strict'
 import { ApiError } from "../Api.js";
+import { Storage } from "../Storage.js";
 export default {
   template: /*html*/
   `
@@ -207,10 +208,9 @@ export default {
       try{
         this.message="Saving...";
         await this.saveFamily();
-        
-        // await Promise.all([
-          
-        // ]);
+       
+        //Regenerate the cache.
+        this.$router.app.loadFamilies();
 
       }catch(ex){
         this.message = "Error saving family.";

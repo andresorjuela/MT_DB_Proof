@@ -26,7 +26,7 @@ export class Api{
     return result.custom_attributes;
   }
   async getEquipmentList(qopts){
-    if(!qopts) qopts = {limit:100, order_by:'+model'};
+    if(!qopts) qopts = {limit:1000, order_by:'+model'};
     let result = await this._get(`${this.base_url}/equipment`, qopts);
     return result.equipment_views;
   }
@@ -38,22 +38,22 @@ export class Api{
     return await this._get(`${this.base_url}/equipment/count`, qopts);
   }
   async getEquipmentGroups(qopts){
-    if(!qopts) qopts={limit: 100, order_by: "+model,+group_code"};
+    if(!qopts) qopts={limit: 1000, order_by: "+model,+group_code"};
     let result =  await this._get(`${this.base_url}/equipment_groups`, qopts);
     return result.equipment_group_views;
   }
   async getEquipmentTypes(qopts){
-    if(!qopts) qopts = {limit:100, order_by:'+name_en'};
+    if(!qopts) qopts = {limit:1000, order_by:'+name_en'};
     let result = await this._get(`${this.base_url}/equipment_types`, qopts);
     return result.equipment_types;
   }
   async getFamilies(qopts){
-    if(!qopts) qopts = {limit:10, order_by:'+family_code'};
+    if(!qopts) qopts = {limit:1000, order_by:'+family_code'};
     let result = await this._get(`${this.base_url}/families`, qopts);
     return result.family_views;
   }
   async getFamiliesForBrand(brand_id){
-    let query = {brand_id: brand_id, limit:100, order_by:'+family_code'};
+    let query = {brand_id: brand_id, limit:1000, order_by:'+family_code'};
     let result = await this._get(`${this.base_url}/families`, query);
     return result.family_views;
   }
@@ -72,12 +72,12 @@ export class Api{
     return await this._get(`${this.base_url}/groups/count`, qopts);
   }
   async getGroups(qopts){
-    if(!qopts) qopts={limit: 100, order_by: "+group_code"};
+    if(!qopts) qopts={limit: 1000, order_by: "+group_code"};
     let result =  await this._get(`${this.base_url}/groups`, qopts);
     return result.groups
   }
   async getGroupEquipment(group_id, qopts){
-    if(!qopts) qopts={limit: 100, order_by: "+group_id,+model"};
+    if(!qopts) qopts={limit: 1000, order_by: "+group_id,+model"};
     let result =  await this._get(`${this.base_url}/groups/${group_id}/equipment`, qopts);
     return result.equipment_group_views;
   }
@@ -95,7 +95,7 @@ export class Api{
     return result.lifecycles;
   }
   async getProducts(qopts){
-    if(!qopts) qopts = {limit:10, order_by:'+name_en'};
+    if(!qopts) qopts = {limit:1000, order_by:'+name_en'};
     let result = await this._get(`${this.base_url}/products`, qopts);
     return result.product_views;
   }

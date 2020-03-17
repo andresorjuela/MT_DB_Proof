@@ -31,6 +31,7 @@ export class Storage {
 
   getCategories(){ return this.getObjectFromStorage('categories'); }
   setCategories(arr){ return this.putObjectInStorage('categories', arr); }
+  removeCategories(){ return this.removeFromStorage('categories'); }
 
   getCertificates(){ return this.getObjectFromStorage('certificates'); }
   setCertificates(arr){ return this.putObjectInStorage('certificates', arr); }
@@ -40,7 +41,8 @@ export class Storage {
 
   getFamilies(){ return this.getObjectFromStorage('families'); }
   setFamilies(arr){ return this.putObjectInStorage('families', arr); }
-
+  removeFamilies(){ return this.removeFromStorage('families'); }
+  
   getGroups(){ return this.getObjectFromStorage('groups'); }
   setGroups(arr){ return this.putObjectInStorage('groups', arr); }
 
@@ -63,7 +65,8 @@ export class Storage {
   putObjectInStorage(key, obj){ if(!obj){return;} window.localStorage.setItem(key,JSON.stringify(obj)); };
   getStringFromStorage(key){ let str = window.localStorage.getItem(key); return str; }
   putStringInStorage(key, str){ window.localStorage.setItem(key,str); }
-
+  removeFromStorage(key){ window.localStorage.removeItem(key); }
+  
   install(Vue){
     if(!storageAvailable("localStorage")){
       console.error("This app uses browser local storage for better performance. Please enable local storage or use a different browser.");
