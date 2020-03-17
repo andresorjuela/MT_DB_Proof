@@ -62,7 +62,7 @@ export default {
       </b-col>
 
       <b-col>
-        <b-form-group id="g_p_name_zh" label="Title:" label-for="p_name_zh" label-cols="2" label-align="right" >
+        <b-form-group id="g_p_name_zh" label="Title (ZH):" label-for="p_name_zh" label-cols="2" label-align="right" >
           <b-input-group>
             <b-form-input id="p_name_zh" v-model="product.name_zh" placeholder="从公式得出" trim></b-form-input>
             <b-input-group-append>
@@ -204,7 +204,7 @@ export default {
 
     <b-form-row >
       <b-col cols="8">
-        <b-form-group id="g_p_description_zh" label="Description (CH):" label-for="p_description_zh" label-align="left" label-cols="2" >
+        <b-form-group id="g_p_description_zh" label="Description (ZH):" label-for="p_description_zh" label-align="left" label-cols="2" >
           <b-form-textarea id="p_description_zh" v-model="product.description_zh" rows="3" max-rows="6"></b-form-textarea>
         </b-form-group>
       </b-col>
@@ -263,7 +263,7 @@ export default {
             </b-col>
 
             <b-col cols="4">
-              <b-img :src="validateImage(pimage.image_link)" fluid/>
+              <b-img :src="validateImage(pimage.image_link)" width="120" height="80" right />
               <b-button @click="removeProductImage(idx)"  variant="outline-danger" size="sm">Delete</b-button>
             </b-col>
           </b-form-row>

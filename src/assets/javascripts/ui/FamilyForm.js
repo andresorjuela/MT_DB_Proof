@@ -84,7 +84,7 @@ export default {
         </b-form-group>
       </b-col>
       <b-col>
-        <b-img :src="family.image_link_connector_distal" fluid/>
+        <b-img :src="family.image_link_connector_distal" width="120" height="80" right/>
       </b-col>
     </b-form-row>
 
