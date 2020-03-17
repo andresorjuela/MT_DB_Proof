@@ -147,7 +147,7 @@ router.get('/suppliers', function (req, res, next) {
 }, fetchMany);
 
 router.get('/technologies', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['name','id'], ['+name','+id'], 1000);
+  let  q = parseQueryOptions(req, ['name_en','name_zh','id'], ['+name_en','+id'], 1000);
   res.locals.dbInstructions = {
     dao: req.app.locals.Database.Technology(),
     query: q.query,

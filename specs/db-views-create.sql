@@ -42,7 +42,7 @@ order by pfo.product_id asc, fo.filter_id asc;
 create view v_family as select f.`id`, f.`family_code`, f.`family_connector_code`, 
 f.`brand_id`, b.`name_en` as brand_en, b.`name_zh` as brand_zh,
 f.`group_id`, g.`group_code`,
-f.`technology_id`, t.`name` as technology,
+f.`technology_id`, t.`name_en` as technology_en, t.`name_zh` as technology_zh,
 f.`image_link_connector_distal`, f.`created`, f.`updated`
 from t_family f
 left outer join t_brand b on b.id=f.brand_id 
