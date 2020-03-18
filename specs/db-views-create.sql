@@ -69,9 +69,9 @@ left outer join t_group g on g.id = j.group_id;
 
 -- product custom attribute view
 create view v_product_custom_attribute as
-select pca.id, 
+select pca.id, pca.product_id, 
 pca.custom_attribute_id, ca.name_en as custom_attribute_en, ca.name_zh as custom_attribute_zh,
-pca.name_en as value_en, pca.name_zh as value_zh, pca.created, pca.updated, pca.version
+pca.value_en as value_en, pca.value_zh as value_zh, pca.created, pca.updated, pca.version
 from t_product_custom_attribute pca
 left outer join t_custom_attribute ca on ca.id = pca.custom_attribute_id;
 
@@ -81,3 +81,11 @@ it.name as image_type,
 pi.image_link, pi.created, pi.updated, pi.version 
 from t_product_image pi 
 left outer join t_image_type it on it.id = pi.image_type_id;
+
+-- product set view
+create view v_product_set as select s.id, s.parent_product_id, pp.sku as parent_sku, 
+s.child_product_id, p.sku as child_sku,
+s.quantity, s.created, s.updated, s.version
+from t_product_set s
+left outer join t_product pp on pp.id=s.parent_product_id
+left outer join t_product p on p.id=s.child_product_id;

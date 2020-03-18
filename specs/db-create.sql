@@ -45,8 +45,8 @@ CREATE TABLE `t_certificate` (
 CREATE TABLE `t_custom_attribute` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `category_id` int(11) unsigned NOT NULL,
-  `name_en` varchar(255) DEFAULT NULL,
-  `name_zh` varchar(255) DEFAULT NULL,
+  `value_en` varchar(255) DEFAULT NULL,
+  `value_zh` varchar(255) DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
