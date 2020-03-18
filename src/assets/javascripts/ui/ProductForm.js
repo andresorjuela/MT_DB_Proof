@@ -342,22 +342,53 @@ export default {
           <b-spinner small variant="secondary" v-if="busy && tab_active=='Custom Attributes'"></b-spinner> Custom Attributes
         </template>
         <b-form v-if="product_custom_attributes">
-          <b-form-row>
-            <b-col cols="6" v-for="(attr, idx) in custom_attributes" :key="attr.id" >
-              <b-form-group :label="attr.name_en+':'" label-cols="4" >
-                <b-form-input v-model="getProductCustomAttribute(attr.id).name_en" type="text">
+          <b-form-row v-for="(attr, idx) in custom_attributes" :key="idx" >
+            <b-col cols="6" >
+              <b-form-group :label="attr.name_en+' (EN):'" label-cols="4" >
+                <b-form-input v-model="getProductCustomAttribute(attr.id).value_en" type="text">
                 </b-form-input>
               </b-form-group>
             </b-col>
-
+            <b-col cols="6" >
+              <b-form-group :label="attr.name_zh+' (ZH):'" label-cols="4" >
+                <b-form-input v-model="getProductCustomAttribute(attr.id).value_zh" type="text">
+                </b-form-input>
+              </b-form-group>
+            </b-col>
           </b-form-row>
         </b-form>
       </b-tab>
 
-      <b-tab v-if="isPart">
+      <b-tab @click="loadProductSets" v-if="isPart">
         <template v-slot:title>
           <b-spinner small variant="secondary" v-if="busy"></b-spinner> Set
         </template>
+        <b-form v-for="(pset, idx) in product_sets" :key="idx" v-if="product_sets">
+          <b-form-row>
+            <b-col cols="4">
+              <b-form-group label="Child product:" label-cols="4" >
+                <b-form-select v-model="pset.child_product_id" :options="products" value-field="id" text-field="sku">
+                  <template v-slot:first>
+                    <b-form-select-option :value="null">选择/Choose</b-form-select-option>
+                  </template>
+                </b-form-select>
+              </b-form-group>
+            </b-col>
+          
+            <b-col cols="4">
+              <b-form-group label="Child count:" label-align="right" label-cols="4" >
+                <b-form-input type="number" min="0" step="1" v-model="pset.quantity"></b-form-input>
+              </b-form-group>
+            </b-col>
+
+            <b-col cols="4">
+              <b-button @click="removeProductSet(idx)"  variant="outline-danger" size="sm">Delete</b-button>
+            </b-col>
+          </b-form-row>
+        </b-form>
+        
+        <b-button variant="outline-success" @click="newProductSet" size="sm">Add Child Product</b-button>
+
       </b-tab>
     </b-tabs>
   </b-card>
@@ -380,15 +411,16 @@ export default {
       product_certificates: [],
       product_tags: [],
       
+      products: [], //for sets
       /*
         Initialized to null intentionally. Load from server only loads
         when null, not when empty.
       */
-      product_oem_refs: null,
       product_images: null, 
       product_custom_attributes: null,
-      product_filter_options: null
-      
+      product_filter_options: null,
+      product_oem_refs: null,
+      product_sets: null,
     }
   },
   //props: {},
@@ -591,6 +623,20 @@ export default {
         this.in_process--;
       }
     },
+    loadProducts : async function(){
+      try{
+        this.in_process++;
+        this.message="Loading...";
+        this.products = await Vue.mtapi.getProducts({order_by:"+sku", limit: 1000});
+        
+      }catch(ex){
+        console.error(ex);
+        this.error="Couldn't load products.";
+      } finally {
+        this.message = null;
+        this.in_process--;
+      }
+    },
     loadProductCertificates : async function(){
       try{
         this.in_process++;
@@ -704,6 +750,28 @@ export default {
         this.message="";
       }
     },
+    loadProductSets : async function(){
+      if(this.product_sets!==null) return;//Otherwise server overwrites work
+      try{
+        this.tab_active = 'Sets';
+        this.error = null;
+        this.message = "Loading set...";  
+        this.in_process++;
+        this.product_sets = await Vue.mtapi.getProductSets(this.$route.params.id);
+        await this.loadProducts();
+
+      } catch (err){
+        if(err instanceof ApiError){
+          this.error = `Couldn't get product set. ${err.message}`;
+        } else {
+          console.error(err);
+        }
+      } finally {
+        this.tab_active = null;
+        this.message="";
+        this.in_process--;
+      }
+    },
     newProductFilterOption : function(){
       this.product_filter_options.push({
         id: null,
@@ -727,6 +795,13 @@ export default {
         name: ""
       });
     },
+    newProductSet : function(){
+      this.product_sets.push({
+        parent_product_id: this.product.id,
+        child_product_id: null,
+        quantity: null
+      });
+    },
     removeProductFilterOption : function(idx){
       if(idx>=0) this.product_filter_options.splice(idx, 1);
     },
@@ -735,6 +810,9 @@ export default {
     },
     removeProductOemReference : function(idx){
       if(idx>=0) this.product_oem_refs.splice(idx, 1);
+    },
+    removeProductSet: function(idx){
+      if(idx>=0) this.product_sets.splice(idx, 1);
     },
     saveAllProductData: async function(){
       try{
@@ -748,6 +826,7 @@ export default {
           this.saveProductOemReferences(),
           this.saveProductFilterOptions(),
           this.saveProductCustomAttributes(),
+          this.saveProductSets(),
         ]);
 
       }catch(ex){
@@ -846,6 +925,20 @@ export default {
         await Vue.mtapi.saveProductOemReferences(this.product.id, this.product_oem_refs);
       }catch(ex){
         this.message = "Error OEM references.";
+        this.error = ex.message; 
+      }finally{
+        this.in_process--;
+        this.message="";
+      }
+    },
+    saveProductSets: async function(){
+      if(this.product_sets === null) return;
+      this.in_process++;
+      this.message="Saving set..."
+      try{
+        await Vue.mtapi.saveProductSets(this.product.id, this.product_sets);
+      }catch(ex){
+        this.message = "Error saving set.";
         this.error = ex.message; 
       }finally{
         this.in_process--;
