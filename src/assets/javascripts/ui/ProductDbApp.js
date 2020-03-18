@@ -242,6 +242,21 @@ var app = new Vue({
         console.error(err);
       }
     },
+    simulateLogout: function(){
+      Vue.storage.clearBrands();
+      Vue.storage.clearCategories();
+      Vue.storage.clearCertificates();
+      Vue.storage.clearEquipmentTypes();
+      Vue.storage.clearFamilies();
+      Vue.storage.clearGroups();
+      Vue.storage.clearImageTypes();
+      Vue.storage.clearLifecycles();
+      Vue.storage.clearProductTypes()
+      Vue.storage.clearSuppliers();
+      Vue.storage.clearTechnologies();
+      this.reloadData();
+      this.$router.push({path: "/"});
+    },
     topAncestorCategoryFor: function(category_id){
       let cat = this.categories.find((c)=>{ return c.id === category_id; });
       if(!cat) return null;

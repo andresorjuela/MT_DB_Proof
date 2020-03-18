@@ -242,8 +242,10 @@ export default {
   <!-- 1:N relationships -->
   <b-card v-if="product">
     <b-tabs content-class="mt-3" card>
-      <b-tab title="Images" active>
-        <h5>Images</h5>
+      <b-tab active>
+        <template v-slot:title>
+          <b-spinner small variant="secondary" v-if="busy && tab_active=='Images'"></b-spinner>  Images
+        </template>
         <b-form v-for="(pimage, idx) in product_images" :key="idx" v-if="product_images">
           <b-form-row>
             <b-col cols="4">
@@ -272,12 +274,22 @@ export default {
         <b-button variant="outline-success" @click="newProductImage" size="sm">Add Image</b-button>
       </b-tab>
       
-      <b-tab title="OEM References" @click="loadProductOemReferences" v-if="isAccessory" >
-        <h5>OEM References</h5>
+      <b-tab @click="loadProductOemReferences" v-if="isAccessory" >
+        <template v-slot:title>
+          <b-spinner small variant="secondary" v-if="busy && tab_active=='OEM References'"></b-spinner> OEM References
+        </template>
         <b-form v-for="(oemref, idx) in product_oem_refs" :key="oemref.brand_id" v-if="product_oem_refs">
           <b-form-row>
             <b-col cols="5">
-              <b-form-group label="OEM:" label-cols="4" >
+              <b-form-group
+                label="OEM Reference:"
+                label-align="right"
+                label-cols="4" >
+                <b-form-input v-model="oemref.name" type="text" ></b-form-input>
+              </b-form-group>
+            </b-col>
+            <b-col cols="5">
+              <b-form-group label="Brand:" label-cols="4" >
                 <b-form-select v-model="oemref.brand_id" :options="$router.app.brands" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" >
                   <template v-slot:first>
                     <b-form-select-option :value="null">选择</b-form-select-option>
@@ -290,15 +302,6 @@ export default {
                 </b-form-select>
               </b-form-group>
             </b-col>
-          
-            <b-col cols="5">
-              <b-form-group
-                label="Reference:"
-                label-align="right"
-                label-cols="4" >
-                <b-form-input v-model="oemref.name" type="text" ></b-form-input>
-              </b-form-group>
-            </b-col>
 
             <b-col cols="2">
               <b-button @click="removeProductOemReference(idx)" variant="outline-danger" size="sm">Delete</b-button>
@@ -309,8 +312,10 @@ export default {
         <b-button variant="outline-success" @click="newProductOemReference" size="sm">Add OEM Reference</b-button>
       </b-tab>
 
-      <b-tab title="Filters" @click="loadProductFilterOptions">
-        <h5>Filters</h5>
+      <b-tab @click="loadProductFilterOptions">
+        <template v-slot:title>
+          <b-spinner small variant="secondary" v-if="busy && tab_active=='Filters'"></b-spinner> Filters
+        </template>
         <b-form v-if="product_filter_options">
           <b-form-row>
             <b-col cols="6" v-for="(filter, idx) in filters" :key="filter.filter_id" >
@@ -332,8 +337,10 @@ export default {
         </b-form>
       </b-tab>
       
-      <b-tab title="Custom Attributes" @click="loadProductCustomAttributes" v-if="isAccessory||isRepairService">
-        <h5>Custom Attributes</h5>
+      <b-tab @click="loadProductCustomAttributes" v-if="isAccessory||isRepairService">
+        <template v-slot:title>
+          <b-spinner small variant="secondary" v-if="busy && tab_active=='Custom Attributes'"></b-spinner> Custom Attributes
+        </template>
         <b-form v-if="product_custom_attributes">
           <b-form-row>
             <b-col cols="6" v-for="(attr, idx) in custom_attributes" :key="attr.id" >
@@ -347,8 +354,10 @@ export default {
         </b-form>
       </b-tab>
 
-      <b-tab title="Set" v-if="isPart">
-        <h5>Set</h5>
+      <b-tab v-if="isPart">
+        <template v-slot:title>
+          <b-spinner small variant="secondary" v-if="busy"></b-spinner> Set
+        </template>
       </b-tab>
     </b-tabs>
   </b-card>
@@ -361,20 +370,21 @@ export default {
       message: null,
       error: null,
       in_process: 0,
-     
+      tab_active: null,
+
       custom_attributes: [],
       filters: [], //options will also be loaded
       related_families: [],//family ids only
     
       product: null,//actually a product-view
       product_certificates: [],
-      product_oem_refs: [],
       product_tags: [],
       
       /*
         Initialized to null intentionally. Load from server only loads
         when null, not when empty.
       */
+      product_oem_refs: null,
       product_images: null, 
       product_custom_attributes: null,
       product_filter_options: null
@@ -598,6 +608,7 @@ export default {
     loadProductCustomAttributes : async function(){
       if(this.product_custom_attributes!==null) return;//Otherwise server overwrites work
       try{
+        this.tab_active = "Custom Attributes";
         this.error = null;
         this.message = "Loading custom attributes...";
         this.in_process++;
@@ -610,6 +621,7 @@ export default {
           console.error(err);
         }
       } finally {
+        this.tab_active = null;
         this.message = null;
         this.in_process--;
       }
@@ -632,6 +644,7 @@ export default {
     loadProductFilterOptions : async function(){
       if(this.product_filter_options!==null) return;//Otherwise server overwrites work
       try{
+        this.tab_active = "Filters";
         this.error = null;
         this.message = "Loading filter options...";
         this.in_process++;
@@ -644,6 +657,7 @@ export default {
           console.error(err);
         }
       } finally {
+        this.tab_active = null;
         this.message = null;
         this.in_process--;
       }
@@ -651,6 +665,7 @@ export default {
     loadProductImages : async function(){
       if(this.product_images!==null) return;//Otherwise server overwrites work
       try{
+        this.tab_active = 'Images';
         this.error = null;
         this.message = "Loading images...";  
         this.in_process++;
@@ -663,6 +678,7 @@ export default {
           console.error(err);
         }
       } finally {
+        this.tab_active = null;
         this.message="";
         this.in_process--;
       }
@@ -670,6 +686,7 @@ export default {
     loadProductOemReferences : async function(){
       if(this.product_oem_refs!==null) return;//Otherwise server overwrites work
       try{
+        this.tab_active = "OEM References";
         this.error = null;
         this.message = "Loading OEMs...";
         this.in_process++;
@@ -682,6 +699,7 @@ export default {
           console.error(err);
         }
       } finally {
+        this.tab_active = null;
         this.in_process--;
         this.message="";
       }

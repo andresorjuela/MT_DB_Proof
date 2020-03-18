@@ -247,7 +247,7 @@ export class Api{
     return result.suppliers;
   }
   async getTechnologies(){
-    let result = await this._get(`${this.base_url}/technologies`, {limit:100, order_by:'+name'});
+    let result = await this._get(`${this.base_url}/technologies`, {limit:100, order_by:'+name_en'});
     return result.technologies;
   }
   

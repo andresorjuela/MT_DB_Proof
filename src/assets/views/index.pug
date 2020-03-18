@@ -11,6 +11,9 @@ block content
           b-nav-item(to="/family" :active="selectedMenu==='family'") Family
           b-nav-item(to="/equipment" :active="selectedMenu==='equipment'") Equipment
           b-nav-item(to="/group" :active="selectedMenu==='group'") Group
+          b-button(@click="simulateLogout" small variant="outline-secondary")
+            b-icon-power
+            span &nbsp;Logout
         b-form
           b-form-input#primary_search(placeholder="Search")
         
