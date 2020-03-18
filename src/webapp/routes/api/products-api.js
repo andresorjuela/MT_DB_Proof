@@ -129,7 +129,7 @@ router.post('/:product_id/custom_attributes', function (req, res, next) {
     dao: req.app.locals.Database.ProductCustomAttribute(),
     toSave: req.body, //assuming an array of objects
     query: {product_id: req.params.product_id},
-    comparison: function(obj){ return `${obj.custom_attribute_id}|${obj.name_en}|${obj.name_zh}`; }
+    comparison: function(obj){ return `${obj.custom_attribute_id}|${obj.value_en}|${obj.value_zh}`; }
   };
   next();
 }, saveAll);
@@ -230,81 +230,26 @@ router.get('/view/:product_id', function (req, res, next) {
 }, fetchById);
 
 
-router.post('/:product_id/properties/', async function (req, res, next) {
-  if (!req.body.name || ("" !== req.body.value && !req.body.value)) {
-    //If a name/value is not provided, it is an invalid request.
-    res.status(400).end();
-    return;
-  }
-  let dao = req.app.locals.Database.AccountProperty();
-  let toSave = {
-    product_id: req.params.product_id * 1,
-    name: req.body.name,
-    value: req.body.value
-  };
-
-  if (_.isEmpty(toSave.name)) {
-    res.status(400).end();
-    return;
-  }
-
-  try {
-    let exists = await dao.one({ product_id: toSave.product_id, name: toSave.name });
-    if (_.isEmpty(exists)) {
-      toSave = await dao.create(toSave);
-      res.status(201).json(toSave);
-    } else {
-      toSave = await dao.update(toSave);
-      res.status(200).json(toSave);
-    }
-  } catch (ex) {
-    next(ex);
-  }
-
-});
-
-
-router.get('/:product_id/properties/:name', async function (req, res, next) {
-
+/** Get all set values for a product. */
+router.get('/:product_id/sets', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.AccountProperty(),
-    query: {
-      product_id: req.params.product_id,
-      name: req.params.name
-    }
+    dao: req.app.locals.Database.ProductSetView(),
+    query: {parent_product_id: req.params.product_id},
+    //query_options: q.query_options
   }
   next();
-
-}, fetchOne);
-
-
-router.delete('/:product_id/properties/:name', async function (req, res, next) {
-
-  res.locals.dbInstructions = {
-    dao: req.app.locals.Database.AccountProperty(),
-    toDelete: {
-      product_id: req.params.product_id,
-      name: req.params.name
-    }
-  }
-  next();
-
-}, deleteMatching);
-
-
-router.get('/:product_id/properties', async function (req, res, next) {
-
-  res.locals.dbInstructions = {
-    dao: req.app.locals.Database.AccountProperty(),
-    query: {
-      product_id: req.params.product_id
-    }
-  }
-  next();
-
 }, fetchMany);
 
-
+/** Save all product sets values. */
+router.post('/:product_id/set', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductSet(),
+    toSave: req.body, //assuming an array of objects
+    query: {parent_product_id: req.params.product_id},
+    comparison: function(obj){ return `${obj.child_product_id}|${obj.quantity}`; }
+  };
+  next();
+}, saveAll);
 
 //Default error handling
 router.use(function (err, req, res, next) {
