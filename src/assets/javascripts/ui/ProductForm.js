@@ -361,7 +361,7 @@ export default {
 
       <b-tab @click="loadProductSets" v-if="isPart">
         <template v-slot:title>
-          <b-spinner small variant="secondary" v-if="busy"></b-spinner> Set
+          <b-spinner small variant="secondary" v-if="busy && tab_active=='Set'"></b-spinner> Set
         </template>
         <b-form v-for="(pset, idx) in product_sets" :key="idx" v-if="product_sets">
           <b-form-row>
@@ -628,7 +628,7 @@ export default {
         this.in_process++;
         this.message="Loading...";
         this.products = await Vue.mtapi.getProducts({order_by:"+sku", limit: 1000});
-        
+        this.products = this.products.filter(p => {return p.sku ? true: false; })
       }catch(ex){
         console.error(ex);
         this.error="Couldn't load products.";
@@ -753,7 +753,7 @@ export default {
     loadProductSets : async function(){
       if(this.product_sets!==null) return;//Otherwise server overwrites work
       try{
-        this.tab_active = 'Sets';
+        this.tab_active = 'Set';
         this.error = null;
         this.message = "Loading set...";  
         this.in_process++;
