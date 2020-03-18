@@ -8,6 +8,9 @@ export class Api{
     }
     this.base_url = base_url;
   }
+  //
+  // GET methods
+  //
   async getBrands(){
     let result = await this._get(`${this.base_url}/brands`, {limit:1000, order_by:'+name_en'});
     return result.brands;
@@ -112,6 +115,58 @@ export class Api{
     return result.product_certificates;
   }
 
+  async getProductCustomAttributes(id){
+    let result =  await this._get(`${this.base_url}/products/${id}/custom_attributes`);
+    return result.product_custom_attribute_views;
+  }
+
+  /**
+   * 
+   * @param {number} id product id
+   */
+  async getProductFamilies(id){
+    let result =  await this._get(`${this.base_url}/products/${id}/families`);
+    return result.product_family_connects;
+  }
+
+  async getProductFilterOptions(id){
+    let result =  await this._get(`${this.base_url}/products/${id}/filter_options`);
+    return result.product_filter_option_views;//this api method returns a view object
+  }
+
+  async getProductImages(id){
+    let result =  await this._get(`${this.base_url}/products/${id}/images`);
+    return result.product_image_views;
+  }
+  
+  async getProductOemReferences(id){
+    let result =  await this._get(`${this.base_url}/products/${id}/oem_references`);
+    return result.product_oem_references;
+  }
+  async getProductSets(id){
+    let result =  await this._get(`${this.base_url}/products/${id}/sets`);
+    return result.product_set_views;
+  }
+  async getProductTypes(){
+    let result = await this._get(`${this.base_url}/product-types`, {limit:100, order_by:'+name_en'});
+    return result.product_types;
+  }
+  async getProductView(id){
+    let result =  await this._get(`${this.base_url}/products/view/${id}`);
+    return result;
+  }
+  async getSuppliers(){
+    let result = await this._get(`${this.base_url}/suppliers`, {limit:100, order_by:'+name_en'});
+    return result.suppliers;
+  }
+  async getTechnologies(){
+    let result = await this._get(`${this.base_url}/technologies`, {limit:100, order_by:'+name_en'});
+    return result.technologies;
+  }
+
+  //
+  // SAVE methods
+  //
   async saveEquipment(equipment){
     if(equipment.id){
       return await this._put(`${this.base_url}/equipment/${equipment.id}`, equipment);
@@ -143,6 +198,15 @@ export class Api{
       return await this._post(`${this.base_url}/families`,family);
     }
   }
+    
+  async saveProduct(product){
+    if(product.id){
+      return await this._put(`${this.base_url}/products/${product.id}`,product);
+    } else {
+      return await this._post(`${this.base_url}/products`,product);
+    }
+  }
+
   /**
    * 
    * @param {number} product_id 
@@ -158,11 +222,7 @@ export class Api{
     return await this._post(`${this.base_url}/products/${product_id}/certificates`, payload);
   }
 
-  async getProductCustomAttributes(id){
-    let result =  await this._get(`${this.base_url}/products/${id}/custom_attributes`);
-    return result.product_custom_attribute_views;
-  }
-/**
+  /**
    * 
    * @param {number} product_id 
    * @param {array} cust_attr array of custom attribute objects
@@ -171,14 +231,6 @@ export class Api{
     return await this._post(`${this.base_url}/products/${product_id}/custom_attributes`, cust_attr);
   }
 
-  /**
-   * 
-   * @param {number} id product id
-   */
-  async getProductFamilies(id){
-    let result =  await this._get(`${this.base_url}/products/${id}/families`);
-    return result.product_family_connects;
-  }
   /**
    * 
    * @param {number} product_id 
@@ -194,10 +246,6 @@ export class Api{
     return await this._post(`${this.base_url}/products/${product_id}/families`, payload);
   }
 
-  async getProductFilterOptions(id){
-    let result =  await this._get(`${this.base_url}/products/${id}/filter_options`);
-    return result.product_filter_option_views;//this api method returns a view object
-  }
   /**
    * 
    * @param {number} product_id 
@@ -208,10 +256,6 @@ export class Api{
     return await this._post(`${this.base_url}/products/${product_id}/filter_options`, with_ids);
   }
 
-  async getProductImages(id){
-    let result =  await this._get(`${this.base_url}/products/${id}/images`);
-    return result.product_image_views;
-  }
   /**
    * 
    * @param {number} product_id 
@@ -221,10 +265,6 @@ export class Api{
     return await this._post(`${this.base_url}/products/${product_id}/images`, images);
   }
 
-  async getProductOemReferences(id){
-    let result =  await this._get(`${this.base_url}/products/${id}/oem_references`);
-    return result.product_oem_references;
-  }
   /**
    * 
    * @param {number} product_id 
@@ -234,31 +274,14 @@ export class Api{
     return await this._post(`${this.base_url}/products/${product_id}/oem_references`, oem_refs);
   }
 
-  async getProductTypes(){
-    let result = await this._get(`${this.base_url}/product-types`, {limit:100, order_by:'+name_en'});
-    return result.product_types;
+  /**
+   * 
+   * @param {number} product_id 
+   * @param {array} sets array of set objects
+   */
+  async saveProductSets(product_id, sets){
+    return await this._post(`${this.base_url}/products/${product_id}/sets`, sets);
   }
-  async getProductView(id){
-    let result =  await this._get(`${this.base_url}/products/view/${id}`);
-    return result;
-  }
-  async getSuppliers(){
-    let result = await this._get(`${this.base_url}/suppliers`, {limit:100, order_by:'+name_en'});
-    return result.suppliers;
-  }
-  async getTechnologies(){
-    let result = await this._get(`${this.base_url}/technologies`, {limit:100, order_by:'+name_en'});
-    return result.technologies;
-  }
-  
-  async saveProduct(product){
-    if(product.id){
-      return await this._put(`${this.base_url}/products/${product.id}`,product);
-    } else {
-      return await this._post(`${this.base_url}/products`,product);
-    }
-  }
-
 
   //common methods.
   async _get(url, parms){
