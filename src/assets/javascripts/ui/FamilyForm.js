@@ -1,6 +1,5 @@
 'use strict'
-import { ApiError } from "../Api.js";
-import { Storage } from "../Storage.js";
+
 export default {
   template: /*html*/
   `
@@ -79,6 +78,18 @@ export default {
     </b-form-row>
 
     <b-form-row>
+      <b-col>
+        <b-form-group label="Equipment Group:" label-cols="6" >
+          <b-form-select v-model="family.group_id" :options="$router.app.groups" value-field="id" text-field="group_code" >
+            <template v-slot:first>
+              <b-form-select-option value="" >Choose</b-form-select-option>
+            </template>
+          </b-form-select>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
+    
+    <b-form-row>
       <b-col cols="6" >
         <b-form-group label="Image link connector distal:" label-cols="4" >
           <b-form-input v-model="family.image_link_connector_distal" />
@@ -86,18 +97,6 @@ export default {
       </b-col>
       <b-col>
         <b-img :src="family.image_link_connector_distal" width="120" height="80" right/>
-      </b-col>
-    </b-form-row>
-
-    <b-form-row>
-      <b-col>
-        <b-form-group label="Associated Equipment Group:" label-cols="4" >
-          <b-form-select v-model="family.group_id" :options="$router.app.groups" value-field="id" text-field="group_code" >
-            <template v-slot:first>
-              <b-form-select-option value="" >Choose</b-form-select-option>
-            </template>
-          </b-form-select>
-        </b-form-group>
       </b-col>
     </b-form-row>
 
