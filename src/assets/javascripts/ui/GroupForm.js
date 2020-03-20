@@ -16,8 +16,9 @@ export default {
     </b-col>
     <b-col class="text-right">
       <b-button small variant="success" @click="saveAllGroupData" :disabled="busy">
-      <b-icon-cloud-upload />&nbsp;Save
-    </b-button>
+        <b-icon-cloud-upload />&nbsp;Save
+      </b-button>
+    </b-col>
   </b-row>
   
   <b-form v-if="group">
@@ -35,13 +36,17 @@ export default {
         <b-form-group label="Equipment Models:" label-cols="4" for="eqlisttext">
           <b-form-input placeholder="model / brand" @input="filter_as_typed" v-model="filter" debounce="200"></b-form-input>
           <b-list-group>
-            <b-list-group-item action v-for="(equip,idx) in filter_options" @click="addGroupEquipment(equip)" :key="idx">{{equip.label}}</b-list-group-item>
+            <b-list-group-item action v-for="(equip,idx) in equip_filtered" @click="addGroupEquipment(equip)" :key="idx">{{equip.label}}</b-list-group-item>
           </b-list-group>
         </b-form-group>
       </b-col>
       <b-col cols="6">
         <b-form-group label="Equipment in this Group:" label-cols="4" >
-          <b-badge href="#" variant="light" v-for="(equip,idx) in group_equipment" :key="idx" pill @click="removeGroupEquipment(equip)">{{equip.model}}</b-badge>
+          <span class="h6">
+            <b-badge href="#" variant="light" v-for="(grequip,idx) in group_equipment" :key="idx" pill>{{grequip.model}}
+              <b-icon-x variant="danger" @click="removeGroupEquipment(grequip)" ></b-icon-x>
+            </b-badge>
+          </span>
         </b-form-group>
       </b-col>
     </b-form-row>
@@ -58,7 +63,7 @@ export default {
       in_process: 0,
       group: null,
       filter: '',
-      filter_options: [],
+      equip_filtered: [],//holds equipment data
       equipment: [],
       group_equipment: [] 
     }
@@ -77,10 +82,10 @@ export default {
   methods: {
     filter_as_typed: function(v){
       if(!v){ 
-        this.filter_options = [];
+        this.equip_filtered = [];
         return;
       }
-      this.filter_options = this.equipment.filter(function(eq){ 
+      this.equip_filtered = this.equipment.filter(function(eq){ 
         return eq.model.includes(v) 
         || eq.brand_en.includes(v) 
         || eq.brand_zh.includes(v);
@@ -97,17 +102,17 @@ export default {
           this.group_equipment.push({
             model: equipment.model,
             equipment_id: equipment.id,
-            group: self.group.id
+            group_id: self.group.id
           });
         }
       }
-      this.filter_options = [];
+      this.equip_filtered = [];
     },
-    removeGroupEquipment(equipment){
+    removeGroupEquipment(grequip){
       let self = this;
-      if(equipment){
+      if(grequip){
         let existingIdx = this.group_equipment.findIndex(function(ge){
-          return ge.equipment_id == equipment.id && 
+          return ge.equipment_id == grequip.equipment_id && 
             ge.group_id == self.group.id;
         });
         if(existingIdx>=0){
