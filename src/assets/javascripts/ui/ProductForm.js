@@ -337,7 +337,7 @@ export default {
         </b-form>
       </b-tab>
       
-      <b-tab @click="loadProductCustomAttributes" v-if="isAccessory||isRepairService">
+      <b-tab @click="loadProductCustomAttributes" >
         <template v-slot:title>
           <b-spinner small variant="secondary" v-if="busy && tab_active=='Custom Attributes'"></b-spinner> Custom Attributes
         </template>
