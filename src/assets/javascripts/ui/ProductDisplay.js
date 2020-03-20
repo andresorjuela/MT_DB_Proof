@@ -19,111 +19,122 @@ export default {
     </b-row>
     
     <b-row>
-      <b-col cols="8">
-        <span class="text-info" v-if="$router.app.lang==='zh'">{{product.description_zh||'(no description yet)'}}</span>
-        <span class="text-info" v-else>{{product.description_en||'(no description yet)'}}</span>
+      <b-col cols="6">
+
+        <b-row>
+          <b-col>
+            <span class="text-info" v-if="$router.app.lang==='zh'">{{product.description_zh||'(no description yet)'}}</span>
+            <span class="text-info" v-else>{{product.description_en||'(no description yet)'}}</span>
+          </b-col>
+        </b-row>
+        
+        <b-table-simple responsive borderless>
+          <b-thead>
+            <b-tr>
+              <b-th variant="secondary">OEM</b-th>
+              <b-th variant="light">Manufacturer</b-th>
+            </b-tr>
+          </b-thead>
+          <b-tbody>
+            <b-tr>
+              <b-td>{{product.oem}}</b-td>
+              <b-td>{{product.brand_en}}</b-td>
+            </b-tr>
+          </b-tbody>
+        
+          <b-thead>
+            <b-tr>
+              <b-th>SKU</b-th>
+              <b-th>Price</b-th>
+            </b-tr>
+          </b-thead>
+          <b-tbody>
+            <b-tr>
+              <b-td class="bg-info">{{product.sku}}</b-td>
+              <b-td class="bg-light">{{product.price+' ￥'}}</b-td>
+            </b-tr>
+          </b-tbody>
+        </b-table-simple>
+
       </b-col>
-      <b-col v-if="product_images" cols="4" >
-        <b-carousel controls indicators background="#0c0c0c" img-width="400" img-height="300" style="text-shadow: 1px 1px 2px #333;">
+
+      <b-col>
+        <b-carousel controls indicators background="#0c0c0c" img-width="400" img-height="300" style="text-shadow: 1px 1px 2px #333;"  v-if="product_images" >
           <b-carousel-slide v-for="(img,idx) in product_images" :key="idx" :caption="img.image_type" :img-src="img.image_link"></b-carousel-slide>
         </b-carousel>
       </b-col>
     </b-row>
 
     <b-row>
-      <b-col>
-        <span class="tlabel">Category:</span>
-        <span class="tvalue text-info" v-if="$router.app.lang==='zh'">{{product.category_zh}}</span>
-        <span class="tvalue text-info" >{{product.category_en}}</span>
+      <b-col cols="6">
+        <b-table-simple responsive >
+          <b-tbody>
+            <b-tr>
+              <b-th variant="light">Category</b-th>
+              <b-td>{{$router.app.lang==='zh' ? product.category_zh : product.category_en}}</b-td>
+            </b-tr>
+
+            <b-tr>
+              <b-th variant="light">Product Type</b-th>
+              <b-td>{{$router.app.lang==='zh' ? product.product_type_zh : product.product_type_en}}</b-td>
+            </b-tr>
+
+            <b-tr>
+              <b-th variant="light">Supplier</b-th>
+              <b-td>{{$router.app.lang==='zh' ? product.supplier_zh : product.supplier_en}}</b-td>
+            </b-tr>
+
+            <b-tr>
+              <b-th variant="light">Family</b-th>
+              <b-td>{{product.family_code}}</b-td>
+            </b-tr>
+
+            <b-tr>
+              <b-th variant="light">Certificates</b-th>
+              <b-td>{{ certificates || '(none)' }}</b-td>
+            </b-tr>
+          </b-tbody>
+        </b-table-simple>
+
       </b-col>
+
       <b-col>
-        <span class="tlabel">Product Type:</span>
-        <span class="tvalue text-info" v-if="$router.app.lang==='zh'">{{product.product_type_zh}}</span>
-        <span class="tvalue text-info" v-else>{{product.product_type_en}}</span>
+        <b-table-simple responsive >
+          <b-tbody>
+            <b-tr>
+              <b-th variant="light">Connects To</b-th>
+              <b-td>{{ connects_to || '(none)' }}</b-td>
+            </b-tr>
+
+            <b-tr>
+              <b-th variant="light">Tags</b-th>
+              <b-td>{{ product.tags || '(none)' }}</b-td>
+            </b-tr>
+
+            <b-tr>
+              <b-th variant="light">Warranty</b-th>
+              <b-td>{{product.warranty_duration_months}} months</b-td>
+            </b-tr>
+
+            <b-tr>
+              <b-th variant="light">Lifecycle</b-th>
+              <b-td>{{product.lifecycle_en}}</b-td>
+            </b-tr>
+
+            <b-tr>
+              <b-th variant="light">Weight</b-th>
+              <b-td>{{ product.weight ? product.weight+' g' : '' }}</b-td>
+            </b-tr>
+
+            <b-tr>
+              <b-th variant="light">Unit</b-th>
+              <b-td>{{ product.packaging_factor }}</b-td>
+            </b-tr>
+          </b-tbody>
+        </b-table-simple>
       </b-col>
     </b-row>
-
-    <b-row>
-      <b-col>
-        <span class="tlabel">OEM:</span>
-        <span class="tvalue text-info">{{product.oem}}</span>
-      </b-col>
-      <b-col>
-        <span class="tlabel">SKU:</span>
-        <span class="tvalue text-info">{{product.sku}}</span>
-      </b-col>
-    </b-row>
-
-    <b-row>
-      <b-col>
-        <span class="tlabel">Supplier:</span>
-        <span class="tvalue text-info" >{{product.supplier_en}}</span>
-      </b-col>
-      <b-col>
-        <span class="tlabel">Manufacturer:</span>
-        <span class="tvalue text-info" >{{product.brand_en}}</span>
-      </b-col>
-    </b-row>
-
-    <b-row>
-      <b-col>
-        <span class="tlabel">Family:</span>
-        <span class="tvalue text-info" >{{product.family_code}}</span>
-      </b-col>
-      <b-col>
-        <span class="tlabel">Warranty:</span>
-        <span class="tvalue text-info" >{{product.warranty_duration_months}} months</span>
-      </b-col>
-      
-    </b-row>
-
-    <b-row>
-      <b-col>
-        <span class="tlabel">Certificates:</span>
-        <span class="tvalue text-info" >{{ certificates || '(none)' }}</span>
-      </b-col>
-      <b-col>
-        <span class="tlabel">Lifecycle:</span>
-        <span class="tvalue text-info" >{{product.lifecycle_en}}</span>
-      </b-col>
-    </b-row>
-
-    <b-row>
-      <b-col>
-        <span class="tlabel">Price:</span>
-        <span class="tvalue text-info">{{ product.price+' ￥' }}</span>
-      </b-col>
-      <b-col>
-        <span class="tlabel">Weight:</span>
-        <span class="tvalue text-info">{{ product.weight ? product.weight+' g' : '' }}</span>
-      </b-col>
-    </b-row>
-
-    <b-row>
-      <b-col>
-        <span class="tlabel">Unit:</span>
-        <span class="tvalue text-info">{{ product.packaging_factor }}</span>
-      </b-col>
-      <b-col></b-col>
-    </b-row>
-
-    <b-row>
-      <b-col>
-        <span class="tlabel">Connects To:</span>
-        <span class="tvalue text-info">{{ connects_to || '(none)' }}</span>
-      </b-col>
-      <b-col></b-col>
-    </b-row>
-
-    <b-row>
-      <b-col>
-        <span class="tlabel">Tags:</span>
-        <span class="tvalue text-info" >{{ product.tags || '(none)' }}</span>
-      </b-col>
-      <b-col></b-col>
-    </b-row>
-   
-
+    
     
     <!-- 1:N relationships -->
     <b-card v-if="product">
