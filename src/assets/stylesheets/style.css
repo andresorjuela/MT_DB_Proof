@@ -37,3 +37,6 @@ a {
   float: right;
   padding-left: 1em;
 }
+.carousel-control-prev-icon, .carousel-control-next-icon {
+  background-color: #909090;
+}

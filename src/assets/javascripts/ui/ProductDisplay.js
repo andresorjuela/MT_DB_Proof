@@ -59,7 +59,7 @@ export default {
       </b-col>
 
       <b-col>
-        <b-carousel controls indicators background="#0c0c0c" img-width="400" img-height="300" style="text-shadow: 1px 1px 2px #333;"  v-if="product_images" >
+        <b-carousel controls indicators img-width="400" img-height="300" style="text-shadow: 1px 1px 2px #000;"  v-if="product_images" >
           <b-carousel-slide v-for="(img,idx) in product_images" :key="idx" :caption="img.image_type" :img-src="img.image_link"></b-carousel-slide>
         </b-carousel>
       </b-col>
