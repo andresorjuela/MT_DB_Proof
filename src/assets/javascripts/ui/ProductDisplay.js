@@ -129,20 +129,20 @@ export default {
     <b-card v-if="product">
       <b-tabs content-class="mt-3" card>
         
-        <b-tab title="OEM References" @click="loadProductOemReferences">
+        <b-tab title="OEM References" @click="loadProductOemReferences" v-if="isAccessory">
           <b-table hover :items="product_oem_refs" ></b-table>
         </b-tab>
 
-        <b-tab title="Filters" @click="loadProductFilterOptions">
+        <b-tab title="Filters" @click="loadProductFilterOptions" active>
           <b-table hover :items="product_filter_options" ></b-table>
         </b-tab>
         
-        <b-tab title="Custom Attributes" @click="loadProductCustomAttributes">
+        <b-tab title="Custom Attributes" @click="loadProductCustomAttributes" v-if="isPart||isAccessory">
           <b-table hover :items="product_custom_attributes" ></b-table>
         </b-tab>
 
-        <b-tab title="Set">
-          <h5>Set</h5>
+        <b-tab title="Set" @click="loadProductSets" v-if="isPart && product.packaging_factor==='Set'">
+          <b-table hover :items="product_sets" ></b-table>
         </b-tab>
       </b-tabs>
     </b-card>
@@ -161,7 +161,7 @@ export default {
       product_families:[],
       product_certificates: [],
       product_oem_refs: [],
-      
+      product_sets: [],
       /*
         Initialized to null intentionally. Load from server only loads
         when null, not when empty.
@@ -200,6 +200,9 @@ export default {
     general_category: function(){
       return this.$router.app.topAncestorCategoryFor(this.product.category_id);
     },
+    isPart: function(){ return this.general_category.id==2; },
+    isAccessory: function(){ return this.general_category.id==1; },
+    isRepairService: function(){ return this.general_category.id==3; },
     valid_units: function(){
       let units = [1, 5, 6, 10, 12, 16, 20, 24, 25, 50, 100];
       let ancestor = this.general_category;
@@ -297,7 +300,8 @@ export default {
           this.loadProductOemReferences(),
           this.loadCustomAttributesForCategory(),
           this.loadProductCertificates(),
-          this.loadProductFamilies()
+          this.loadProductFamilies(),
+          this.loadProductFilterOptions()
         ]);
         
         //If master data is missing, emit a reload request from the master app.
@@ -433,6 +437,25 @@ export default {
       } finally {
         this.in_process--;
         this.message="";
+      }
+    },
+    loadProductSets : async function(){
+      try{
+        this.error = null;
+        this.message = "Loading set...";  
+        this.in_process++;
+        this.product_sets = await Vue.mtapi.getProductSets(this.product.id);
+
+      } catch (err){
+        if(err instanceof ApiError){
+          this.error = `Couldn't get product set. ${err.message}`;
+        } else {
+          console.error(err);
+        }
+      } finally {
+        this.tab_active = null;
+        this.message="";
+        this.in_process--;
       }
     },
     validateImage : function(img){
