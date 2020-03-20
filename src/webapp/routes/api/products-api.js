@@ -3,21 +3,28 @@ var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
 let { fetchOne, fetchById, fetchCount, fetchMany, deleteMatching, parseQueryOptions, updateById, create, saveAll } = require('../middleware/db-api');
 
-/* GET checks if service is online */
+/* Search for products. */
 router.get('/', function (req, res, next) {
   let q = parseQueryOptions(req, 
     [
-      'product_id',
-      'oem', 
+      'product_id', 
       'sku',
+      'oem',
+      'name_en', 
+      'name_zh',
+      'description_en',
+      'description_zh',
+      'product_type_en',
+      'product_type_zh',
+      'family_id',
+      'family_code',
       'brand_id',
       'brand_en',
       'brand_zh',
       'category_id',
       'category_en',
       'category_zh',
-      'name_en', 
-      'name_zh'
+      
     ], 
     ['+name_en', '+id'], 1000);
 
