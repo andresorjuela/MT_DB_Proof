@@ -47,7 +47,7 @@ export default {
     <b-form-row>
       <b-col cols="6">
         <b-form-group label="Brand:" label-cols="4" >
-          <tree-selector-input :list="$router.app.brands" v-model="family.brand_id" label_en="Brand" label_zh="类别" v-if="brand_tree"></tree-selector-input>
+          <tree-selector-input :list="$router.app.brands" v-model="family.brand_id" label="Brand" display_ancestors v-if="brand_tree"></tree-selector-input>
         </b-form-group>
       </b-col>
       <b-col cols="6">

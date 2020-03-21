@@ -3,17 +3,21 @@ export default {
   name: "tree-selector-input",
   template: /*html*/`
 <div class="mt-ts-input">
-  <tree-selector :children="tree.children" :root=true @selected="onSelected" style="height: 10em; overflow: auto;" ></tree-selector>
+  <tree-selector :children="tree.children" :root=true @selected="onSelected" :id_field="id_field" :parent_id_field="parent_id_field" :text_field="text_field" style="height: 10em; overflow: auto;" ></tree-selector>
   <input type="hidden" :value="value" />
   <b-form-input readonly :value="display_value" />
 </div>
 `,
   props:{
-    label_en: {type: String},
-    label_zh: {type: String},
+    label: {type: String},
+    text_field: {type: String, default: "name_en"},
+    id_field: {type: String, default: "id"},
+    parent_id_field: {type: String, default: "parent_id"},
     value: [String, Number],
     root: {type: Boolean, default: true},
-    list: { type: Array }
+    list: { type: Array },
+    
+    display_ancestors: {type: Boolean, default: false}
   },
   data:function(){
     return {
@@ -23,8 +27,7 @@ export default {
   },
   created: function(){
     this.tree = {
-      label: this.label_en,
-      label_zh: this.label_zh,
+      label: this.label,
       children: []
     };
 
@@ -38,7 +41,23 @@ export default {
       if(typeof this.value_copy !== 'undefined' && this.value_copy !== null){
         let selection = this.list.find((v)=>{return v.id == this.value_copy;});
         if(selection){
-          return selection.name_en;
+          let ancestors = [];
+          let current_ancestor = selection;
+          if(this.display_ancestors){
+            for(let i=0; i<100; i++){//assume depth is less than 100
+              current_ancestor = this.list.find((v)=>{ return v.id == current_ancestor.parent_id;})
+              if(!current_ancestor){
+                break;
+              } else {
+                ancestors.splice(0,0,current_ancestor[this.text_field]);
+              }
+            }
+          }
+          let to_display = selection[this.text_field];
+          if(ancestors.length > 0){
+            to_display += ` (${ancestors.join("/")})`;
+          }
+          return to_display;
         }
       }
       return '';
@@ -64,8 +83,8 @@ export default {
     },
     onSelected: function(payload){
       // console.log(`Node ${payload.id} selected.`);
-      this.value_copy = payload.id;
-      this.$emit('input', payload.id);//compatible for v-model
+      this.value_copy = payload[this.id_field];
+      this.$emit('input', payload[this.id_field]);//compatible for v-model
     }
   }
 }
