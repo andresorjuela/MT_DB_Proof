@@ -23,7 +23,7 @@ export default {
     <b-form-row>
       <b-col>
         <b-form-group id="g_p_category" description="" label="Category:" label-for="p_category" label-cols="4" >
-          <tree-selector-input :list="$router.app.categories" v-model="product.category_id"></tree-selector-input>
+          <tree-selector-input :list="$router.app.categories" v-model="product.category_id" label_en="Category" label_zh="类别"></tree-selector-input>
         </b-form-group>
       </b-col>
       <b-col>

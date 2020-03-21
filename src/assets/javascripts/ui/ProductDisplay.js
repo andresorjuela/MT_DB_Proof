@@ -32,12 +32,12 @@ export default {
           <b-thead>
             <b-tr>
               <b-th variant="secondary">OEM</b-th>
-              <b-th variant="light">Manufacturer</b-th>
+              <b-th style="background-color: #e5e5e5">Manufacturer</b-th>
             </b-tr>
           </b-thead>
           <b-tbody>
             <b-tr>
-              <b-td>{{product.oem}}</b-td>
+              <b-td variant="light">{{product.oem}}</b-td>
               <b-td>{{product.brand_en}}</b-td>
             </b-tr>
           </b-tbody>
@@ -51,7 +51,7 @@ export default {
           <b-tbody>
             <b-tr>
               <b-td class="bg-info">{{product.sku}}</b-td>
-              <b-td class="bg-light">{{product.price+' ￥'}}</b-td>
+              <b-td style="background-color: #63daf2">{{product.price+' ￥'}}</b-td>
             </b-tr>
           </b-tbody>
         </b-table-simple>
@@ -59,7 +59,7 @@ export default {
       </b-col>
 
       <b-col>
-        <b-carousel controls indicators img-width="400" img-height="300" style="text-shadow: 1px 1px 2px #000;"  v-if="product_images" >
+        <b-carousel controls indicators img-width="400" img-height="300" style="text-shadow: 1px 1px 2px #000;"  v-if="product_images" :interval="0" >
           <b-carousel-slide v-for="(img,idx) in product_images" :key="idx" :caption="img.image_type" :img-src="img.image_link"></b-carousel-slide>
         </b-carousel>
       </b-col>
@@ -141,19 +141,47 @@ export default {
       <b-tabs content-class="mt-3" card>
         
         <b-tab title="OEM References" @click="loadProductOemReferences" v-if="isAccessory">
-          <b-table hover :items="product_oem_refs" ></b-table>
+          <b-table hover :items="product_oem_refs" :busy="busy" >
+            <template v-slot:table-busy>
+              <div class="text-center text-secondary">
+                <b-spinner class="align-middle"></b-spinner>
+                <span>Loading...</span>
+              </div>
+            </template>
+          </b-table>
         </b-tab>
 
         <b-tab title="Filters" @click="loadProductFilterOptions" active>
-          <b-table hover :items="product_filter_options" ></b-table>
+          <b-table hover :items="product_filter_options" :fields="product_filter_options_fields" :busy="busy">
+            <template v-slot:table-busy>
+              <div class="text-center text-secondary">
+                <b-spinner class="align-middle"></b-spinner>
+                <span>Loading...</span>
+              </div>
+            </template>
+          </b-table>
         </b-tab>
         
-        <b-tab title="Custom Attributes" @click="loadProductCustomAttributes" v-if="isPart||isAccessory">
-          <b-table hover :items="product_custom_attributes" ></b-table>
+        <b-tab title="Custom Attributes" @click="loadProductCustomAttributes" v-if="isPart||isAccessory" >
+          <b-table hover :items="product_custom_attributes" :fields="product_custom_attributes_fields" :busy="busy" thead-class="hidden" borderless>
+            <template v-slot:table-busy>
+              <div class="text-center text-secondary">
+                <b-spinner class="align-middle"></b-spinner>
+                <span>Loading...</span>
+              </div>
+            </template>
+          </b-table>
         </b-tab>
 
         <b-tab title="Set" @click="loadProductSets" v-if="isPart && product.packaging_factor==='Set'">
-          <b-table hover :items="product_sets" ></b-table>
+          <b-table hover :items="product_sets" :fields="product_set_fields" :busy="busy">
+            <template v-slot:table-busy>
+              <div class="text-center text-secondary">
+                <b-spinner class="align-middle"></b-spinner>
+                <span>Loading...</span>
+              </div>
+            </template>
+          </b-table>
         </b-tab>
       </b-tabs>
     </b-card>
@@ -172,15 +200,31 @@ export default {
       product_families:[],
       product_certificates: [],
       product_oem_refs: [],
-      product_sets: [],
+      
+      product_images: null, 
       /*
         Initialized to null intentionally. Load from server only loads
         when null, not when empty.
       */
-      product_images: null, 
+      product_sets: null,
       product_custom_attributes: null,
-      product_filter_options: null
-      
+      product_filter_options: null,
+      product_set_fields: [
+        {key: "child_sku", label: "Child Product"},
+        {key: "quantity", label: "Child SKU"},
+      ],
+
+      product_custom_attributes_fields: [
+        {key: "custom_attribute_en", label: "", formatter(value, key, item){ return `${value}: ${item.value_en}`}},
+        {key: "custom_attribute_zh", label: "", formatter(value, key, item){ return `${value}: ${item.value_zh}`}},
+      ],
+
+      product_filter_options_fields : [
+        {key: "filter_en", label: "Filter (EN)"},
+        {key: "option_en", label: "Option (EN)"},
+        {key: "filter_zh", label: "Filter (ZH)"},
+        {key: "option_zh", label: "Option (ZH)"},
+      ],
     }
   },
   //props: {},
@@ -451,6 +495,7 @@ export default {
       }
     },
     loadProductSets : async function(){
+      if(this.product_sets!==null) return;
       try{
         this.error = null;
         this.message = "Loading set...";  

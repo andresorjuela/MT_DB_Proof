@@ -16,8 +16,9 @@ export default {
     </b-col>
     <b-col class="text-right">
       <b-button small variant="success" @click="saveAllFamilyData" :disabled="busy">
-      <b-icon-cloud-upload />&nbsp;Save
-    </b-button>
+        <b-icon-cloud-upload />&nbsp;Save
+      </b-button>
+    </b-col>
   </b-row>
   
   <b-form v-if="family">
@@ -46,16 +47,7 @@ export default {
     <b-form-row>
       <b-col cols="6">
         <b-form-group label="Brand:" label-cols="4" >
-          <b-form-select v-model="family.brand_id" :options="$router.app.brands" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'">
-            <template v-slot:first>
-              <b-form-select-option value="" >Choose</b-form-select-option>
-            </template>
-          </b-form-select>
-          <b-form-select v-model="family.brand_id" :options="$router.app.brands" value-field="id" text-field="name_en" v-else >
-            <template v-slot:first>
-              <b-form-select-option value="" >Choose</b-form-select-option>
-            </template>
-          </b-form-select>
+          <tree-selector-input :list="$router.app.brands" v-model="family.brand_id" label_en="Brand" label_zh="类别" v-if="brand_tree"></tree-selector-input>
         </b-form-group>
       </b-col>
       <b-col cols="6">
@@ -111,7 +103,7 @@ export default {
       in_process: 0,
      
       family: null,
-
+      brand_tree: [],
       products: [],
     }
   },

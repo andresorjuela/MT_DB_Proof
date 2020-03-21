@@ -40,3 +40,6 @@ a {
 .carousel-control-prev-icon, .carousel-control-next-icon {
   background-color: #909090;
 }
+.hidden{
+  display: none;
+}

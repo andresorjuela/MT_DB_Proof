@@ -15,7 +15,6 @@ export default {
     value: { type: Object },
     root: {type: Boolean, default: true},
     label: { type: String },
-    node_id: { type: String },
     children: { type: Array }
   },
   data:function(){

@@ -3,15 +3,16 @@ export default {
   name: "tree-selector-input",
   template: /*html*/`
 <div class="mt-ts-input">
-  <tree-selector :children="tree.children" :root=true @selected="onSelected" ></tree-selector>
+  <tree-selector :children="tree.children" :root=true @selected="onSelected" style="height: 10em; overflow: auto;" ></tree-selector>
   <input type="hidden" :value="value" />
   <b-form-input readonly :value="display_value" />
 </div>
 `,
   props:{
+    label_en: {type: String},
+    label_zh: {type: String},
     value: [String, Number],
     root: {type: Boolean, default: true},
-    node_id: { type: String },
     list: { type: Array }
   },
   data:function(){
@@ -22,8 +23,8 @@ export default {
   },
   created: function(){
     this.tree = {
-      label: "category",
-      label_zh: "类别",
+      label: this.label_en,
+      label_zh: this.label_zh,
       children: []
     };
 
@@ -62,7 +63,7 @@ export default {
       return roots;
     },
     onSelected: function(payload){
-      console.log(`Node ${payload.id} selected.`);
+      // console.log(`Node ${payload.id} selected.`);
       this.value_copy = payload.id;
       this.$emit('input', payload.id);//compatible for v-model
     }
