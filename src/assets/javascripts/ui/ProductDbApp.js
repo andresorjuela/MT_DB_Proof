@@ -6,6 +6,10 @@ import TreeSelector from "./comp/TreeSelector.js";
 import TreeSelectorInput from "./comp/TreeSelectorInput.js";
 import TreeSelectorInputRow from "./comp/TreeSelectorInputRow.js";
 
+Vue.component("tree-selector", TreeSelector);
+Vue.component("tree-selector-input", TreeSelectorInput);
+Vue.component("tree-selector-input-row", TreeSelectorInputRow);
+
 Vue.use(new Api(env().API_BASE_URL));
 Vue.use(new Storage());
 
@@ -273,6 +277,3 @@ var app = new Vue({
   // }
 }).$mount('#app');
 
-Vue.component("tree-selector", TreeSelector);
-Vue.component("tree-selector-input", TreeSelectorInput);
-Vue.component("tree-selector-input-row", TreeSelectorInputRow);

@@ -47,7 +47,7 @@ export default {
     <b-form-row>
       <b-col cols="6">
         <b-form-group label="Brand:" label-cols="4" >
-          <tree-selector-input :list="$router.app.brands" v-model="family.brand_id" label="Brand" display_ancestors v-if="brand_tree"></tree-selector-input>
+          <tree-selector-input :list="$router.app.brands" v-model="family.brand_id" label="Brand" display_ancestors ></tree-selector-input>
         </b-form-group>
       </b-col>
       <b-col cols="6">
@@ -127,11 +127,7 @@ export default {
   },
   created: async function(){
     this.$router.app.selectedMenu="family";
-    if(this.$route.params.id){
-      await this.loadData();
-    } else {
-      this.error="No family specified."
-    }
+    await this.loadData();
   },
   methods: {
     loadProducts: async function(){
