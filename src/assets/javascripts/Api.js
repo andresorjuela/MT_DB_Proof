@@ -184,7 +184,7 @@ export class Api{
   async saveGroupEquipment(group_id, equipment_ids){
     let payload = equipment_ids.map(eqid=>{ 
       return {
-        group_id: product_id,
+        group_id: group_id,
         equipment_id: eqid
       };
     });

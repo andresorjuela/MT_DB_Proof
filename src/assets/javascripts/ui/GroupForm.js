@@ -214,7 +214,7 @@ export default {
       this.message="Saving group..."
       try{
         this.group = await Vue.mtapi.saveGroup(this.group);
-        
+        this.$emit('reload', this.group);//tell parent to reload.
       }catch(ex){
         this.message = "Error saving group.";
         this.error = ex.message; 
@@ -227,7 +227,7 @@ export default {
       this.in_process++;
       this.message="Saving equipment..."
       try{
-        this.group = await Vue.mtapi.saveGroupEquipment(
+        await Vue.mtapi.saveGroupEquipment(
           this.group.id,
           this.group_equipment.map(eg=>{return eg.equipment_id; })
         );
