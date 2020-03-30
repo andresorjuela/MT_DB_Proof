@@ -26,15 +26,24 @@ export default {
   </b-row>
   
   <b-form v-if="product">
-    <b-form-row>
+    <tree-selector-input-row 
+      :list="$router.app.categories" 
+      v-model="product.category_id" 
+      label="Category:"
+      label-cols="1"
+      tree-cols="4"
+      display_ancestors></tree-selector-input-row>
+    <!--<b-form-row>
       <b-col cols="5">
         <b-form-group id="g_p_category" description="" label="Category:" label-for="p_category" label-cols="4" >
           <tree-selector-input :list="$router.app.categories" v-model="product.category_id" label_en="Category" label_zh="类别" display_ancestors></tree-selector-input>
         </b-form-group>
       </b-col>
+    </b-form-row>-->
 
-      <b-col cols="7">
-        <b-form-group id="g_p_name_en" description="" label="Title (EN):" label-for="p_name_en" label-cols="2" label-align="right" >
+    <b-form-row>
+      <b-col>
+        <b-form-group id="g_p_name_en" description="" label="Title (EN):" label-for="p_name_en" label-cols="2" label-align="" >
           <b-input-group>
             <b-form-input id="p_name_en" v-model="product.name_en" placeholder="derived by formula" trim></b-form-input>
             <b-input-group-append>
@@ -46,8 +55,21 @@ export default {
     </b-form-row>
 
     <b-form-row>
-      <b-col cols="5">
-        <b-form-group id="g_p_product_type" label="Product Type:" label-for="p_product_type" label-cols="4">
+      <b-col>
+        <b-form-group id="g_p_name_en" description="" label="Title (ZH):" label-for="p_name_en" label-cols="2" label-align="" >
+          <b-input-group>
+            <b-form-input id="p_name_en" v-model="product.name_en" placeholder="derived by formula" trim></b-form-input>
+            <b-input-group-append>
+              <b-button variant="outline-secondary" @click="generateName('en')" :disabled="!hasNameFormula">Create Title</b-button>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
+
+    <b-form-row>
+      <b-col>
+        <b-form-group id="g_p_product_type" label="Product Type:" label-for="p_product_type" label-cols="2">
           <b-form-select id="p_product_type" v-model="product.product_type_id" :options="$router.app.product_types" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" >
             <template v-slot:first>
               <b-form-select-option value="" >选择</b-form-select-option>
@@ -60,29 +82,15 @@ export default {
           </b-form-select>
         </b-form-group>
       </b-col>
-
-      <b-col>
-        <b-form-group id="g_p_name_zh" label="Title (ZH):" label-for="p_name_zh" label-cols="2" label-align="right" >
-          <b-input-group>
-            <b-form-input id="p_name_zh" v-model="product.name_zh" placeholder="从公式得出" trim></b-form-input>
-            <b-input-group-append>
-              <b-button variant="outline-secondary" @click="generateName('zh')" :disabled="!hasNameFormula">Create Title</b-button>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-      </b-col>
-
     </b-form-row>
 
     <b-form-row>
-      <b-col cols="5" v-if="isAccessory||isPart">
-        <b-form-group id="g_p_oem" label="OEM:" label-for="p_oem" label-cols="4" >
+      <b-col cols="7" v-if="isAccessory||isPart">
+        <b-form-group id="g_p_oem" label="OEM:" label-for="p_oem" label-cols="3" >
           <b-form-input id="p_oem" v-model="product.oem" trim></b-form-input>
         </b-form-group>
       </b-col>
       
-      <b-col>
-      </b-col>
       
       <b-col cols="5">
         <b-form-group id="g_p_sku" label="SKU:" label-for="p_sku" label-align="right" label-cols="4" >
@@ -92,18 +100,25 @@ export default {
 
     </b-form-row>
 
+    <tree-selector-input-row 
+      :list="$router.app.brands" 
+      v-model="product.brand_id" 
+      label="OEM Brand:"
+      label-cols="1"
+      tree-cols="4"
+      display_ancestors></tree-selector-input-row>
+
     <b-form-row>
-      <b-col cols="5" v-if="isAccessory||isPart">
-        <b-form-group id="g_p_oem" label="Manufacturer:"  label-cols="4" class="pb-1"  >
+      <!--<b-col cols="7" v-if="isAccessory||isPart">
+        <tree-selector-input :list="$router.app.brands" v-model="product.brand_id" label="OEM Brand" display_ancestors ></tree-selector-input>
+        <b-form-group id="g_p_oem" label="OEM Brand:"  label-cols="3" class="pb-1"  >
           <b-form-input v-if="$router.app.lang==='zh'" v-model="product.brand_zh" readonly ></b-form-input>
           <b-form-input v-else v-model="product.brand_en" readonly></b-form-input>
         </b-form-group>
-      </b-col>
+      </b-col>-->
+      
       <b-col>
-        
-      </b-col>
-      <b-col cols="5">
-        <b-form-group id="g_p_supplier" label="Supplier:" label-for="p_supplier" label-align="right" label-cols="4" >
+        <b-form-group id="g_p_supplier" label="Supplier:" label-for="p_supplier" label-cols="2" >
           <b-form-select id="p_supplier" v-model="product.supplier_id" :options="$router.app.suppliers" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" >
             <template v-slot:first>
               <b-form-select-option value="" >选择</b-form-select-option>
@@ -120,8 +135,8 @@ export default {
     </b-form-row>
 
     <b-form-row>
-      <b-col v-if="isAccessory||isPart" >
-        <b-form-group id="g_p_family" label="Family:" label-for="p_family" label-cols="4" >
+      <b-col v-if="isAccessory||isPart" cols="7" >
+        <b-form-group id="g_p_family" label="Family:" label-for="p_family" label-cols="3" >
           <b-form-select id="p_family" v-model="product.family_id" :options="$router.app.families" value-field="id" text-field="family_code" :disabled="busy" >
             <template v-slot:first>
               <b-form-select-option value="" >选择/Choose</b-form-select-option>

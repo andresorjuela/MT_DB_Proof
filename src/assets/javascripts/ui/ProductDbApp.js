@@ -4,6 +4,7 @@ import {Storage} from "../Storage.js";
 import router from  "./ProductsAppRouter.js";
 import TreeSelector from "./comp/TreeSelector.js";
 import TreeSelectorInput from "./comp/TreeSelectorInput.js";
+import TreeSelectorInputRow from "./comp/TreeSelectorInputRow.js";
 
 Vue.use(new Api(env().API_BASE_URL));
 Vue.use(new Storage());
@@ -274,3 +275,4 @@ var app = new Vue({
 
 Vue.component("tree-selector", TreeSelector);
 Vue.component("tree-selector-input", TreeSelectorInput);
+Vue.component("tree-selector-input-row", TreeSelectorInputRow);
