@@ -31,7 +31,7 @@ export default {
     
     </b-form-row>
 
-    <b-form-row v-if="group.id">
+    <b-form-row>
       <b-col cols="6">
         <b-form-group label="Equipment Models:" label-cols="4" for="eqlisttext">
           <b-form-input placeholder="model / brand" @input="filter_as_typed" v-model="filter" debounce="200"></b-form-input>
@@ -138,7 +138,6 @@ export default {
       }
     },
     loadEquipment: async function(){
-      if(!this.group || !this.group.id) return;
       try{
         this.in_process++;
         this.equipment = await Vue.mtapi.getEquipmentList({limit:1000});

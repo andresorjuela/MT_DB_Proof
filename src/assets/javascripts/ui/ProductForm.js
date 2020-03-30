@@ -423,6 +423,7 @@ export default {
       related_families: [],//family ids only
     
       product: null,//actually a product-view
+      family: null,//actually a family-view
       product_certificates: [],
       product_tags: [],
       
@@ -519,10 +520,15 @@ export default {
           let generator = {
             generate: eval(this.category.product_name_formula)
           };
+          let context = {
+            family: this.family,
+            product: this.product,
+            filter_options: this.product_filter_options,
+          };
           if(locale === 'en'){
-            this.product.name_en = generator.generate({product: this.product}, 'en');
+            this.product.name_en = generator.generate(context, 'en');
           } else {
-            this.product.name_zh = generator.generate({product: this.product}, 'zh');
+            this.product.name_zh = generator.generate(context, 'zh');
           }
         }catch(ex){
           console.error(ex);
@@ -535,10 +541,15 @@ export default {
           let generator = {
             generate: eval(this.category.product_description_formula)
           };
+          let context = {
+            family: this.family,
+            product: this.product,
+            filter_options: this.product_filter_options,
+          };
           if(locale === 'en'){
-            this.product.description_en = generator.generate({product: this.product}, 'en');
+            this.product.description_en = generator.generate(context, 'en');
           } else {
-            this.product.description_zh = generator.generate({product: this.product}, 'zh');
+            this.product.description_zh = generator.generate(context, 'zh');
           }
         }catch(ex){
           console.error(ex);
@@ -568,7 +579,9 @@ export default {
           this.loadCustomAttributesForCategory(),
           this.loadProductCertificates(),
           this.loadProductFamilies(),
-          this.loadFilterOptionViewsForCategory()
+          this.loadFilterOptionViewsForCategory(),
+          this.loadProductFilterOptions(),
+          this.loadFamily()
         ]);
         
         //If master data is missing, emit a reload request from the master app.
@@ -588,6 +601,22 @@ export default {
           this.error = `Couldn't load product data.`;
           console.error(err);
         }
+      }
+    },
+    loadFamily : async function(){
+      try{
+        if(!this.product || !this.product.family_id) return;
+        if(this.family && this.family.id == this.product.family_id) return;
+        this.in_process++;
+        this.message="Loading...";
+        this.family = await Vue.mtapi.getFamily(this.product.family_id);
+        
+      }catch(ex){
+        console.error(ex);
+        this.error="Couldn't load family.";
+      } finally {
+        this.message = null;
+        this.in_process--;
       }
     },
     loadFilterOptionViewsForCategory : async function(){
