@@ -125,6 +125,13 @@ export default {
       return this.products.map((p)=>{ return p.sku; })
     }
   },
+  watch: {
+    async $route(to, from) {
+      if( to.params != from.params ){
+        await this.loadData();
+      }
+    }
+  },
   created: async function(){
     this.$router.app.selectedMenu="family";
     await this.loadData();

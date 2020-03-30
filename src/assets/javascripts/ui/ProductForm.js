@@ -478,6 +478,13 @@ export default {
       return units;
     }
   },
+  watch: {
+    async $route(to, from) {
+      if( to.params != from.params ){
+        await this.loadData();
+      }
+    }
+  },
   created: async function(){
     this.$router.app.selectedMenu="product";
     if(this.$route.params.id){

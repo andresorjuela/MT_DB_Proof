@@ -75,6 +75,13 @@ export default {
     hasMessage: function(){ return this.message?true:false; },
     
   },
+  watch: {
+    async $route(to, from) {
+      if( to.params != from.params ){
+        await this.loadData();
+      }
+    }
+  },
   created: async function(){
     this.$router.app.selectedMenu="group";
     await this.loadData();
