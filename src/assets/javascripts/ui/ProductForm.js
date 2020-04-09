@@ -56,11 +56,11 @@ export default {
 
     <b-form-row>
       <b-col>
-        <b-form-group id="g_p_name_en" description="" label="Title (ZH):" label-for="p_name_en" label-cols="2" label-align="" >
+        <b-form-group id="g_p_name_zh" description="" label="Title (ZH):" label-for="p_name_zh" label-cols="2" label-align="" >
           <b-input-group>
-            <b-form-input id="p_name_en" v-model="product.name_en" placeholder="derived by formula" trim></b-form-input>
+            <b-form-input id="p_name_zh" v-model="product.name_zh" placeholder="derived by formula" trim></b-form-input>
             <b-input-group-append>
-              <b-button variant="outline-secondary" @click="generateName('en')" :disabled="!hasNameFormula">Create Title</b-button>
+              <b-button variant="outline-secondary" @click="generateName('zh')" :disabled="!hasNameFormula">Create Title</b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
@@ -135,9 +135,9 @@ export default {
     </b-form-row>
 
     <b-form-row>
-      <b-col v-if="isAccessory||isPart" cols="7" >
+      <b-col v-if="isAccessory||isPart" cols="4" >
         <b-form-group id="g_p_family" label="Family:" label-for="p_family" label-cols="3" >
-          <b-form-select id="p_family" v-model="product.family_id" :options="$router.app.families" value-field="id" text-field="family_code" :disabled="busy" >
+          <b-form-select id="p_family" v-model="product.family_id" :options="$router.app.families" value-field="id" text-field="family_code" :disabled="busy">
             <template v-slot:first>
               <b-form-select-option value="" >选择/Choose</b-form-select-option>
             </template>
@@ -146,14 +146,14 @@ export default {
         <!-- <mt-family-search family_id="product.family_id"></mt-family-search> -->
       </b-col>
       <b-col >
-        <b-form-group id="g_p_warranty" description="months duration" label="Warranty:" label-for="p_warranty" label-align="right" label-cols="4" >
+        <b-form-group id="g_p_warranty" description="months duration" label="Warranty:" label-for="p_warranty" label-align="right" label-cols="6" >
           <b-form-input id="p_warranty" v-model="product.warranty_duration_months" type="number" min=0 max=120 step=1>
           </b-form-input>
         </b-form-group>
       </b-col>
       <b-col v-if="isAccessory">
-        <b-form-group id="g_p_certificates" label="Certificates:" label-for="p_certificates" label-cols="3" >
-          <b-form-checkbox-group id="p_certficates" v-model="product_certificates" :options="$router.app.certificates" value-field="id" text-field="name_en" :disabled="busy" >
+        <b-form-group id="g_p_certificates" label="Certificates:" label-for="p_certificates" label-align="right" label-cols="3"  >
+          <b-form-checkbox-group id="p_certficates" v-model="product_certificates" :options="$router.app.certificates" value-field="id" text-field="name_en" :disabled="busy" class="float-right" stacked  >
           </b-form-checkbox-group>       
         </b-form-group>
       </b-col>
