@@ -106,8 +106,9 @@ export class Api{
     let result =  await this._get(`${this.base_url}/products/${id}`);
     return result;
   }
-  async getProductCount(){
-    let result =  await this._get(`${this.base_url}/products/count`);
+  async getProductCount(qopts){
+    if(!qopts) qopts = {};
+    let result =  await this._get(`${this.base_url}/products/count`, qopts);
     return result;
   }
   async getProductCertificates(id){

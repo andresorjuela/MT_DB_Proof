@@ -6,6 +6,17 @@ export default {
 <div>
   <b-row>
     <b-col>
+      <b-input-group >
+        <b-input type="text" placeholder="search" v-model="search_term" />
+        <b-input-group-append>
+          <b-button variant="outline-primary" @click="getProducts">Search</b-button>
+        </b-input-group-append>
+      </b-input-group>
+      </b-form>
+    </b-col>
+  </b-row>
+  <b-row>
+    <b-col>
       <b-alert v-if="!busy && hasError" variant="danger">{{ error }}</b-alert>
       <b-alert v-if="!busy && hasMessage" variant="info">{{ message }}</b-alert>
     </b-col>
@@ -39,7 +50,8 @@ export default {
         {key: "name_en", label: "Name", sortable: true}
       ],
       pages: [],
-      selected : null
+      selected : null,
+      search_term: ''
     }
   },
   props: {
@@ -47,7 +59,8 @@ export default {
       type: Number,
       required: true,
       default: 1
-    }
+    },
+    search: String
   },
   computed: {
     busy: function(){ return this.in_process > 0;},
@@ -55,8 +68,12 @@ export default {
     hasMessage: function(){ return this.message ? true: false;}
   },
   created: async function(){
-    await this.getProducts();
     this.$router.app.selectedMenu="product";
+    if(this.search){
+      //If prop was set elsewhere use it for search term.
+      this.search_term = this.search;
+    }
+    await this.getProducts();
   },
   errorCaptured: function(err, component, info){
     console.error('ProductList Error'); 
@@ -70,10 +87,10 @@ export default {
     },
   },
   methods: {
-    getProductCount : async function(){
+    getProductCount : async function(q){
       this.in_process ++;
       try{
-        this.total = await Vue.mtapi.getProductCount();
+        this.total = await Vue.mtapi.getProductCount(q);
       } finally {
         this.in_process --;
       }
@@ -81,13 +98,17 @@ export default {
     getProducts : async function(){
       this.in_process ++;
       try{
-        await this.getProductCount();
-    
-        this.products = await Vue.mtapi.getProducts({
+        
+        let query = {
           offset: this.page && this.page > 0? (this.page-1)*this.limit : 0,
           limit: this.limit,
           order_by: '+sku'
-        });
+        };
+        if(this.search_term){
+          query.search_term = this.search_term;
+        }
+        await this.getProductCount(query); 
+        this.products = await Vue.mtapi.getProducts(query);
       
         this.recalculatePages();
 

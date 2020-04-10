@@ -6,6 +6,17 @@ export default {
 <div>
   <b-row>
     <b-col>
+      <b-input-group >
+        <b-input type="text" placeholder="search" v-model="search_term" />
+        <b-input-group-append>
+          <b-button variant="outline-primary" @click="getEquipmentList">Search</b-button>
+        </b-input-group-append>
+      </b-input-group>
+      </b-form>
+    </b-col>
+  </b-row>
+  <b-row>
+    <b-col>
       <b-alert v-if="!busy && hasError" variant="danger">{{ error }}</b-alert>
       <b-alert v-if="!busy && hasMessage" variant="info">{{ message }}</b-alert>
     </b-col>
@@ -40,7 +51,8 @@ export default {
         {key: "type_zh", label: "Type (Chinese)", sortable: true}
       ],
       pages:[],
-      selected : null
+      selected : null,
+      search_term: null
     }
   },
   props: {
@@ -48,7 +60,8 @@ export default {
       type: Number,
       required: true,
       default: 1
-    }
+    },
+    search: String
   },
   computed: {
     busy: function(){ return this.in_process > 0;},
@@ -56,8 +69,11 @@ export default {
     hasMessage: function(){ return this.message ? true: false;}
   },
   created: function(){
-    this.getEquipmentList();
     this.$router.app.selectedMenu="equipment";
+    if(this.search) {
+      this.search_term = this.search;
+    }
+    this.getEquipmentList(); 
   },
   errorCaptured: function(err, component, info){
     console.error('EquipmentList Error'); 
@@ -71,10 +87,10 @@ export default {
     },
   },
   methods: {
-    getEquipmentCount : async function(){
+    getEquipmentCount : async function(q){
       this.in_process ++;
       try{
-        this.total = await Vue.mtapi.getEquipmentCount();
+        this.total = await Vue.mtapi.getEquipmentCount(q);
       } finally {
         this.in_process --;
       }
@@ -83,12 +99,16 @@ export default {
       this.in_process++;
       try{
         this.error, this.message = null;
-        await this.getEquipmentCount();
-        this.equipment = await Vue.mtapi.getEquipmentList({
+        let query = {
           offset: this.page && this.page > 0 ? (this.page-1)*this.limit : 0,
           limit: this.limit,
           order_by: '+model'
-        });
+        };
+        if(this.search_term){
+          query.search_term = this.search_term;
+        }
+        await this.getEquipmentCount(query);
+        this.equipment = await Vue.mtapi.getEquipmentList(query);
 
         this.recalculatePages();
 

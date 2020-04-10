@@ -2,64 +2,92 @@ var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
 let { fetchOne, fetchById, fetchCount, fetchMany, deleteMatching, parseQueryOptions, updateById, create, saveAll } = require('../middleware/db-api');
+let CriteriaHelper = require('@apigrate/mysqlutils/helpers/criteria');
+
+let SEARCHABLE_PRODUCT_COLUMNS = [ 
+  'product_id', 
+  'sku',
+  'oem',
+  'name_en', 
+  'name_zh',
+  'description_en',
+  'description_zh',
+  'product_type_en',
+  'product_type_zh',
+  'family_id',
+  'family_code',
+  'brand_id',
+  'brand_en',
+  'brand_zh',
+  'category_id',
+  'category_en',
+  'category_zh',
+  'search_term'
+];
 
 /* Search for products. */
-router.get('/', function (req, res, next) {
+router.get('/', async function (req, res, next) {
   let q = parseQueryOptions(req, 
-    [
-      'product_id', 
-      'sku',
-      'oem',
-      'name_en', 
-      'name_zh',
-      'description_en',
-      'description_zh',
-      'product_type_en',
-      'product_type_zh',
-      'family_id',
-      'family_code',
-      'brand_id',
-      'brand_en',
-      'brand_zh',
-      'category_id',
-      'category_en',
-      'category_zh',
-      
-    ], 
+    SEARCHABLE_PRODUCT_COLUMNS, 
     ['+name_en', '+id'], 1000);
 
-  res.locals.dbInstructions = {
-    dao: req.app.locals.Database.ProductView(),
-    query: q.query,
-    query_options: q.query_options
+  let ProductView = req.app.locals.Database.ProductView();
+  if(q.query.search_term){
+    let criteria = parseSearchTermCriteria(q);
+
+    let qresult = await ProductView.selectWhere(criteria.whereClause, criteria.parms);
+    
+    let result = {};
+    result[ProductView.plural] = qresult;
+    res.status(200).json(result);
+
+  } else {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.Database.ProductView(),
+      query: q.query,
+      query_options: q.query_options
+    }
+    next();
   }
-  next();
+  
 }, fetchMany);
 
-router.get('/count', function (req, res, next) {
+router.get('/count', async function (req, res, next) {
   let q = parseQueryOptions(req, 
-    [
-      'product_id',
-      'oem', 
-      'sku',
-      'brand_id',
-      'brand_en',
-      'brand_zh',
-      'category_id',
-      'category_en',
-      'category_zh',
-      'name_en', 
-      'name_zh'
-    ], 
+    SEARCHABLE_PRODUCT_COLUMNS, 
     ['+name_en', '+id'], 1000);
 
-  res.locals.dbInstructions = {
-    dao: req.app.locals.Database.ProductView(),
-    query: q.query
+  let ProductView = req.app.locals.Database.ProductView();
+  if(q.query.search_term){
+    let criteria = parseSearchTermCriteria(q);
+
+    let qresult = await ProductView.callDb(`SELECT count(*) as count FROM ${ProductView.table} WHERE ${criteria.whereClause}`, criteria.parms);
+
+    res.status(200).json(qresult[0].count);
+
+  } else {
+    res.locals.dbInstructions = {
+      dao: req.app.locals.Database.ProductView(),
+      query: q.query
+    }
+    next();
   }
-  next();
 }, fetchCount);
 
+/**
+ * Provide consistent search term queries.
+ * @param {object} q a parsed query options object.
+ * @returns a criteria helper object containing a whereClause and parms property
+ * that can be used for queries
+ */
+function parseSearchTermCriteria(q){
+  let criteria = new CriteriaHelper();
+    criteria.or('sku', 'LIKE', `%${q.query.search_term}%`)
+    .or('oem', 'LIKE', `%${q.query.search_term}%`)
+    .or('category_en', 'LIKE', `%${q.query.search_term}%`)
+    .or('category_zh', 'LIKE', `%${q.query.search_term}%`);
+  return criteria;
+}
 
 router.get('/:product_id', function (req, res, next) {
 

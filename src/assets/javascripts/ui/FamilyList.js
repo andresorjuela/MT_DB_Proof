@@ -6,6 +6,17 @@ export default {
 <div>
   <b-row>
     <b-col>
+      <b-input-group >
+        <b-input type="text" placeholder="search" v-model="search_term" />
+        <b-input-group-append>
+          <b-button variant="outline-primary" @click="getFamilies">Search</b-button>
+        </b-input-group-append>
+      </b-input-group>
+      </b-form>
+    </b-col>
+  </b-row>
+  <b-row>
+    <b-col>
       <b-alert v-if="!busy && hasError" variant="danger">{{ error }}</b-alert>
       <b-alert v-if="!busy && hasMessage" variant="info">{{ message }}</b-alert>
     </b-col>
@@ -38,7 +49,8 @@ export default {
         {key: "family_connector_code", label: "Connector Code", sortable: true}
       ],
       pages:[],
-      selected : null
+      selected : null,
+      search_term: null,
     }
   },
   props: {
@@ -46,7 +58,8 @@ export default {
       type: Number,
       required: true,
       default: 1
-    }
+    },
+    search: String
   },
   computed: {
     busy: function(){ return this.in_process > 0;},
@@ -54,8 +67,11 @@ export default {
     hasMessage: function(){ return this.message ? true: false;}
   },
   created: function(){
-    this.getFamilies();
     this.$router.app.selectedMenu="family";
+    if(this.search){
+      this.search_term = this.search;
+    }
+    this.getFamilies();
   },
   errorCaptured: function(err, component, info){
     console.error('FamilyList Error'); 
@@ -69,10 +85,10 @@ export default {
     },
   },
   methods: {
-    getFamilyCount : async function(){
+    getFamilyCount : async function(q){
       this.in_process ++;
       try{
-        this.total = await Vue.mtapi.getFamilyCount();
+        this.total = await Vue.mtapi.getFamilyCount(q);
       } finally {
         this.in_process --;
       }
@@ -81,12 +97,16 @@ export default {
       this.in_process++;
       try{
         this.error, this.message = null;
-        await this.getFamilyCount();
-        this.families = await Vue.mtapi.getFamilies({
+        let query = {
           offset: this.page && this.page > 0 ? (this.page-1)*this.limit : 0,
           limit: this.limit,
           order_by: '+family_code'
-        });
+        };
+        if(this.search_term){
+          query.search_term = this.search_term;
+        }
+        await this.getFamilyCount(query);
+        this.families = await Vue.mtapi.getFamilies(query);
 
         this.recalculatePages();
 
