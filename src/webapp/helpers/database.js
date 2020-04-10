@@ -4,7 +4,7 @@
 */
 module.exports = function (pool) {
   var _ = require('lodash');
-  var Dao = require('@apigrate/mysqlutils');
+  var {Dao} = require('@apigrate/mysqlutils');
   
   var standard_opts = {
     created_timestamp_column: 'created',

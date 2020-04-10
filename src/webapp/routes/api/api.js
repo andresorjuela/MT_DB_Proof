@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchMany, parseQueryOptions } = require('../middleware/db-api');
+let { fetchMany, parseQueryOptions } = require('@apigrate/mysqlutils/lib/express/db-api');
 
 router.get('/brands', function (req, res, next) {
   let  q = parseQueryOptions(req, ['name_en','name_zh','id'], ['+name_en','+id'], 1000);

@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchById, fetchMany, parseQueryOptions, fetchCount, create, updateById } = require('../middleware/db-api');
+let { fetchById, fetchMany, parseQueryOptions, fetchCount, create, updateById } = require('@apigrate/mysqlutils/lib/express/db-api');
 let CriteriaHelper = require('@apigrate/mysqlutils/helpers/criteria');
 
 const EQUIPMENT_QUERY_FIELDS = [
@@ -12,9 +12,7 @@ const EQUIPMENT_QUERY_FIELDS = [
 /** Query for equipment */
 router.get('/', async function (req, res, next) {
 
-  let q = parseQueryOptions(req, 
-    EQUIPMENT_QUERY_FIELDS, 
-    ['+equipment_code', '+id'], 1000);
+  let q = parseQueryOptions(req, EQUIPMENT_QUERY_FIELDS, ['+model', '+id'], 1000);
 
   let EquipmentView = req.app.locals.Database.EquipmentView();
   if(q.query.search_term){
@@ -39,9 +37,7 @@ router.get('/', async function (req, res, next) {
 
 /** Count all equipment matching the query. */
 router.get('/count', async function (req, res, next) {
-  let q = parseQueryOptions(req, 
-    EQUIPMENT_QUERY_FIELDS, 
-    ['+equipment_code', '+id'], 1000);
+  let q = parseQueryOptions(req,  EQUIPMENT_QUERY_FIELDS);
 
   let EquipmentView = req.app.locals.Database.EquipmentView();
   if(q.query.search_term){

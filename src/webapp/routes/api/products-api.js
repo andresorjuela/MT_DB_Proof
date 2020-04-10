@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchOne, fetchById, fetchCount, fetchMany, deleteMatching, parseQueryOptions, updateById, create, saveAll } = require('../middleware/db-api');
+let { fetchOne, fetchById, fetchCount, fetchMany, deleteMatching, parseQueryOptions, updateById, create, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
 let CriteriaHelper = require('@apigrate/mysqlutils/helpers/criteria');
 
 let SEARCHABLE_PRODUCT_COLUMNS = [ 
@@ -27,9 +27,7 @@ let SEARCHABLE_PRODUCT_COLUMNS = [
 
 /* Search for products. */
 router.get('/', async function (req, res, next) {
-  let q = parseQueryOptions(req, 
-    SEARCHABLE_PRODUCT_COLUMNS, 
-    ['+name_en', '+id'], 1000);
+  let q = parseQueryOptions(req, SEARCHABLE_PRODUCT_COLUMNS, ['+name_en', '+id'], 1000);
 
   let ProductView = req.app.locals.Database.ProductView();
   if(q.query.search_term){
@@ -53,9 +51,7 @@ router.get('/', async function (req, res, next) {
 }, fetchMany);
 
 router.get('/count', async function (req, res, next) {
-  let q = parseQueryOptions(req, 
-    SEARCHABLE_PRODUCT_COLUMNS, 
-    ['+name_en', '+id'], 1000);
+  let q = parseQueryOptions(req, SEARCHABLE_PRODUCT_COLUMNS);
 
   let ProductView = req.app.locals.Database.ProductView();
   if(q.query.search_term){

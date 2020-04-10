@@ -36,21 +36,28 @@ The default context includes the following data:
   * lifecycle_en
   * lifecycle_zh
 
-
+* `filters` backed by the v_product_filter_options view, with the following fields:
+  * id 
+  * TODO 
 
 
 #### column: product_name_formula
 The syntax as originally written...
 
 ```
-t_family.brand_id + t_category.name + t_product.oem
+t_family.brand_id + ' ' + t_category.name + ' ' + t_product.oem
 ```
 
 in javascript becomes...
 ```javascript
 (c,lang)=>{
-  return `${c.product.brand} ${c.product.category_en} ${c.product.oem}`;
+  if(lang=='en'){
+    return `${c.product.brand_en} ${c.product.category_en} ${c.product.oem}`;
+  } else if (lang=='zh'){
+    return `${c.product.brand_zh} ${c.product.category_zh} ${c.product.oem}`;
+  }
 }
+
 ```
 In the above arrow function, the arguments:
 * `c` is a context object that gives the function access to things like `product` (and other future data elements if needed).

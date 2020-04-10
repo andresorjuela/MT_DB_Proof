@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchOne, fetchById, fetchMany, parseQueryOptions, fetchCount, create, updateById } = require('../middleware/db-api');
+let { fetchOne, fetchById, fetchMany, parseQueryOptions, fetchCount, create, updateById } = require('@apigrate/mysqlutils/lib/express/db-api');
 let CriteriaHelper = require('@apigrate/mysqlutils/helpers/criteria');
 
 const FAMILY_QUERY_FIELDS = [
@@ -14,9 +14,7 @@ const FAMILY_QUERY_FIELDS = [
 /** Query for families */
 router.get('/', async function (req, res, next) {
 
-  let q = parseQueryOptions(req, 
-    FAMILY_QUERY_FIELDS, 
-    ['+family_code', '+id'], 1000);
+  let q = parseQueryOptions(req, FAMILY_QUERY_FIELDS, ['+family_code', '+id'], 1000);
   
   let FamilyView = req.app.locals.Database.FamilyView();
   if(q.query.search_term){
@@ -41,9 +39,7 @@ router.get('/', async function (req, res, next) {
 
 /** Count all families matching the query. */
 router.get('/count', async function (req, res, next) {
-  let q = parseQueryOptions(req, 
-    FAMILY_QUERY_FIELDS, 
-    ['+family_code', '+id'], 1000);
+  let q = parseQueryOptions(req, FAMILY_QUERY_FIELDS);
 
   let FamilyView = req.app.locals.Database.FamilyView();
   if(q.query.search_term){
