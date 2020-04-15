@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
 let { fetchOne, fetchById, fetchCount, fetchMany, deleteMatching, parseQueryOptions, updateById, create, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
+let debug = require('debug')('medten:routes');
+
 let CriteriaHelper = require('@apigrate/mysqlutils/helpers/criteria');
 
 let SEARCHABLE_PRODUCT_COLUMNS = [ 
@@ -51,6 +53,7 @@ router.get('/', async function (req, res, next) {
 }, fetchMany);
 
 router.get('/count', async function (req, res, next) {
+  debug(`Counting products for query...`);
   let q = parseQueryOptions(req, SEARCHABLE_PRODUCT_COLUMNS);
 
   let ProductView = req.app.locals.Database.ProductView();
@@ -88,7 +91,7 @@ function parseSearchTermCriteria(q){
 router.get('/:product_id', function (req, res, next) {
 
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.Product(),
+    dao: req.app.locals.Database.ProductView(),
     id: req.params.product_id
   }
   next();

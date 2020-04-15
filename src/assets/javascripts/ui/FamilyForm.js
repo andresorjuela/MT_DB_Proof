@@ -52,7 +52,7 @@ export default {
       </b-col>
       <b-col cols="6">
         <b-form-group label="Technology:" label-cols="4" label-align="right" >
-          <b-form-select v-model="family.technology_id" :options="$router.app.technologies" value-field="id" text-field="name" >
+          <b-form-select v-model="family.technology_id" :options="$router.app.technologies" value-field="id" text-field="name_en" >
             <template v-slot:first>
               <b-form-select-option value="" >Choose</b-form-select-option>
             </template>
