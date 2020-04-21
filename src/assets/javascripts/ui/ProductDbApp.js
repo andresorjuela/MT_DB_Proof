@@ -132,7 +132,8 @@ var app = new Vue({
     loadFamilies: async function(){
       this.in_process++;
       try{
-        this.families = await Vue.mtapi.getFamilies();
+        let apiresp = await Vue.mtapi.getFamilies()
+        this.families = apiresp.family_views;
         if(this.families){
           Vue.storage.setFamilies(this.families);
         }

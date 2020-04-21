@@ -85,14 +85,6 @@ export default {
     },
   },
   methods: {
-    getFamilyCount : async function(q){
-      this.in_process ++;
-      try{
-        this.total = await Vue.mtapi.getFamilyCount(q);
-      } finally {
-        this.in_process --;
-      }
-    },
     getFamilies : async function(){
       this.in_process++;
       try{
@@ -105,8 +97,9 @@ export default {
         if(this.search_term){
           query.search_term = this.search_term;
         }
-        await this.getFamilyCount(query);
-        this.families = await Vue.mtapi.getFamilies(query);
+        let apiresp = await Vue.mtapi.getFamilies(query);
+        this.families = apiresp.family_views;
+        this.total = apiresp.total;
 
         this.recalculatePages();
 

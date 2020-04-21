@@ -20,17 +20,25 @@ router.get('/', async function (req, res, next) {
   if(q.query.search_term){
     let criteria = parseSearchTermCriteria(q);
 
-    let qresult = await FamilyView.selectWhere(criteria.whereClause, criteria.parms);
+    // let qresult = await FamilyView.selectWhere(criteria.whereClause, criteria.parms);
     
-    let result = {};
-    result[FamilyView.plural] = qresult;
-    res.status(200).json(result);
+    // let result = {};
+    // result[FamilyView.plural] = qresult;
+    // res.status(200).json(result);
+    res.locals.dbInstructions = {
+      dao: FamilyView,
+      criteria: criteria,
+      query_options: q.query_options,
+      with_total: true,
+    }
+    next();
 
   } else {
     res.locals.dbInstructions = {
       dao: FamilyView,
       query: q.query,
-      query_options: q.query_options
+      query_options: q.query_options,
+      with_total: true,
     }
     next();
   }

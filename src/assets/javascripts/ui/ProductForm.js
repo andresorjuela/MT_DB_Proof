@@ -532,6 +532,9 @@ export default {
             product: this.product,
             filter_options: this.product_filter_options,
           };
+          this.cleanNulls(context.family);
+          this.cleanNulls(context.product);
+          context.filter_options.forEach( fo => { this.cleanNulls(fo); });
           if(locale === 'en'){
             this.product.name_en = generator.generate(context, 'en');
           } else {
@@ -553,6 +556,9 @@ export default {
             product: this.product,
             filter_options: this.product_filter_options,
           };
+          this.cleanNulls(context.family);
+          this.cleanNulls(context.product);
+          context.filter_options.forEach( fo => { this.cleanNulls(fo); });
           if(locale === 'en'){
             this.product.description_en = generator.generate(context, 'en');
           } else {
@@ -562,6 +568,15 @@ export default {
           console.error(ex);
         }
       }
+    },
+    cleanNulls: function(entity){
+      if(!entity) return;
+      for(let fld in entity){
+        if(entity[fld]===null){
+          entity[fld]="";
+        }
+      }
+      return entity;
     },
     loadCustomAttributesForCategory : async function(){
       try{

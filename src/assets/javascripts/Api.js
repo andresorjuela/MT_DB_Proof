@@ -53,7 +53,7 @@ export class Api{
   async getFamilies(qopts){
     if(!qopts) qopts = {limit:1000, order_by:'+family_code'};
     let result = await this._get(`${this.base_url}/families`, qopts);
-    return result.family_views;
+    return result;
   }
   async getFamiliesForBrand(brand_id){
     let query = {brand_id: brand_id, limit:1000, order_by:'+family_code'};
@@ -63,9 +63,6 @@ export class Api{
   async getFamily(id){
     let result =  await this._get(`${this.base_url}/families/${id}`);
     return result;
-  }
-  async getFamilyCount(qopts){
-    return await this._get(`${this.base_url}/families/count`, qopts);
   }
   async getGroup(id){
     let result =  await this._get(`${this.base_url}/groups/${id}`);
