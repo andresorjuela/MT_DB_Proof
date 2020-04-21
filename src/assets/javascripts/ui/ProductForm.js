@@ -693,7 +693,8 @@ export default {
       try{
         this.in_process++;
         this.message="Loading...";
-        this.products = await Vue.mtapi.getProducts({order_by:"+sku", limit: 1000});
+        let apiresp = await Vue.mtapi.getProducts({order_by:"+sku", limit: 1000});
+        this.products = apiresp.product_views;
         this.products = this.products.filter(p => {return p.sku ? true: false; })
       }catch(ex){
         console.error(ex);

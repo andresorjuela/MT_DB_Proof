@@ -27,28 +27,23 @@ let SEARCHABLE_PRODUCT_COLUMNS = [
   'search_term'
 ];
 
-/* Search for products. */
+/** Query for products. */
 router.get('/', async function (req, res, next) {
   let q = parseQueryOptions(req, SEARCHABLE_PRODUCT_COLUMNS, ['+name_en', '+id'], 1000);
+  
+  let dbInstructions = {
+    dao: req.app.locals.Database.ProductView(),
+    query_options: q.query_options,
+    with_total: true,
+  };
 
-  let ProductView = req.app.locals.Database.ProductView();
   if(q.query.search_term){
-    let criteria = parseSearchTermCriteria(q);
-
-    let qresult = await ProductView.selectWhere(criteria.whereClause, criteria.parms);
-    
-    let result = {};
-    result[ProductView.plural] = qresult;
-    res.status(200).json(result);
-
+    dbInstructions.criteria = parseSearchTermCriteria(q);
   } else {
-    res.locals.dbInstructions = {
-      dao: req.app.locals.Database.ProductView(),
-      query: q.query,
-      query_options: q.query_options
-    }
-    next();
+    dbInstructions.query = q.query;
   }
+  res.locals.dbInstructions = dbInstructions;
+  next();
   
 }, fetchMany);
 

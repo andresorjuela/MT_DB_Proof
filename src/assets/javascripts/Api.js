@@ -97,15 +97,10 @@ export class Api{
   async getProducts(qopts){
     if(!qopts) qopts = {limit:1000, order_by:'+name_en'};
     let result = await this._get(`${this.base_url}/products`, qopts);
-    return result.product_views;
+    return result;
   }
   async getProduct(id){
     let result =  await this._get(`${this.base_url}/products/${id}`);
-    return result;
-  }
-  async getProductCount(qopts){
-    if(!qopts) qopts = {};
-    let result =  await this._get(`${this.base_url}/products/count`, qopts);
     return result;
   }
   async getProductCertificates(id){

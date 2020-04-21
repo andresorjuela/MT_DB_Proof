@@ -87,14 +87,6 @@ export default {
     },
   },
   methods: {
-    getProductCount : async function(q){
-      this.in_process ++;
-      try{
-        this.total = await Vue.mtapi.getProductCount(q);
-      } finally {
-        this.in_process --;
-      }
-    },
     getProducts : async function(){
       this.in_process ++;
       try{
@@ -107,9 +99,10 @@ export default {
         if(this.search_term){
           query.search_term = this.search_term;
         }
-        await this.getProductCount(query); 
-        this.products = await Vue.mtapi.getProducts(query);
-      
+        let apiresp = await Vue.mtapi.getProducts(query);
+        this.products = apiresp.product_views;
+        this.total = apiresp.total;
+
         this.recalculatePages();
 
       } finally {

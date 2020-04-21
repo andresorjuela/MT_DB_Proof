@@ -141,11 +141,12 @@ export default {
       if(!this.family || !this.family.id) return;
       try{
         this.in_process++;
-        this.products = await Vue.mtapi.getProducts({
+        let apiresp = await Vue.mtapi.getProducts({
           family_id: this.family.id,
           order_by: '+sku',
           limit: 100
         });
+        this.products = apiresp.product_views; 
         if(this.products.length > 0){
           this.products[0]
         }
