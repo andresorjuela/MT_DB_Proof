@@ -38,7 +38,7 @@ export default {
           <b-tbody>
             <b-tr>
               <b-td variant="light">{{product.oem}}</b-td>
-              <b-td>{{product.brand_en}}</b-td>
+              <b-td>{{product.oem_brand_en}}</b-td>
             </b-tr>
           </b-tbody>
         
