@@ -147,8 +147,8 @@ export default {
     loadEquipment: async function(){
       try{
         this.in_process++;
-        this.equipment = await Vue.mtapi.getEquipmentList({limit:1000});
-        
+        let apiresp = await Vue.mtapi.getEquipmentList({limit:1000});
+        this.equipment = apiresp.equipment_views;
         //decorate with label
         this.equipment.forEach(eq=>{
           eq.label = `${eq.model} / ${eq.brand_en}`;

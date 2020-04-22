@@ -15,7 +15,7 @@ const FAMILY_QUERY_FIELDS = [
 router.get('/', async function (req, res, next) {
 
   let q = parseQueryOptions(req, FAMILY_QUERY_FIELDS, ['+family_code', '+id'], 1000);
-  
+
   let dbInstructions = {
     dao: req.app.locals.Database.FamilyView(),
     query_options: q.query_options,
@@ -32,26 +32,6 @@ router.get('/', async function (req, res, next) {
   
 }, fetchMany);
 
-/** Count all families matching the query. */
-router.get('/count', async function (req, res, next) {
-  let q = parseQueryOptions(req, FAMILY_QUERY_FIELDS);
-
-  let FamilyView = req.app.locals.Database.FamilyView();
-  if(q.query.search_term){
-    let criteria = parseSearchTermCriteria(q);
-
-    let qresult = await FamilyView.callDb(`SELECT count(*) as count FROM ${FamilyView.table} WHERE ${criteria.whereClause}`, criteria.parms);
-
-    res.status(200).json(qresult[0].count);
-  } else {
-    res.locals.dbInstructions = {
-      dao: FamilyView,
-      query: q.query
-    }
-    next();
-  }
-  
-}, fetchCount);
 
 /**
  * Provide consistent search term queries.

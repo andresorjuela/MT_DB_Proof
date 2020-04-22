@@ -30,15 +30,11 @@ export class Api{
   }
   async getEquipmentList(qopts){
     if(!qopts) qopts = {limit:1000, order_by:'+model'};
-    let result = await this._get(`${this.base_url}/equipment`, qopts);
-    return result.equipment_views;
+    return await this._get(`${this.base_url}/equipment`, qopts);
   }
   async getEquipment(id){
     let result =  await this._get(`${this.base_url}/equipment/${id}`);
     return result;
-  }
-  async getEquipmentCount(qopts){
-    return await this._get(`${this.base_url}/equipment/count`, qopts);
   }
   async getEquipmentGroups(qopts){
     if(!qopts) qopts={limit: 1000, order_by: "+model,+group_code"};

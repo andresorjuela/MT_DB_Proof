@@ -13,48 +13,22 @@ const EQUIPMENT_QUERY_FIELDS = [
 router.get('/', async function (req, res, next) {
 
   let q = parseQueryOptions(req, EQUIPMENT_QUERY_FIELDS, ['+model', '+id'], 1000);
+  
+  let dbInstructions = {
+    dao: req.app.locals.Database.EquipmentView(),
+    query_options: q.query_options,
+    with_total: true,
+  };
 
-  let EquipmentView = req.app.locals.Database.EquipmentView();
   if(q.query.search_term){
-    let criteria = parseSearchTermCriteria(q);
-
-    let qresult = await EquipmentView.selectWhere(criteria.whereClause, criteria.parms);
-    
-    let result = {};
-    result[EquipmentView.plural] = qresult;
-    res.status(200).json(result);
-
+    dbInstructions.criteria = parseSearchTermCriteria(q);
   } else {
-    res.locals.dbInstructions = {
-      dao: EquipmentView,
-      query: q.query,
-      query_options: q.query_options
-    }
-    next();
+    dbInstructions.query = q.query;
   }
-
+  res.locals.dbInstructions = dbInstructions;
+  next();
+  
 }, fetchMany);
-
-/** Count all equipment matching the query. */
-router.get('/count', async function (req, res, next) {
-  let q = parseQueryOptions(req,  EQUIPMENT_QUERY_FIELDS);
-
-  let EquipmentView = req.app.locals.Database.EquipmentView();
-  if(q.query.search_term){
-    let criteria = parseSearchTermCriteria(q);
-
-    let qresult = await EquipmentView.callDb(`SELECT count(*) as count FROM ${EquipmentView.table} WHERE ${criteria.whereClause}`, criteria.parms);
-
-    res.status(200).json(qresult[0].count);
-  } else {
-    res.locals.dbInstructions = {
-      dao: EquipmentView,
-      query: q.query
-    }
-    next();
-  }
-
-}, fetchCount);
 
 /**
  * Provide consistent search term queries.
