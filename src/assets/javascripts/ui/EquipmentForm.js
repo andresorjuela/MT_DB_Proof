@@ -163,7 +163,7 @@ export default {
       this.message="Saving equipment..."
       try{
         this.equipment = await Vue.mtapi.saveEquipment(this.equipment);
-        
+        this.$emit('equipment-changed', this.group.id);
       }catch(ex){
         this.message = "Error saving equipment.";
         this.error = ex.message; 

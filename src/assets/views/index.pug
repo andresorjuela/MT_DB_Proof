@@ -1,6 +1,6 @@
 extends ./layout
 block content
-  b-container(@reload="reloadData")#app
+  b-container()#app
     b-row
       b-col
         b-link(href="#" to="/")
@@ -27,7 +27,7 @@ block content
       b-col(cols="10")
         //- route outlet
         //- component matched by the route will render here
-        router-view
+        router-view(@family-changed="loadFamilies" @group-changed="loadGroups" @reload="reloadData") 
 
 append endbody
   script(src=`${process.env.STATIC_ASSETS_PATH}/javascripts/ui/ProductDbApp.js` type="module")

@@ -57,6 +57,7 @@ export default {
       limit: 10,
       total: 0,
       fields: [
+        {key: "id"},
         {key: "oem", sortable: true},
         {key: "sku", sortable: true},
         {key: "name_en", label: "Name", sortable: true}

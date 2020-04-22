@@ -217,7 +217,7 @@ export default {
       this.message="Saving family..."
       try{
         this.family = await Vue.mtapi.saveFamily(this.family);
-        
+        this.$emit('family-changed', this.family.id);
       }catch(ex){
         this.message = "Error saving family.";
         this.error = ex.message; 
