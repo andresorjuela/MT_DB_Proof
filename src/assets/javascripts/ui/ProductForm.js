@@ -85,15 +85,8 @@ export default {
     </b-form-row>
 
     <b-form-row>
-      <b-col cols="7" v-if="isAccessory||isPart">
-        <b-form-group id="g_p_oem" label="OEM:" label-for="p_oem" label-cols="3" >
-          <b-form-input id="p_oem" v-model="product.oem" trim></b-form-input>
-        </b-form-group>
-      </b-col>
-      
-      
-      <b-col cols="5">
-        <b-form-group id="g_p_sku" label="SKU:" label-for="p_sku" label-align="right" label-cols="4" >
+      <b-col>
+        <b-form-group id="g_p_sku" label="SKU:" label-for="p_sku" label-cols="2" >
           <b-form-input id="p_sku" v-model="product.sku" trim></b-form-input>
         </b-form-group>
       </b-col>
@@ -102,21 +95,21 @@ export default {
 
     <tree-selector-input-row 
       :list="$router.app.brands" 
-      v-model="product.brand_id" 
+      v-model="product.oem_brand_id" 
       label="OEM Brand:"
       label-cols="1"
       tree-cols="4"
       display_ancestors></tree-selector-input-row>
+    
+    <b-form-row>
+      <b-col cols="7" v-if="isAccessory||isPart">
+        <b-form-group id="g_p_oem" label="OEM:" label-for="p_oem" label-cols="3" >
+          <b-form-input id="p_oem" v-model="product.oem" trim></b-form-input>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
 
     <b-form-row>
-      <!--<b-col cols="7" v-if="isAccessory||isPart">
-        <tree-selector-input :list="$router.app.brands" v-model="product.brand_id" label="OEM Brand" display_ancestors ></tree-selector-input>
-        <b-form-group id="g_p_oem" label="OEM Brand:"  label-cols="3" class="pb-1"  >
-          <b-form-input v-if="$router.app.lang==='zh'" v-model="product.brand_zh" readonly ></b-form-input>
-          <b-form-input v-else v-model="product.brand_en" readonly></b-form-input>
-        </b-form-group>
-      </b-col>-->
-      
       <b-col>
         <b-form-group id="g_p_supplier" label="Supplier:" label-for="p_supplier" label-cols="2" >
           <b-form-select id="p_supplier" v-model="product.supplier_id" :options="$router.app.suppliers" value-field="id" text-field="name_zh" v-if="$router.app.lang==='zh'" >
