@@ -12,15 +12,15 @@ let SEARCHABLE_PRODUCT_COLUMNS = [
   'oem',
   'name_en', 
   'name_zh',
+  'oem_brand_id',
+  'brand_en',
+  'brand_zh',
   'description_en',
   'description_zh',
   'product_type_en',
   'product_type_zh',
   'family_id',
   'family_code',
-  'brand_id',
-  'brand_en',
-  'brand_zh',
   'category_id',
   'category_en',
   'category_zh',
@@ -243,7 +243,7 @@ router.post('/:product_id/oem_references', function (req, res, next) {
     dao: req.app.locals.Database.ProductOemReference(),
     toSave: req.body, //assuming an array of objects
     query: {product_id: req.params.product_id},
-    comparison: function(obj){ return `${obj.brand_id}|${obj.name}`; }
+    comparison: function(obj){ return `${obj.oem_brand_id}|${obj.name}`; }
   };
   next();
 }, saveAll);

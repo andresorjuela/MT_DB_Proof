@@ -116,7 +116,6 @@ CREATE TABLE `t_family` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `family_code` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
   `group_id` int(11) unsigned NOT NULL,
-  `brand_id` int(11) unsigned DEFAULT NULL,
   `technology_id` int(11) unsigned DEFAULT NULL,
   `family_connector_code` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `image_link_connector_distal` varchar(255) DEFAULT NULL,
@@ -188,6 +187,7 @@ CREATE TABLE `t_product` (
   `sku` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
   `product_type_id` int(11) unsigned DEFAULT NULL,
   `oem` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `oem_brand_id` int(11) unsigned DEFAULT NULL,
   `family_id` int(11) unsigned DEFAULT NULL,
   `category_id` int(11) unsigned DEFAULT NULL,
   `name_en` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '',
@@ -343,9 +343,6 @@ ALTER TABLE `t_equipment_group`
 ALTER TABLE `t_equipment_image` 
   ADD CONSTRAINT `fk_equipment_image_equip` FOREIGN KEY (`equipment_id`) REFERENCES `t_equipment` (`id`);
 
-
-ALTER TABLE `t_family` 
-  ADD CONSTRAINT `fk_family_brand` FOREIGN KEY (`brand_id`) REFERENCES `t_brand` (`id`);
   
 ALTER TABLE `t_family` 
   ADD CONSTRAINT `fk_family_technology` FOREIGN KEY (`technology_id`) REFERENCES `t_technology` (`id`);
@@ -376,6 +373,9 @@ ALTER TABLE `t_product`
 
 ALTER TABLE `t_product` 
   ADD CONSTRAINT `fk_product_lifecycle` FOREIGN KEY (`lifecycle_id`) REFERENCES `t_lifecycle` (`id`);
+
+ALTER TABLE `t_product` 
+  ADD CONSTRAINT `fk_oem_brand` FOREIGN KEY (`oem_brand_id`) REFERENCES `t_brand` (`id`);
 
 
 ALTER TABLE `t_product_certificate` 

@@ -12,12 +12,12 @@ p.weight, p.warranty_duration_months, p.tags,
 p.lifecycle_id, l.name_en as lifecycle_en, l.name_zh as lifecycle_zh,
 p.created, p.updated, p.version
 from t_product p
-join t_category     c on c.id = p.category_id
+left outer join t_category     c on c.id = p.category_id
 left outer join t_family       f on f.id = p.family_id
 left outer join t_product_type t on t.id = p.product_type_id
 left outer join t_supplier     u on u.id = p.supplier_id
 left outer join t_lifecycle    l on l.id = p.lifecycle_id
-left outer join t_brand        b on b.id = f.brand_id;
+left outer join t_brand        b on b.id = p.oem_brand_id;
 
 -- filters and filter options
 create view v_filter_option as 
@@ -40,12 +40,10 @@ order by pfo.product_id asc, fo.filter_id asc;
 
 -- family with brand, group and technology info
 create view v_family as select f.`id`, f.`family_code`, f.`family_connector_code`, 
-f.`brand_id`, b.`name_en` as brand_en, b.`name_zh` as brand_zh,
 f.`group_id`, g.`group_code`,
 f.`technology_id`, t.`name_en` as technology_en, t.`name_zh` as technology_zh,
 f.`image_link_connector_distal`, f.`created`, f.`updated`
 from t_family f
-left outer join t_brand b on b.id=f.brand_id 
 left outer join t_group g on g.id=f.group_id 
 left outer join t_technology t on t.id=f.technology_id;
 

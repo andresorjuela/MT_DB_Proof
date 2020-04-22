@@ -6,7 +6,6 @@ let CriteriaHelper = require('@apigrate/mysqlutils/helpers/criteria');
 
 const FAMILY_QUERY_FIELDS = [
   'id', 'family_connector_code', 'family_code', 'image_link_connector_distal', 'created', 'updated',
-  'brand_id', 'brand_en', 'brand_zh',
   'group_id', 'group_code',
   'technology_id', 'technology_en', 'search_term'
 ];
