@@ -38,20 +38,15 @@ export default {
 
     <b-form-row>
       <b-col>
-        <b-form-group label="Product SKUs in Family:" label-align="left" label-cols="2" >
+        <b-form-group label="Product SKUs in Family:" label-cols="3" >
           <b-form-tags disabled :value="product_skus" separator="," placeholder="" tag-variant="light" ></b-form-tags>
         </b-form-group>
       </b-col>
     </b-form-row>
 
     <b-form-row>
-      <b-col cols="6">
-        <b-form-group label="Brand:" label-cols="4" >
-          <tree-selector-input :list="$router.app.brands" v-model="family.brand_id" label="Brand" display_ancestors ></tree-selector-input>
-        </b-form-group>
-      </b-col>
-      <b-col cols="6">
-        <b-form-group label="Technology:" label-cols="4" label-align="right" >
+      <b-col>
+        <b-form-group label="Technology:" label-cols="3" >
           <b-form-select v-model="family.technology_id" :options="$router.app.technologies" value-field="id" text-field="name_en" >
             <template v-slot:first>
               <b-form-select-option value="" >Choose</b-form-select-option>
@@ -63,7 +58,7 @@ export default {
 
     <b-form-row>
       <b-col >
-        <b-form-group label="Family Connector Code:" label-cols="6" >
+        <b-form-group label="Family Connector Code:" label-cols="3" >
           <b-form-input v-model="family.family_connector_code" />
         </b-form-group>
       </b-col>
@@ -71,7 +66,7 @@ export default {
 
     <b-form-row>
       <b-col>
-        <b-form-group label="Equipment Group:" label-cols="6" >
+        <b-form-group label="Equipment Group:" label-cols="3" >
           <b-form-select v-model="family.group_id" :options="$router.app.groups" value-field="id" text-field="group_code" >
             <template v-slot:first>
               <b-form-select-option value="" >Choose</b-form-select-option>
@@ -82,7 +77,7 @@ export default {
     </b-form-row>
     
     <b-form-row>
-      <b-col cols="6" >
+      <b-col cols="8" >
         <b-form-group label="Image link connector distal:" label-cols="4" >
           <b-form-input v-model="family.image_link_connector_distal" />
         </b-form-group>
@@ -103,7 +98,6 @@ export default {
       in_process: 0,
      
       family: null,
-      brand_tree: [],
       products: [],
     }
   },
@@ -170,8 +164,7 @@ export default {
         ]);
         
         //If master data is missing, emit a reload request from the master app.
-        if(this.$router.app.brands.length===0 
-          || this.$router.app.groups.length===0
+        if(this.$router.app.groups.length===0
           || this.$router.app.technologies.length===0 ){
           this.$emit('reload');
         }
