@@ -29,6 +29,8 @@ export default {
       :items="equipment" 
       :fields="fields" 
       :busy.sync="busy"
+      empty-text="No equipment found."
+      show-empty
       selectable 
       @row-selected="onRowSelected" >
       <template v-slot:table-busy>
@@ -103,8 +105,6 @@ export default {
         let apiresp = await Vue.mtapi.getEquipmentList(query);
         this.equipment = apiresp.equipment_views;
         this.total = apiresp.total;
-
-        //this.recalculatePages();
 
       } catch (err){
         if(err instanceof ApiError){

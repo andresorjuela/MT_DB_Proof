@@ -29,6 +29,8 @@ export default {
       :items="groups" 
       :fields="fields"
       :busy.sync="busy"
+      empty-text="No groups found."
+      show-empty
       selectable 
       @row-selected="onRowSelected" >
       <template v-slot:table-busy>
@@ -88,7 +90,7 @@ export default {
       try{
         this.error, this.message = null;
         let query = {
-          offset: this.page && this.page > 0 ? (this.page-1)*this.limit : 0,
+          offset: this.currentPage && this.currentPage > 0 ? (this.currentPage-1)*this.limit : 0,
           limit: this.limit,
           order_by: '+group_code'
         };
