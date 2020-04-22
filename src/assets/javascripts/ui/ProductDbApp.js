@@ -147,7 +147,8 @@ var app = new Vue({
     loadGroups: async function(){
       this.in_process++;
       try{
-        this.groups = await Vue.mtapi.getGroups();
+        let apiresp = await Vue.mtapi.getGroups();
+        this.groups = apiresp.groups;
         if(this.groups){
           Vue.storage.setGroups(this.groups);
         }

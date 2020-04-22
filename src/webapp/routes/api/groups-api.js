@@ -13,47 +13,21 @@ router.get('/', async function (req, res, next) {
 
   let q = parseQueryOptions(req, GROUP_QUERY_FIELDS, ['+group_code', '+id'], 1000);
   
-  let Group = req.app.locals.Database.Group();
+  let dbInstructions = {
+    dao: req.app.locals.Database.Group(),
+    query_options: q.query_options,
+    with_total: true,
+  };
+  
   if(q.query.search_term){
-    let criteria = parseSearchTermCriteria(q);
-
-    let qresult = await Group.selectWhere(criteria.whereClause, criteria.parms);
-    
-    let result = {};
-    result[Group.plural] = qresult;
-    res.status(200).json(result);
-
+    dbInstructions.criteria = parseSearchTermCriteria(q);
   } else {
-    res.locals.dbInstructions = {
-      dao: Group,
-      query: q.query,
-      query_options: q.query_options
-    }
-    next();
+    dbInstructions.query = q.query;
   }
+  res.locals.dbInstructions = dbInstructions;
+  next();
   
 }, fetchMany);
-
-/** Count all group matching the query. */
-router.get('/count', async function (req, res, next) {
-  let q = parseQueryOptions(req, GROUP_QUERY_FIELDS);
-  
-  let Group = req.app.locals.Database.Group();
-  if(q.query.search_term){
-    let criteria = parseSearchTermCriteria(q);
-
-    let qresult = await Group.callDb(`SELECT count(*) as count FROM ${Group.table} WHERE ${criteria.whereClause}`, criteria.parms);
-
-    res.status(200).json(qresult[0].count);
-  } else {
-    res.locals.dbInstructions = {
-      dao: Group,
-      query: q.query
-    }
-    next();
-  }
-  
-}, fetchCount);
 
 /**
  * Provide consistent search term queries.

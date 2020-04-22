@@ -64,13 +64,9 @@ export class Api{
     let result =  await this._get(`${this.base_url}/groups/${id}`);
     return result;
   }
-  async getGroupCount(qopts){
-    return await this._get(`${this.base_url}/groups/count`, qopts);
-  }
   async getGroups(qopts){
     if(!qopts) qopts={limit: 1000, order_by: "+group_code"};
-    let result =  await this._get(`${this.base_url}/groups`, qopts);
-    return result.groups
+    return await this._get(`${this.base_url}/groups`, qopts);
   }
   async getGroupEquipment(group_id, qopts){
     if(!qopts) qopts={limit: 1000, order_by: "+group_id,+model"};

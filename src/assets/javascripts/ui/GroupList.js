@@ -9,7 +9,7 @@ export default {
       <b-input-group >
         <b-input type="text" placeholder="search" v-model="search_term" />
         <b-input-group-append>
-          <b-button variant="outline-primary" @click="getGroups">Search</b-button>
+          <b-button variant="outline-primary" @click="search">Search</b-button>
         </b-input-group-append>
       </b-input-group>
       </b-form>
@@ -25,13 +25,25 @@ export default {
     <b-col>
     <b-alert v-if="!busy && error" variant="danger">{{ error }}</b-alert>
     <b-alert v-if="!busy && message" variant="info">{{ message }}</b-alert>
-    <b-table hover :items="groups" :fields="fields" selectable @row-selected="onRowSelected" ></b-table>
-    <b-spinner v-if="busy" variant="secondary" />
+    <b-table hover 
+      :items="groups" 
+      :fields="fields"
+      :busy.sync="busy"
+      selectable 
+      @row-selected="onRowSelected" >
+      <template v-slot:table-busy>
+        <b-row class="d-flex justify-content-center"><b-spinner variant="secondary" center /></b-row>
+      </template>
+    </b-table>
   </b-col>
   </b-row>
   <b-row>
     <b-col class="text-center">
-      <b-pagination-nav v-if="!busy" :pages="pages" use-router></b-pagination-nav>
+      <b-pagination v-model="currentPage" 
+      :total-rows="total"
+      :per-page="limit" 
+      aria-controls="search-table" 
+      @input="getGroups"></b-pagination>
     </b-col>
   </b-row>
 </div>`,
@@ -46,18 +58,10 @@ export default {
       fields: [
         {key: "group_code", label: "Group Code", sortable: true},
       ],
-      pages:[],
+      currentPage: 1,
       selected : null,
       search_term: null
     }
-  },
-  props: {
-    page: {
-      type: Number,
-      required: true,
-      default: 1
-    },
-    search: String
   },
   computed: {
     busy: function(){ return this.in_process > 0;},
@@ -66,10 +70,6 @@ export default {
   },
   created: function(){
     this.$router.app.selectedMenu="group";
-    if(this.search){
-      //If prop was set elsewhere use it for search term.
-      this.search_term = this.search;
-    }
     this.getGroups();
   },
   errorCaptured: function(err, component, info){
@@ -78,19 +78,10 @@ export default {
     this.error = err.message;
     return false;
   },
-  watch: {
-    page: async function(oldp,newp){
-      await this.getGroups();
-    },
-  },
   methods: {
-    getGroupCount : async function(q){
-      this.in_process ++;
-      try{
-        this.total = await Vue.mtapi.getGroupCount(q);
-      } finally {
-        this.in_process --;
-      }
+    search: function(){
+      this.currentPage = 1;
+      this.getGroups();
     },
     getGroups : async function(){
       this.in_process++;
@@ -105,10 +96,9 @@ export default {
           query.search_term = this.search_term;
         }
 
-        await this.getGroupCount(query);
-        this.groups = await Vue.mtapi.getGroups(query);
-
-        this.recalculatePages();
+        let apiresp = await Vue.mtapi.getGroups(query);
+        this.groups = apiresp.groups; 
+        this.total = apiresp.total;
 
       } catch (err){
         if(err instanceof ApiError){
@@ -124,19 +114,6 @@ export default {
       let selected = items[0];
       this.$router.push({ path: `/group/${selected.id}` });
     },
-    recalculatePages(){
-      let total_pages = Math.ceil(this.total/this.limit); 
-      this.pages = [];
-      for(let page = 1; page <= total_pages; page++){
-        this.pages.push({
-          link: { query: { 
-            page: page,
-            limit: this.limit
-          }},
-          text: page
-        })
-      }
-    }
     
   }
 };

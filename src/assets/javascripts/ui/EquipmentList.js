@@ -39,7 +39,11 @@ export default {
   </b-row>
   <b-row>
     <b-col class="text-center">
-      <b-pagination v-model="currentPage" :total-rows="total" :pages="pages" :per-page="limit" aria-controls="search-table" @input="getEquipmentList"></b-pagination>
+      <b-pagination v-model="currentPage" 
+        :total-rows="total"
+        :per-page="limit" 
+        aria-controls="search-table" 
+        @input="getEquipmentList"></b-pagination>
     </b-col>
   </b-row>
 </div>`,
