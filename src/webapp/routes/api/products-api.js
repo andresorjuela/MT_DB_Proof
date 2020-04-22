@@ -76,10 +76,10 @@ router.get('/count', async function (req, res, next) {
  */
 function parseSearchTermCriteria(q){
   let criteria = new CriteriaHelper();
-    criteria.or('sku', 'LIKE', `%${q.query.search_term}%`)
-    .or('oem', 'LIKE', `%${q.query.search_term}%`)
-    .or('category_en', 'LIKE', `%${q.query.search_term}%`)
-    .or('category_zh', 'LIKE', `%${q.query.search_term}%`);
+    criteria.or('sku', '=', q.query.search_term)
+    .or('oem', '=', q.query.search_term)
+    .or('category_en', '=', q.query.search_term)
+    .or('category_zh', '=', q.query.search_term);
   return criteria;
 }
 

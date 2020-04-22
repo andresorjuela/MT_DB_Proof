@@ -58,9 +58,11 @@ export default {
       total: 0,
       fields: [
         {key: "id"},
-        {key: "oem", sortable: true},
-        {key: "sku", sortable: true},
-        {key: "name_en", label: "Name", sortable: true}
+        {key: "oem"},
+        {key: "sku"},
+        {key: "name_en", label: "Name"},
+        {key: "category_en", label: "Category"},
+        {key: "category_zh", label: "Category (Chinese)"},
       ],
       currentPage: 1,
       selected : null,

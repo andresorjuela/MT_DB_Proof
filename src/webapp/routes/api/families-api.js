@@ -41,12 +41,10 @@ router.get('/', async function (req, res, next) {
  */
 function parseSearchTermCriteria(q){
   let criteria = new CriteriaHelper();
-    criteria.or('family_code', 'LIKE', `%${q.query.search_term}%`)
-    .or('family_connector_code', 'LIKE', `%${q.query.search_term}%`)
-    .or('technology_en', 'LIKE', `%${q.query.search_term}%`)
-    .or('technology_zh', 'LIKE', `%${q.query.search_term}%`)
-    .or('brand_en', 'LIKE', `%${q.query.search_term}%`)
-    .or('brand_zh', 'LIKE', `%${q.query.search_term}%`);
+    criteria.or('family_code', '=', q.query.search_term)
+    .or('family_connector_code', '=', q.query.search_term)
+    .or('technology_en', '=', q.query.search_term)
+    .or('technology_zh', '=', q.query.search_term);
   return criteria;
 }
 
