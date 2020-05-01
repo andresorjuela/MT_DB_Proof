@@ -41,11 +41,9 @@ order by pfo.product_id asc, fo.filter_id asc;
 -- family with brand, group and technology info
 create view v_family as select f.`id`, f.`family_code`, f.`family_connector_code`, 
 f.`group_id`, g.`group_code`,
-f.`technology_id`, t.`name_en` as technology_en, t.`name_zh` as technology_zh,
 f.`image_link_connector_distal`, f.`created`, f.`updated`
 from t_family f
-left outer join t_group g on g.id=f.group_id 
-left outer join t_technology t on t.id=f.technology_id;
+left outer join t_group g on g.id=f.group_id;
 
 -- equipment view, includes brand info.
 create view v_equipment as select e.id, e.model, 
