@@ -116,7 +116,6 @@ CREATE TABLE `t_family` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `family_code` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
   `group_id` int(11) unsigned NOT NULL,
-  `technology_id` int(11) unsigned DEFAULT NULL,
   `family_connector_code` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `image_link_connector_distal` varchar(255) DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -299,18 +298,6 @@ CREATE TABLE `t_supplier` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
--- Create syntax for TABLE 't_technology'
-CREATE TABLE `t_technology` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name_en` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
-  `name_zh` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
-  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `version` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-
-
 /*
   Foreign Key relationships follow.
 */
@@ -343,9 +330,6 @@ ALTER TABLE `t_equipment_group`
 ALTER TABLE `t_equipment_image` 
   ADD CONSTRAINT `fk_equipment_image_equip` FOREIGN KEY (`equipment_id`) REFERENCES `t_equipment` (`id`);
 
-  
-ALTER TABLE `t_family` 
-  ADD CONSTRAINT `fk_family_technology` FOREIGN KEY (`technology_id`) REFERENCES `t_technology` (`id`);
 
 ALTER TABLE `t_family` 
   ADD CONSTRAINT `fk_family_group` FOREIGN KEY (`group_id`) REFERENCES `t_group` (`id`);
