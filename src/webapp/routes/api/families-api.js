@@ -6,8 +6,7 @@ let CriteriaHelper = require('@apigrate/mysqlutils/helpers/criteria');
 
 const FAMILY_QUERY_FIELDS = [
   'id', 'family_connector_code', 'family_code', 'image_link_connector_distal', 'created', 'updated',
-  'group_id', 'group_code',
-  'technology_id', 'technology_en', 'search_term'
+  'group_id', 'group_code', 'search_term'
 ];
 
 /** Query for families */
@@ -41,9 +40,7 @@ router.get('/', async function (req, res, next) {
 function parseSearchTermCriteria(q){
   let criteria = new CriteriaHelper();
     criteria.or('family_code', '=', q.query.search_term)
-    .or('family_connector_code', '=', q.query.search_term)
-    .or('technology_en', '=', q.query.search_term)
-    .or('technology_zh', '=', q.query.search_term);
+    .or('family_connector_code', '=', q.query.search_term);
   return criteria;
 }
 

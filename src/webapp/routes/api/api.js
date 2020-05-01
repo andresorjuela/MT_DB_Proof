@@ -146,15 +146,6 @@ router.get('/suppliers', function (req, res, next) {
   next();
 }, fetchMany);
 
-router.get('/technologies', function (req, res, next) {
-  let  q = parseQueryOptions(req, ['name_en','name_zh','id'], ['+name_en','+id'], 1000);
-  res.locals.dbInstructions = {
-    dao: req.app.locals.Database.Technology(),
-    query: q.query,
-    query_options: q.query_options
-  }
-  next();
-}, fetchMany);
 
 //Default error handling
 router.use(function (err, req, res, next) {

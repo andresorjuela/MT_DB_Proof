@@ -38,7 +38,7 @@ left outer join t_filter_option fo on fo.id = pfo.filter_option_id
 left outer join t_filter f on f.id = fo.filter_id
 order by pfo.product_id asc, fo.filter_id asc;
 
--- family with brand, group and technology info
+-- family with brand, group info
 create view v_family as select f.`id`, f.`family_code`, f.`family_connector_code`, 
 f.`group_id`, g.`group_code`,
 f.`image_link_connector_distal`, f.`created`, f.`updated`

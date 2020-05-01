@@ -45,18 +45,6 @@ export default {
     </b-form-row>
 
     <b-form-row>
-      <b-col>
-        <b-form-group label="Technology:" label-cols="3" >
-          <b-form-select v-model="family.technology_id" :options="$router.app.technologies" value-field="id" text-field="name_en" >
-            <template v-slot:first>
-              <b-form-select-option value="" >Choose</b-form-select-option>
-            </template>
-          </b-form-select>
-        </b-form-group>
-      </b-col>
-    </b-form-row>
-
-    <b-form-row>
       <b-col >
         <b-form-group label="Family Connector Code:" label-cols="3" >
           <b-form-input v-model="family.family_connector_code" />

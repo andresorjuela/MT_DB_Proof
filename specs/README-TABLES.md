@@ -67,7 +67,7 @@ In the above arrow function, the arguments:
 The syntax: 
 
 ```
-if t_product.product_type_id=2 : t_product_type.name + t_technology.name + (loop: t_filter.name + t_filter_option.option)
+if t_product.product_type_id=2 : t_product_type.name + (loop: t_filter.name + t_filter_option.option)
 else: t_product_type.name
 ```
 
