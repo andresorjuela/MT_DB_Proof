@@ -66,11 +66,7 @@ export class Storage {
   getSuppliers(){ return this.getObjectFromStorage('suppliers'); }
   setSuppliers(arr){ return this.putObjectInStorage('suppliers', arr); }
   clearSuppliers(){ return this.removeFromStorage('suppliers'); }
-  
-  getTechnologies(){ return this.getObjectFromStorage('technologies'); }
-  setTechnologies(arr){ return this.putObjectInStorage('technologies', arr); }
-  clearTechnologies(){ return this.removeFromStorage('technologies'); }
-  
+   
   getObjectFromStorage(key){ let str = window.localStorage.getItem(key); return str ? JSON.parse(str) : []; };
   putObjectInStorage(key, obj){ if(!obj){return;} window.localStorage.setItem(key,JSON.stringify(obj)); };
   getStringFromStorage(key){ let str = window.localStorage.getItem(key); return str; }

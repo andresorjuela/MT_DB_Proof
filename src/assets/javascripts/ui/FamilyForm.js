@@ -152,8 +152,7 @@ export default {
         ]);
         
         //If master data is missing, emit a reload request from the master app.
-        if(this.$router.app.groups.length===0
-          || this.$router.app.technologies.length===0 ){
+        if(this.$router.app.groups.length===0 ){
           this.$emit('reload');
         }
         

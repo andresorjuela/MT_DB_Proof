@@ -27,7 +27,6 @@ var app = new Vue({
     lifecycles: [],
     product_types: [],
     suppliers: [],
-    technologies: [],
     warranties: [],
 
   },
@@ -47,7 +46,6 @@ var app = new Vue({
     this.lifecycles = Vue.storage.getLifecycles();
     this.product_types = Vue.storage.getProductTypes()
     this.suppliers = Vue.storage.getSuppliers();
-    this.technologies = Vue.storage.getTechnologies();
 
     if(this.brands.length===0 ||
        this.categories.length===0 || 
@@ -58,8 +56,7 @@ var app = new Vue({
        this.image_types.length===0 || 
        this.lifecycles.length===0 || 
        this.product_types.length===0 || 
-       this.suppliers.length===0 ||
-       this.technologies.length===0 ){
+       this.suppliers.length===0 ){
 
       await this.reloadData();
     }
@@ -208,20 +205,6 @@ var app = new Vue({
         this.in_process--;
       }
     },
-    loadTechnologies: async function(){
-      this.in_process++;
-      try{
-        this.technologies = await Vue.mtapi.getTechnologies();
-        if(this.technologies){
-          Vue.storage.setTechnologies(this.technologies);
-        }
-      }catch(ex){
-        console.error(ex);
-        this.error = "Error loading technologies.";
-      } finally{
-        this.in_process--;
-      }
-    },
     reloadData: async function(){
       try{
         let pr = await Promise.all([
@@ -234,8 +217,7 @@ var app = new Vue({
           this.loadImageTypes(),
           this.loadLifecycles(),
           this.loadProductTypes(),
-          this.loadSuppliers(),
-          this.loadTechnologies()
+          this.loadSuppliers()
         ]);
        
       }catch(err){
