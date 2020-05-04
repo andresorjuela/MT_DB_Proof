@@ -106,11 +106,18 @@ export class Api{
   }
 
   /**
-   * 
-   * @param {number} id product id
+   * @param {number} product_id product id
    */
-  async getProductFamilies(id){
-    let result =  await this._get(`${this.base_url}/products/${id}/families`);
+  async getProductEquipment(product_id){
+    let result =  await this._get(`${this.base_url}/products/${product_id}/equipment`);
+    return result.product_equipment_connect_views;
+  }
+
+  /**
+   * @param {number} product_id product id
+   */
+  async getProductFamilies(product_id){
+    let result =  await this._get(`${this.base_url}/products/${product_id}/families`);
     return result.product_family_connects;
   }
 
@@ -210,6 +217,21 @@ export class Api{
    */
   async saveProductCustomAttributes(product_id, cust_attr){
     return await this._post(`${this.base_url}/products/${product_id}/custom_attributes`, cust_attr);
+  }
+
+  /**
+   * 
+   * @param {number} product_id 
+   * @param {array} equips array of equipment ids
+   */
+  async saveProductEquipment(product_id, equips){
+    let payload = equips.map(eqid=>{ 
+      return {
+        product_id: product_id,
+        equipment_id: eqid
+      };
+    });
+    return await this._post(`${this.base_url}/products/${product_id}/equipment`, payload);
   }
 
   /**

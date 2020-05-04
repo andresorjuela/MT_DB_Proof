@@ -85,3 +85,8 @@ s.quantity, s.created, s.updated, s.version
 from t_product_set s
 left outer join t_product pp on pp.id=s.parent_product_id
 left outer join t_product p on p.id=s.child_product_id;
+
+-- product equipment connect view (depends on equipment view)
+create view v_product_equipment_connect as select pe.*, e.model, e.brand_en, e.brand_zh
+from t_product_equipment_connect pe 
+join v_equipment e on e.id = pe.equipment_id;

@@ -38,6 +38,7 @@ module.exports = function (pool) {
   factory.Lifecycle              = ()=>{ return create_dao('t_lifecycle', 'lifecycle', standard_opts, null); };
   factory.Product                = ()=>{ return create_dao('t_product', 'product', standard_opts, null); };
   factory.ProductCertificate     = ()=>{ return create_dao('t_product_certificate', 'product_certificate', standard_opts, null); };
+  factory.ProductEquipment       = ()=>{ return create_dao('t_product_equipment_connect', 'product_equipment_connect', standard_opts, null); };
   factory.ProductFamily          = ()=>{ return create_dao('t_product_family_connect', 'product_family_connect', standard_opts, null); };
   factory.ProductImage           = ()=>{ return create_dao('t_product_image', 'product_image', standard_opts, null); };
   factory.ProductOemReference    = ()=>{ return create_dao('t_product_oem_reference', 'product_oem_reference', standard_opts, null); };
@@ -52,6 +53,7 @@ module.exports = function (pool) {
   factory.FamilyView                    = ()=>{ return create_dao('v_family', 'family_view', null, null); };
   factory.FilterOptionView              = ()=>{ return create_dao('v_filter_option', 'filter_option_view', null, null); };
   factory.ProductCustomAttributeView    = ()=>{ return create_dao('v_product_custom_attribute', 'product_custom_attribute_view', null, null); };
+  factory.ProductEquipmentView          = ()=>{ return create_dao('v_product_equipment_connect', 'product_equipment_connect_view', null, null); };
   factory.ProductFilterOptionView       = ()=>{ return create_dao('v_product_filter_option', 'product_filter_option_view', null, null); };
   factory.ProductImageView              = ()=>{ return create_dao('v_product_image', 'product_image_view', null, null); };
   factory.ProductSetView                = ()=>{ return create_dao('v_product_set', 'product_set_view', null, null); };

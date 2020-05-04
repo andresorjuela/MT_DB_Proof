@@ -217,6 +217,18 @@ CREATE TABLE `t_product_certificate` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+-- Create syntax for TABLE 't_product_equipent_connect'
+CREATE TABLE `t_product_equipment_connect` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `product_id` int(10) unsigned DEFAULT NULL,
+  `equipment_id` int(10) unsigned DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `version` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 -- Create syntax for TABLE 't_product_family_connect'
 CREATE TABLE `t_product_family_connect` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -368,6 +380,13 @@ ALTER TABLE `t_product_certificate`
 ALTER TABLE `t_product_certificate` 
   ADD CONSTRAINT `fk_product_certificate_cert` FOREIGN KEY (`certificate_id`) REFERENCES `t_certificate` (`id`);
 
+
+ALTER TABLE `t_product_equipment_connect` 
+  ADD CONSTRAINT `fk_product_equipment_connect_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
+
+ALTER TABLE `t_product_equipment_connect` 
+  ADD CONSTRAINT `fk_product_equipment_connect_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `t_equipment` (`id`);
+  
 
 ALTER TABLE `t_product_family_connect` 
   ADD CONSTRAINT `fk_product_family_connect_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);

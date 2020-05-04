@@ -164,6 +164,28 @@ router.post('/:product_id/custom_attributes', function (req, res, next) {
 }, saveAll);
 
 
+// Get all product equipment connections
+router.get('/:product_id/equipment', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductEquipmentView(),
+    query: {product_id: req.params.product_id},
+    //query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
+/** Save all product equipment connections. */
+router.post('/:product_id/equipment', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductEquipment(),
+    toSave: req.body, //assuming an array
+    query: {product_id: req.params.product_id},
+    comparison: function(obj){ return obj.equipment_id; }
+  };
+  next();
+}, saveAll);
+
+
 // Get all product family connections
 router.get('/:product_id/families', function (req, res, next) {
   res.locals.dbInstructions = {

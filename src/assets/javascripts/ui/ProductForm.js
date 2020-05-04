@@ -220,6 +220,24 @@ export default {
         <b-button variant="outline-secondary" @click="generateDescription('zh')" :disabled="!hasDescriptionFormula" small>Create Description</b-button>
       </b-col>
     </b-form-row>
+
+    <b-form-row v-if="isRepairService">
+      <b-col cols="6">
+        <b-form-group id="g_p_related_equipment" label="Related Models:" label-for="p_related_equipment" label-align="left" label-cols="4" >
+          <b-form-select id="p_related_equipment" v-model="related_equipment" :disabled="busy"  :select-size="4" multiple>
+            <template v-slot:first>
+              <b-form-select-option :value="null">选择/Choose</b-form-select-option>
+            </template>
+            <b-form-select-option v-for="eq in equipment" :value="eq.id">{{eq.model}} / {{eq.brand_en}}</b-form-select-option>
+          </b-form-select>
+        </b-form-group>
+      </b-col>
+      <b-col>
+        <b-form-group v-if="equipment_connections" id="g_display_equipment_connections" label="Currently Related to:" label-for="display_equipment_connections" label-align="left" label-cols="4" >
+          <p id="display_equipment_connections">{{ equipment_connections }}</p>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
     
     <b-form-row v-if="isAccessory">
       <b-col cols="6">
@@ -412,12 +430,14 @@ export default {
       tab_active: null,
 
       custom_attributes: [],
+      equipment: [], //for selecting models
       filters: [], //options will also be loaded
       related_families: [],//family ids only
     
       product: null,//actually a product-view
       family: null,//actually a family-view
       product_certificates: [],
+      related_equipment: [],//equipment ids only
       product_tags: [],
       
       products: [], //for sets
@@ -427,6 +447,7 @@ export default {
       */
       product_images: null, 
       product_custom_attributes: null,
+      
       product_filter_options: null,
       product_oem_refs: null,
       product_sets: null,
@@ -438,6 +459,16 @@ export default {
     busy: function(){ return this.in_process > 0;},
     category: function(){
       return this.$router.app.categories.find(c=>{ return c.id == this.product.category_id; });
+    },
+    equipment_connections: function(){
+      if(!this.related_equipment) return "";
+      return this.related_equipment
+        .filter(eqid=>{return eqid!="";})
+        .map(eqid=>{
+          let eq = this.equipment.find(e=>{ return e.id === eqid });
+          if(eq) return eq.model;
+        })
+        .join(",");
     },
     family_connections: function(){
       if(!this.related_families) return "";
@@ -594,6 +625,8 @@ export default {
         this.message = "Loading product dependencies...";
         await Promise.all([
           this.loadCustomAttributesForCategory(),
+          this.loadEquipment(),
+          this.loadProductEquipment(),
           this.loadProductCertificates(),
           this.loadProductFamilies(),
           this.loadFilterOptionViewsForCategory(),
@@ -618,6 +651,20 @@ export default {
           this.error = `Couldn't load product data.`;
           console.error(err);
         }
+      }
+    },
+    loadEquipment : async function(){
+      try{
+       this.in_process++;
+        this.message="Loading equipment...";
+        let apiresp = await Vue.mtapi.getEquipmentList();
+        this.equipment = apiresp.equipment_views; 
+      }catch(ex){
+        console.error(ex);
+        this.error="Couldn't load equipment.";
+      } finally {
+        this.message = null;
+        this.in_process--;
       }
     },
     loadFamily : async function(){
@@ -730,6 +777,21 @@ export default {
         }
       } finally {
         this.tab_active = null;
+        this.message = null;
+        this.in_process--;
+      }
+    },
+    loadProductEquipment : async function(){
+      try{
+        this.in_process++;
+        this.message = "Loading models...";
+        let temp = await Vue.mtapi.getProductEquipment(this.product.id);
+        this.related_equipment = temp.map(v=>{return v.equipment_id});//just the equipment ids.
+
+      }catch(ex){
+        console.error(ex);
+        this.error="Couldn't load models.";
+      } finally {
         this.message = null;
         this.in_process--;
       }
@@ -883,6 +945,7 @@ export default {
         
         await Promise.all([
           this.saveProductFamilies(),
+          this.saveProductEquipment(),
           this.saveProductCertificates(),
           this.saveProductImages(),
           this.saveProductOemReferences(),
@@ -918,6 +981,19 @@ export default {
         await Vue.mtapi.saveProductCertificates(this.product.id, this.product_certificates);
       }catch(ex){
         this.message = "Error saving certificates.";
+        this.error = ex.message; 
+      }finally{
+        this.in_process--;
+        this.message="";
+      }
+    },
+    saveProductEquipment: async function(){
+      this.in_process++;
+      this.message="Saving related models..."
+      try{
+        await Vue.mtapi.saveProductEquipment(this.product.id, this.related_equipment);
+      }catch(ex){
+        this.message = "Error saving related models.";
         this.error = ex.message; 
       }finally{
         this.in_process--;
@@ -1013,6 +1089,6 @@ export default {
         return img;
       }
       return '';
-    }
+    },
   }
 };
