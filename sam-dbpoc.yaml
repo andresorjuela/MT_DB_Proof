@@ -26,7 +26,7 @@ Resources:
     Properties:
       FunctionName: handleAnyRequest
       Handler: lambda.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       CodeUri: ./
       Description: Handles inbound requests for the AWS serverless express webapp.
       MemorySize: 256

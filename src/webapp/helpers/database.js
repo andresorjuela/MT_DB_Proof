@@ -65,5 +65,71 @@ module.exports = function (pool) {
    */
   factory.pool = ()=> { return pool; }
 
+  /**
+   * Gets a data access object (DAO) for the given name.
+   * @returns a dao registered for the given name. If the name is not found, null is returned.
+   */
+  factory.getDao = (name)=>{
+    switch(name){
+      case 'brand':
+        return factory.Brand();
+      case 'category':
+        return factory.Category();
+      case 'certificate':
+        return factory.Certificate();
+      case 'custom_attribute':
+        return factory.CustomAttribute();
+      case 'product_custom_attribute':
+        return factory.ProductCustomAttribute();
+      case 'equipment':
+        return factory.Equipment();
+      case 'equipment_group':
+        return factory.EquipmentGroup();
+      case 'equipment_image':
+        return factory.EquipmentImage();
+      case 'equipment_type':
+        return factory.EquipmentType();
+      case 'family':
+        return factory.Family();
+      case 'family_group':
+        return factory.FamilyGroup();
+      case 'filter':
+        return factory.Filter();
+      case 'filter_option':
+        return factory.FilterOption();
+      case 'group':
+        return factory.Group();
+      case 'image_type':
+        return factory.ImageType();
+      case 'lifecycle':
+        return factory.Lifecycle();
+      case 'product':
+        return factory.Product();
+      case 'product_certificate':
+        return factory.ProductCertificate();
+      case 'product_equipment_connect':
+        return factory.ProductEquipment();
+      case 'product_family_connect':
+        return factory.ProductFamily();
+      case 'product_image':
+        return factory.ProductImage();
+      case 'product_oem_reference':
+        return factory.ProductOemReference();
+      case 'product_filter_option':
+        return factory.ProductFilterOption();
+      case 'product_set':
+        return factory.ProductSet();
+      case 'product_type':
+        return factory.ProductType();
+      case 'supplier':
+        return factory.Supplier();
+
+      //TODO: views?
+      default:
+        return null;
+    }
+  }
+
+
   return factory;
 }

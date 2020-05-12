@@ -53,6 +53,7 @@ if(process.env.NODE_ENV==="production"){
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.text({ limit: "1024kb", defaultCharset: "utf-8" }));
 app.use(cookieParser());
 
 // let assetspath = process.env.STATIC_ASSETS_PATH
@@ -73,6 +74,7 @@ var familiesApiRouter = require('./routes/api/families-api');
 var equipmentApiRouter = require('./routes/api/equipment-api');
 var groupsApiRouter = require('./routes/api/groups-api');
 var apiRouter = require('./routes/api/api');
+var dataloadApiRouter = require('./routes/api/dataload-api');
 
 // app.use('/', indexRouter);
 // app.use('/products', productsRouter);
@@ -83,6 +85,7 @@ app.use('/api/v1/families', familiesApiRouter);
 app.use('/api/v1/equipment', equipmentApiRouter);
 app.use('/api/v1/groups', groupsApiRouter);
 app.use('/api/v1', apiRouter);
+app.use('/api/v1/dataload', dataloadApiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
