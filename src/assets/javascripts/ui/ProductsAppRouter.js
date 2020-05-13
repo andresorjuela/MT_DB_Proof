@@ -1,4 +1,5 @@
 import Home from './Home.js';
+import DataLoader from './DataLoader.js';
 import ProductAdd from './ProductAdd.js';
 import ProductList from './ProductList.js';
 import ProductForm from './ProductForm.js';
@@ -31,6 +32,8 @@ let router = new VueRouter({
     { path: '/group/:id', component: GroupForm},
 
     { path: '/view/product/:id', component: ProductDisplay},
+
+    { path: '/dataloader', component: DataLoader},
   ]
 });
 

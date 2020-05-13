@@ -151,6 +151,45 @@ export class Api{
     let result = await this._get(`${this.base_url}/suppliers`, {limit:100, order_by:'+name_en'});
     return result.suppliers;
   }
+  async getTableMetadata(entity){
+    let result = await this._get(`${this.base_url}/dataload/${entity}/metadata`);
+    return result;
+  }
+
+  //
+  // other API methods
+  //
+  /** Perform a bulk insert (assume text encoded data) */
+  async bulkInsert(entity, data){
+    let url = `${this.base_url}/dataload/${entity}/bulkinsert`;
+    try{
+      let fetchOpts = {
+        method: 'POST',
+        headers: new Headers({
+          'Content-Type': 'text/plain'
+        }),
+        body: data
+      };
+      let response = await fetch(url, fetchOpts);
+      if( [401,403].indexOf(response.status) >= 0 ){
+        throw new Error('Unauthorized.');
+      } 
+      let responseData = await response.json();
+      if( [400,500].indexOf(response.status) >= 0 ){
+        let msg = `${(responseData.message || "")} ${(responseData.error || "")}`.trim();
+        throw new ApiError(msg)
+      } else {
+        return responseData;
+      }
+    }catch(ex){
+      console.error(ex);
+      console.error(`POST ${url} error. ${ex.message}`);
+      throw new ApiError(ex.message); 
+    }
+
+  }
+
+
 
   //
   // SAVE methods
@@ -299,7 +338,7 @@ export class Api{
   async _delete(url, parms){
     return await this.doFetch('DELETE', url, {parms: parms});
   }
-  async doFetch(method, url, payload){
+  async doFetch(method, url, payload, options){
     if(payload && payload.parms){
       if(payload.parms){
         let searchParams = new URLSearchParams();

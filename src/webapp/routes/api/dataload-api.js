@@ -25,9 +25,9 @@ router.get('/:entity/metadata', validateDao, async function (req, res, next) {
   });
 
   res.status(200).json({
-    name: dao.entity,
-    plural: dao.plural,
-    table: dao.table,
+    name: res.locals.dao.entity,
+    plural: res.locals.dao.plural,
+    table: res.locals.dao.table,
     columns: metadata
   });
   
@@ -36,43 +36,47 @@ router.get('/:entity/metadata', validateDao, async function (req, res, next) {
 
 /** Perform a data load. */
 router.post('/:entity/bulkinsert', validateDao, async function (req, res, next) {
+  try{
+    let to_process = await parseData(req.body, null, res.locals.dao);
 
-  let to_process = await parseData(req.body, null, res.locals.dao);
+    let inserted = 0;
+    let skipped = 0;
+    let warnings = to_process.warnings;
 
-  let inserted = 0;
-  let skipped = 0;
-  let warnings = to_process.warnings;
+    //Each row
+    let promises = [];
+    to_process.data.forEach(function(row, idx){
+      try{
+        
+        promises.push( res.locals.dao.create(row,{explicit_pk: true}) );
 
-  //Each row
-  let promises = [];
-  to_process.data.forEach(function(row, idx){
-    try{
-      
-      promises.push( res.locals.dao.create(row) );
+      }catch(ex){
+        console.error(ex);
+        warnings.push(`Row ${idx+1}: ${ex.message}`);
+      }
 
-    }catch(ex){
-      console.error(ex);
-      warnings.push(`Row ${idx+1}: ${ex.message}`);
-    }
+    });
+    
+    let resultant = await Promise.allSettled(promises);
+    resultant.forEach((p,idx) => {
+      if(p.status === 'fulfilled'){
+        inserted++;
+      } else if (p.status === 'rejected'){
+        skipped++;
+        warnings.push(`Row ${idx+1}: ${p.reason}`);
+      }
+    });
 
-  });
-  
-  let resultant = await Promise.allSettled(promises);
-  resultant.forEach((p,idx) => {
-    if(p.status === 'fulfilled'){
-      inserted++;
-    } else if (p.status === 'rejected'){
-      skipped++;
-      warnings.push(`Row ${idx+1}: ${p.reason}`);
-    }
-  });
-
-  res.status(200).json({
-    total: to_process.data.length,
-    inserted,
-    skipped,
-    warnings
-  });
+    res.status(200).json({
+      total: to_process.data.length,
+      inserted,
+      skipped,
+      warnings
+    });
+  } catch (err){
+    console.error(err);
+    res.status(500).json({message:"Error loading data.", error: err.message});
+  }
 
   
 });
