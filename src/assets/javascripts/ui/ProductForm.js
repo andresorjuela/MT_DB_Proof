@@ -560,9 +560,11 @@ export default {
           this.normalizeEmptyVals(context.product);
           context.filter_options.forEach( fo => { this.normalizeEmptyVals(fo); });
           if(locale === 'en'){
-            this.product.name_en = generator.generate(context, 'en');
+            let result = generator.generate(context, 'en');
+            this.product.name_en = result.replace(/null|undefined/gi,'');
           } else {
-            this.product.name_zh = generator.generate(context, 'zh');
+            let result = generator.generate(context, 'zh');
+            this.product.name_zh = result.replace(/null|undefined/gi,'');
           }
         }catch(ex){
           console.error(ex);
@@ -584,9 +586,11 @@ export default {
           this.normalizeEmptyVals(context.product);
           context.filter_options.forEach( fo => { this.normalizeEmptyVals(fo); });
           if(locale === 'en'){
-            this.product.description_en = generator.generate(context, 'en');
+            let result = generator.generate(context, 'en');
+            this.product.description_en = result.replace(/null|undefined/gi,'');
           } else {
-            this.product.description_zh = generator.generate(context, 'zh');
+            let result = generator.generate(context, 'zh');
+            this.product.description_zh = result.replace(/null|undefined/gi,'');
           }
         }catch(ex){
           console.error(ex);
