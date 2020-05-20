@@ -22,8 +22,8 @@ CREATE TABLE `t_category` (
   `name_en` varchar(255) NOT NULL DEFAULT '',
   `name_zh` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '',
   `parent_id` int(11) unsigned DEFAULT NULL,
-  `product_name_formula` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
-  `product_description_formula` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  `product_name_formula_id` int(11) unsigned DEFAULT NULL,
+  `product_description_formula_id` int(11) unsigned DEFAULT NULL,
   `valid_image_types` varchar(255) NOT NULL DEFAULT '',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -310,9 +310,27 @@ CREATE TABLE `t_supplier` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
+-- Create syntax for TABLE 't_formula'
+CREATE TABLE `t_formula` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `content` text NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `version` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 /*
   Foreign Key relationships follow.
 */
+ALTER TABLE `t_category` 
+  ADD CONSTRAINT `fk_product_name_formula` FOREIGN KEY (`product_name_formula_id`) REFERENCES `t_formula` (`id`);
+
+ALTER TABLE `t_category` 
+  ADD CONSTRAINT `fk_product_description_formula` FOREIGN KEY (`product_description_formula_id`) REFERENCES `t_formula` (`id`);
+
 
 ALTER TABLE `t_custom_attribute` 
   ADD CONSTRAINT `fk_custom_attribute_category` FOREIGN KEY (`category_id`) REFERENCES `t_category` (`id`);
