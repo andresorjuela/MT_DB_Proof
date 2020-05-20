@@ -16,7 +16,7 @@ router.get('/brands', function (req, res, next) {
 router.get('/categories', function (req, res, next) {
   let  q = parseQueryOptions(req, ['name_en','id'], ["+parent_id","+id"], 1000);
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.Category(),
+    dao: req.app.locals.Database.CategoryView(),
     query: q.query,
     query_options: q.query_options
   }

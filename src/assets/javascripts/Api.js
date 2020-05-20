@@ -17,7 +17,7 @@ export class Api{
   }
   async getCategories(){
     let result = await this._get(`${this.base_url}/categories`, {limit:1000, order_by:'+name_en'});
-    return result.categories;
+    return result.category_views;
   }
   async getCertificates(){
     let result = await this._get(`${this.base_url}/certificates`, {limit:1000, order_by:'+name_en'});

@@ -94,3 +94,11 @@ left outer join t_product p on p.id=s.child_product_id;
 create view v_product_equipment_connect as select pe.*, e.model, e.brand_en, e.brand_zh
 from t_product_equipment_connect pe 
 join v_equipment e on e.id = pe.equipment_id;
+
+-- category view (to pick up formulas)
+create view v_category as select 
+c.id, c.name_en, c.name_zh, c.parent_id, nf.content as product_name_formula, df.content as product_description_formula,
+c.valid_image_types, c.created, c.updated, c.version
+from t_category c 
+left outer join t_formula      nf on nf.id = c.product_name_formula_id
+left outer join t_formula      df on df.id = c.product_description_formula_id;
