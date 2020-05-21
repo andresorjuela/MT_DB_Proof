@@ -28,6 +28,7 @@ export default {
   <b-form v-if="product">
     <tree-selector-input-row 
       :list="$router.app.categories" 
+      :key="product.category_id"
       v-model="product.category_id" 
       label="Category:"
       label-cols="1"
@@ -95,6 +96,7 @@ export default {
 
     <tree-selector-input-row 
       :list="$router.app.brands" 
+      :key="product.oem_brand_id"
       v-model="product.oem_brand_id" 
       label="OEM Brand:"
       label-cols="1"
@@ -342,7 +344,7 @@ export default {
         <template v-slot:title>
           <b-spinner small variant="secondary" v-if="busy && tab_active=='Filters'"></b-spinner> Filters
         </template>
-        <b-form v-if="product_filter_options">
+        <b-form v-if="product_filter_options" :key="product.id">
           <b-form-row>
             <b-col cols="6" v-for="(filter, idx) in filters" :key="filter.filter_id" >
               <b-form-group :label="filter.name_en+':'" label-cols="4" >
@@ -504,9 +506,7 @@ export default {
   },
   watch: {
     async $route(to, from) {
-      if( to.params != from.params ){
-        await this.loadData();
-      }
+      await this.loadData();
     }
   },
   created: async function(){
