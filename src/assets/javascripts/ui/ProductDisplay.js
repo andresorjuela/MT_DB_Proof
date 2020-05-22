@@ -267,11 +267,28 @@ export default {
       return units;
     }
   },
+  watch: {
+    async $route(to, from) {
+      this.initializeProductData();
+      await this.loadData();
+    }
+  },
   created: async function(){
     this.$router.app.selectedMenu="product";
     await this.loadData();
   },
   methods: {
+    initializeProductData(){
+      custom_attributes = [];
+      family = null;
+      product = null;
+      product_certificates = [];
+      product_custom_attributes = null;
+      product_filter_options = null;
+      product_images = null;
+      product_oem_refs = null;
+      product_sets = null;
+    },
     getProductCustomAttribute: function(attr_id){
       let the_pca = this.product_custom_attributes.find(pca=>{ return pca.custom_attribute_id == attr_id;});
       if(!the_pca){

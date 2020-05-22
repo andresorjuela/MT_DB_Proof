@@ -340,11 +340,11 @@ export default {
         <b-button variant="outline-success" @click="newProductOemReference" size="sm">Add OEM Reference</b-button>
       </b-tab>
 
-      <b-tab @click="loadProductFilterOptions">
+      <b-tab @click="tabProductFilters" :key="product.id">
         <template v-slot:title>
           <b-spinner small variant="secondary" v-if="busy && tab_active=='Filters'"></b-spinner> Filters
         </template>
-        <b-form v-if="product_filter_options" :key="product.id">
+        <b-form v-if="product_filter_options" >
           <b-form-row>
             <b-col cols="6" v-for="(filter, idx) in filters" :key="filter.filter_id" >
               <b-form-group :label="filter.name_en+':'" label-cols="4" >
@@ -433,26 +433,20 @@ export default {
 
       custom_attributes: [],
       equipment: [], //for selecting models
-      filters: [], //options will also be loaded
-      related_families: [],//family ids only
-    
-      product: null,//actually a product-view
       family: null,//actually a family-view
+      filters: [], //options will also be loaded
+      product: null,//actually a product-view
       product_certificates: [],
-      related_equipment: [],//equipment ids only
-      product_tags: [],
-      
-      products: [], //for sets
-      /*
-        Initialized to null intentionally. Load from server only loads
-        when null, not when empty.
-      */
-      product_images: null, 
       product_custom_attributes: null,
-      
       product_filter_options: null,
+      product_images: null,
       product_oem_refs: null,
       product_sets: null,
+      product_tags: [],
+      products: [], //for sets
+      related_equipment: [],//equipment ids only
+      related_families: [],//family ids only
+    
     }
   },
   //props: {},
@@ -506,6 +500,7 @@ export default {
   },
   watch: {
     async $route(to, from) {
+      this.initializeProductData();
       await this.loadData();
     }
   },
@@ -518,6 +513,23 @@ export default {
     }
   },
   methods: {
+    initializeProductData(){
+      custom_attributes = [];
+      equipment = [];
+      family = null;
+      filters = [];
+      product = null;
+      product_certificates = [];
+      product_custom_attributes = null;
+      product_filter_options = null;
+      product_images = null;
+      product_oem_refs = null;
+      product_sets = null;
+      product_tags = [];
+      products = [];
+      related_families = [];
+      related_equipment = [];
+    },
     getProductCustomAttribute: function(attr_id){
       let the_pca = this.product_custom_attributes.find(pca=>{ return pca.custom_attribute_id == attr_id;});
       if(!the_pca){
@@ -691,7 +703,7 @@ export default {
       try{
         this.in_process++;
         this.message = "Loading filter options...";
-
+        this.filters = [];
         let filter_option_views = await Vue.mtapi.getFilterOptionViewsForCategory(this.product.category_id);
         filter_option_views.forEach(fov=>{
           let filter = this.filters.find(f=>{ return f.filter_id == fov.filter_id; });
@@ -815,10 +827,9 @@ export default {
         this.in_process--;
       }
     },
+
     loadProductFilterOptions : async function(){
-      if(this.product_filter_options!==null) return;//Otherwise server overwrites work
       try{
-        this.tab_active = "Filters";
         this.error = null;
         this.message = "Loading filter options...";
         this.in_process++;
@@ -831,7 +842,6 @@ export default {
           console.error(err);
         }
       } finally {
-        this.tab_active = null;
         this.message = null;
         this.in_process--;
       }
@@ -899,6 +909,10 @@ export default {
         this.message="";
         this.in_process--;
       }
+    },
+
+    tabProductFilters : async function(){
+      this.tab_active = "Filters";
     },
     newProductFilterOption : function(){
       this.product_filter_options.push({
