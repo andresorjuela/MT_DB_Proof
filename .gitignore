@@ -70,10 +70,7 @@ test/*
 package.yaml
 package*.yaml
 
-production.env
-development.env
-test.env
-
-src/assets/javascripts/env.js
+*.env
+!example.env
 
 test.js

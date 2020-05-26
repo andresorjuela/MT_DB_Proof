@@ -2,7 +2,7 @@ require('dotenv').config();
 const {program} = require('commander');
 const mysql = require('mysql');
 // const cliProgress = require('cli-progress');
-const {ProductNameGenerator} = require('../src/webapp/services/product-name-generator');
+const {ProductNameGenerator} = require('../services/product-name-generator');
 
 function commaSeparatedList(value, dummyPrevious) {
   return value.split(',');
@@ -46,7 +46,7 @@ var connPool = mysql.createPool({
 });
 
 //Makes a DAO factory, named 'Database' available globally.
-var database = require('../src/webapp/helpers/database')(connPool);
+var database = require('../database')(connPool);
 
 console.log(`Generating product names...
   beginning id: ${program.beginId}

@@ -2,7 +2,7 @@ require('dotenv').config();
 
 var createError = require('http-errors');
 var express = require('express');
-var path = require('path');
+// var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mysql = require('mysql');
@@ -24,7 +24,7 @@ var connPool = mysql.createPool({
 });
 
 //Makes a DAO factory, named 'Database' available globally.
-var Database = require('./helpers/database')(connPool);
+var Database = require('./database')(connPool);
 app.locals.Database = Database;
 
 // Other Global App Config .....................................................
@@ -42,7 +42,7 @@ console.log("Environment initialized to: " + process.env.NODE_ENV);
 */
 app.use(cors());
 
-if(process.env.NODE_ENV==="production"){
+if(process.env.NODE_ENV==="dbpoc" || process.env.NODE_ENV==="production"){
   app.use(awsServerlessExpressMiddleware.eventContext())
 }
 
@@ -56,19 +56,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.text({ limit: "1024kb", defaultCharset: "utf-8" }));
 app.use(cookieParser());
 
-// let assetspath = process.env.STATIC_ASSETS_PATH
-// //Make available to all view components.
-// app.use((req,res,next)=>{ res.locals.assetspath = assetspath; next() })
-// if(process.env.NODE_ENV==="production"){
-//   //Not serving static files...
-// } else {
-//   //In non-production environments, serve static files from express.
-//   app.use(assetspath, express.static(path.join(__dirname, '..', 'assets')));
-// }
-
 // Routing .....................................................................
-// var indexRouter = require('./routes/index');
-// var productsRouter = require('../../products');
 var productsApiRouter = require('./routes/api/products-api');
 var familiesApiRouter = require('./routes/api/families-api');
 var equipmentApiRouter = require('./routes/api/equipment-api');
@@ -76,8 +64,6 @@ var groupsApiRouter = require('./routes/api/groups-api');
 var apiRouter = require('./routes/api/api');
 var dataloadApiRouter = require('./routes/api/dataload-api');
 
-// app.use('/', indexRouter);
-// app.use('/products', productsRouter);
 
 // api related
 app.use('/api/v1/products', productsApiRouter);

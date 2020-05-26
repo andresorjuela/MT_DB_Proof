@@ -3,10 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "use-development": "cp ./development.env .env && node ./bin/generate-env.js ",
-    "use-production": "cp ./production.env .env && node ./bin/generate-env.js ",
-    "deploy-dbpoc-static": "npm run use-production && aws s3 cp ./src/assets s3://productdb.medten.com --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers --recursive",
-    "package-dbpoc": "npm run use-production && sam package --profile medten --template-file sam-dbpoc.yaml --output-template-file package-dbpoc.yaml --s3-bucket med10-staging",
+    "use-dbpoc": "cp ./config/dbpoc.env .env",
+    "package-dbpoc": "npm run use-dbpoc && sam package --profile medten --template-file sam-dbpoc.yaml --output-template-file package-dbpoc.yaml --s3-bucket med10-staging",
     "deploy-dbpoc": "aws cloudformation deploy --profile medten --template-file package-dbpoc.yaml --stack-name dbpoc",
     "start": "node ./bin/www",
     "startmon": "nodemon ./bin/www"
