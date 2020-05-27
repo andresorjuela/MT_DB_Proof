@@ -34,7 +34,7 @@ router.get('/:entity/metadata', validateDao, async function (req, res, next) {
 });
 
 
-/** Perform a data load. */
+/** Perform a data load in insert mode. */
 router.post('/:entity/bulkinsert', validateDao, async function (req, res, next) {
   try{
     let to_process = await parseData(req.body, null, res.locals.dao);
@@ -80,6 +80,54 @@ router.post('/:entity/bulkinsert', validateDao, async function (req, res, next) 
 
   
 });
+
+/** Perform a data load in update mode */
+router.post('/:entity/bulkupdate', validateDao, async function (req, res, next) {
+  try{
+    let to_process = await parseData(req.body, null, res.locals.dao);
+
+    let updated = 0;
+    let skipped = 0;
+    let warnings = to_process.warnings;
+
+    //Each row
+    let promises = [];
+    to_process.data.forEach(function(row, idx){
+      try{
+        
+        promises.push( res.locals.dao.update(row,{explicit_pk: true}) );
+
+      }catch(ex){
+        console.error(ex);
+        warnings.push(`Row ${idx+1}: ${ex.message}`);
+      }
+
+    });
+    
+    let resultant = await Promise.allSettled(promises);
+    resultant.forEach((p,idx) => {
+      if(p.status === 'fulfilled'){
+        updated++;
+      } else if (p.status === 'rejected'){
+        skipped++;
+        warnings.push(`Row ${idx+1}: ${p.reason}`);
+      }
+    });
+
+    res.status(200).json({
+      total: to_process.data.length,
+      updated,
+      skipped,
+      warnings
+    });
+  } catch (err){
+    console.error(err);
+    res.status(500).json({message:"Error loading data.", error: err.message});
+  }
+
+  
+});
+
 
 /**
  * Middleware which loads a dao into the `res.locals.dao` property based on 

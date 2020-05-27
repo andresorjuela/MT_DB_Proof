@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "use-development": "cp ./config/development.env .env",
     "use-dbpoc": "cp ./config/dbpoc.env .env",
     "package-dbpoc": "npm run use-dbpoc && sam package --profile medten --template-file sam-dbpoc.yaml --output-template-file package-dbpoc.yaml --s3-bucket med10-staging",
     "deploy-dbpoc": "aws cloudformation deploy --profile medten --template-file package-dbpoc.yaml --stack-name dbpoc",

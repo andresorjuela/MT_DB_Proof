@@ -47,6 +47,8 @@ module.exports = function (pool) {
   factory.ProductType            = ()=>{ return create_dao('t_product_type', 'product_type', standard_opts, null); };
   factory.Supplier               = ()=>{ return create_dao('t_supplier', 'supplier', standard_opts, null); };
 
+  factory.Pet                    = ()=>{ return create_dao('t_test_pet', 'pet', standard_opts, null); }; //for testing only.
+
   //views
   factory.CategoryView                  = ()=>{ return create_dao('v_category', 'category_view', null, null); };
   factory.EquipmentGroupView            = ()=>{ return create_dao('v_equipment_group', 'equipment_group_view', null, null); };
@@ -125,6 +127,8 @@ module.exports = function (pool) {
       case 'supplier':
         return factory.Supplier();
 
+      case 'pet':
+        return factory.Pet();
       //TODO: views?
       default:
         return null;
