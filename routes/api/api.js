@@ -126,6 +126,18 @@ router.get('/lifecycles', function (req, res, next) {
   next();
 }, fetchMany);
 
+
+router.get('/packaging_factors', function (req, res, next) {
+  let  q = parseQueryOptions(req, ['name','value','id'], ['+name','+id'], 1000);
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.PackagingFactor(),
+    query: q.query,
+    query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
+
 router.get('/product-types', function (req, res, next) {
   let  q = parseQueryOptions(req, ['name_en','id'], ['+name_en','+id'], 1000);
   res.locals.dbInstructions = {
