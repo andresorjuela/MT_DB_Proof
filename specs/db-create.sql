@@ -193,7 +193,8 @@ CREATE TABLE `t_product` (
   `description_en` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `name_zh` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '',
   `description_zh` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `packaging_factor` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '1',
+  `packaging_factor_id` int(11) unsigned DEFAULT NULL,
+  -- `packaging_factor` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '1',
   `price` decimal(9,2) DEFAULT NULL,
   `supplier_id` int(11) unsigned DEFAULT NULL,
   `weight` decimal(9,2) DEFAULT NULL,
@@ -321,6 +322,16 @@ CREATE TABLE `t_formula` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Create syntax for TABLE 't_packaging_factor'
+CREATE TABLE `t_packaging_factor` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  `value` varchar(100) DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `version` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*
   Foreign Key relationships follow.

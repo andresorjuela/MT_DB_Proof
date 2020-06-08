@@ -8,7 +8,7 @@ p.oem_brand_id, b.name_en as oem_brand_en, b.name_zh as oem_brand_zh,
 p.category_id, c.name_en as category_en, c.name_zh as category_zh, c.valid_image_types,
 nf.content as product_name_formula, 
 df.content as product_description_formula, 
-p.packaging_factor, p.price,
+pf.value as packaging_factor, p.packaging_factor_id, p.price,
 p.supplier_id, u.name_en as supplier_en, u.name_zh as supplier_zh,
 p.weight, p.warranty_duration_months, p.tags,
 p.lifecycle_id, l.name_en as lifecycle_en, l.name_zh as lifecycle_zh,
@@ -21,7 +21,8 @@ left outer join t_family       f on f.id = p.family_id
 left outer join t_product_type t on t.id = p.product_type_id
 left outer join t_supplier     u on u.id = p.supplier_id
 left outer join t_lifecycle    l on l.id = p.lifecycle_id
-left outer join t_brand        b on b.id = p.oem_brand_id;
+left outer join t_brand        b on b.id = p.oem_brand_id
+left outer join t_packaging_factor pf on pf.id = p.packaging_factor_id;
 
 -- filters and filter options
 create view v_filter_option as 

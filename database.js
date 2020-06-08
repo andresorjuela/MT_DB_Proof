@@ -36,6 +36,7 @@ module.exports = function (pool) {
   factory.Group                  = ()=>{ return create_dao('t_group', 'group', standard_opts, null); };
   factory.ImageType              = ()=>{ return create_dao('t_image_type', 'image_type', standard_opts, null); };
   factory.Lifecycle              = ()=>{ return create_dao('t_lifecycle', 'lifecycle', standard_opts, null); };
+  factory.PackagingFactor        = ()=>{ return create_dao('t_packaging_factor', 'packaging_factor', standard_opts, null); };
   factory.Product                = ()=>{ return create_dao('t_product', 'product', standard_opts, null); };
   factory.ProductCertificate     = ()=>{ return create_dao('t_product_certificate', 'product_certificate', standard_opts, null); };
   factory.ProductEquipment       = ()=>{ return create_dao('t_product_equipment_connect', 'product_equipment_connect', standard_opts, null); };
@@ -106,6 +107,8 @@ module.exports = function (pool) {
         return factory.ImageType();
       case 'lifecycle':
         return factory.Lifecycle();
+      case 'packaging_factor':
+        return factory.PackagingFactor();
       case 'product':
         return factory.Product();
       case 'product_certificate':
