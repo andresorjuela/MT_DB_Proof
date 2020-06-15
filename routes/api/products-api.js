@@ -47,6 +47,7 @@ router.get('/', async function (req, res, next) {
   
 }, fetchMany);
 
+/** @deprecated */
 router.get('/count', async function (req, res, next) {
   debug(`Counting products for query...`);
   let q = parseQueryOptions(req, SEARCHABLE_PRODUCT_COLUMNS);
@@ -67,6 +68,14 @@ router.get('/count', async function (req, res, next) {
     next();
   }
 }, fetchCount);
+
+/** Gets an array of all distinct SKUs across all products. Used for validation. A SKU should be globally unique. */
+router.get('/skus', async function (req, res, next) {
+  debug(`Getting distinct SKUs...`);
+  let ProductView = req.app.locals.Database.ProductView();
+  let qresult = await ProductView.callDb(`SELECT DISTINCT(sku) as sku FROM ${ProductView.table} WHERE sku <> '' and sku is not null ORDER BY sku ASC`);
+  res.status(200).json(qresult.map(r=>{return r.sku;}));
+});
 
 /**
  * Provide consistent search term queries.

@@ -1,0 +1,516 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'Medten Product API'
+  description: 'Interact with the Medten product database using this API.'
+servers:
+  - url: https://mgtwitxxi1.execute-api.ap-southeast-1.amazonaws.com/Prod/api/v1
+    description: API Test Environment
+  - url: https://v73kddyeqk.execute-api.ap-southeast-1.amazonaws.com/Prod/api/v1
+    description: API POC (Proof of Concept) Environment
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/gaumeister/medten-product-api/1.0.0
+paths: 
+  /products:
+    post:
+      summary: creates a new product
+      tags:
+        - products
+      requestBody:
+        description: >
+          The product to be created. Note the `id` property should be excluded. It will be returned in the response.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Product'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'   
+  /products/skus:
+    summary: Gets the distinct skus currently in the database.
+    description: Gets the distinct skus currently in the database. SKU should be a unique value.
+    get:
+      summary: list of unique SKUs
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:  
+                  type: string
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /products/${id}:
+    summary: Represents a product
+    description: A medical product.
+    parameters:
+    - name: id
+      in: path
+      description: the product id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets a product by id
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ProductView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    put:
+      summary: updates a product
+      tags:
+        - products
+      requestBody:
+        description: >
+          The product to be updated.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        200:
+          description: returns the product, including extended information
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ProductView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /products/${id}/certificates:
+    summary: The certificates a product is qualified for.
+    parameters:
+    - name: id
+      in: path
+      description: the product id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets all certificates for a product
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_certificates:
+                    type: array
+                    items:  
+                      $ref: '#/components/schemas/Certificate'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    post:
+      summary: saves the current set of certificates for a product, adding those that need to be added, updating any existing, and removing any that no longer match the payload.
+      tags:
+        - products
+      requestBody:
+        description: >
+          The product to be updated.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:  
+                $ref: '#/components/schemas/ProductCertificate'
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:  
+                  $ref: '#/components/schemas/ProductCertificate'
+              
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /products/${id}/custom_attributes:
+    summary: The custom attributes of a product.
+    parameters:
+    - name: id
+      in: path
+      description: the product id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets all custom attributes for a product
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_custom_attribute_view:
+                    type: array
+                    items:  
+                      $ref: '#/components/schemas/ProductCustomAttributeView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  # /families:
+  # /equipment:
+  # /groups:
+  # /:
+  # /dataload:
+
+components:
+  schemas:    
+    Brand:
+      type: object
+      description: An original equipment manufacturer (OEM) or brand.
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            name_en:
+              type: string
+              maxLength: 255
+            name_zh:
+              type: string
+              maxLength: 255
+            parent_id:
+              type: integer
+        - $ref: '#/components/schemas/Auditable'
+    Category:
+      type: object
+      description: Common grouping used to categorize families. Categories define certain defaults and constraints across families.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+          name_en:
+            description: English name.
+            type: string
+            maxLength: 255
+          name_zh:
+            description: Chinese name.
+            type: string
+            maxLength: 255
+          product_name_formula_id:
+            description: Identifies a stored **Formula** that can be used to auto-generate product names.
+            type: string
+            maxLength: 255
+          product_description_formula_id:
+            description: Identifies a stored **Formula** that can be used to auto-generate product descriptions.
+            type: string
+            maxLength: 255
+          valid_image_types:
+            type: string
+            maxLength: 255
+      - $ref: '#/components/schemas/Auditable'
+    Certificate:
+      type: object
+      description: Describes certifications that products may be associated with.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+          name_en:
+            type: string
+            maxLength: 255
+      - $ref: '#/components/schemas/Auditable'
+    Product:
+      type: object
+      description: A medical product.
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            sku:
+              type: string
+              maxLength: 255
+            product_type_id:
+              type: integer
+            oem:
+              type: string
+              maxLength: 255
+            oem_brand_id:
+              type: integer
+            family_id:
+              type: integer
+            category_id:
+              type: integer
+            name_en:
+              type: string
+              maxLength: 255
+            description_en:
+              type: string
+              maxLength: 500
+            name_zh:
+              type: string
+              maxLength: 255
+            description_zh:
+              type: string
+              maxLength: 500
+            packaging_factor_id:
+              type: integer
+            price:
+              type: number
+              format: double
+            supplier_id:
+              type: integer
+            weight:
+              type: number
+              format: double
+            warranty_duration_months:
+              type: integer
+            tags:
+              type: string
+            lifecycle_id:
+              type: integer
+        - $ref: '#/components/schemas/Auditable'
+    ProductView:
+      type: object
+      description: An extended view of a medical product, including commonly used fields from family, category, brand and other related data.
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+            sku:
+              type: string
+              maxLength: 255
+            oem:
+              type: string
+              maxLength: 255
+            name_en:
+              type: string
+              maxLength: 255
+            description_en:
+              type: string
+              maxLength: 500
+            name_zh:
+              type: string
+              maxLength: 255
+            description_zh:
+              type: string
+              maxLength: 500
+            product_type_id:
+              type: integer
+            product_type_en:
+              type: string
+              maxLength: 255
+            product_type_zh:
+              type: string
+              maxLength: 255
+            
+            family_id:
+              type: integer
+            family_code:
+              type: string
+              maxLength: 255
+            family_connector_code:
+              type: string
+              maxLength: 255
+              
+            oem_brand_id:
+              type: integer
+            oem_brand_en:
+              type: string
+              maxLength: 255
+            oem_brand_zh:
+              type: string
+              maxLength: 255
+              
+            category_id:
+              type: integer
+            category_en:
+              type: string
+              maxLength: 255
+            category_zh:
+              type: string
+              maxLength: 255
+            valid_image_types:
+              type: string
+              maxLength: 255
+            product_name_formula:
+              type: string
+            product_description_formula:
+              type: string
+            packaging_factor:
+              type: string
+              maxLength: 100
+            packaging_factor_id:
+              type: integer
+            price:
+              type: number
+              format: double
+            supplier_id:
+              type: integer
+            supplier_en:
+              type: string
+              maxLength: 255
+            supplier_zh:
+              type: string
+              maxLength: 255
+            weight:
+              type: number
+              format: double
+            warranty_duration_months:
+              type: integer
+            tags:
+              type: string
+            lifecycle_id:
+              type: integer
+            lifecyle_en:
+              type: string
+              maxLength: 255
+            lifecyle_zh:
+              type: string
+              maxLength: 255
+            created:
+              type: string
+              format: date-time
+            updated:
+              type: string
+              format: date-time
+            version:
+              type: integer
+        - $ref: '#/components/schemas/Auditable'
+    ProductCertificate:
+      type: object
+      description: An association between a product and a certificate.
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            product_id:
+              type: integer
+            certificate_id:
+              description: reference to a Certificate object
+              type: integer
+    ProductCustomAttribute:
+      type: object
+      description: Custom attribute value for a product.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+          product_id:
+            type: integer
+          custom_attribute_id:
+            type: integer
+          value_en:
+            type: string
+            maxLength: 255
+          value_zh:
+            type: string
+            maxLength: 255
+      - $ref: '#/components/schemas/Auditable'    
+    ProductCustomAttributeView:
+      type: object
+      description: Custom attribute value for a product, including extend information.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+          product_id:
+            type: integer
+          custom_attribute_id:
+            type: integer
+          custom_attribute_en:
+            type: string
+            maxLength: 255
+          custom_attribute_zh:
+            type: string
+            maxLength: 255
+          value_en:
+            type: string
+            maxLength: 255
+          value_zh:
+            type: string
+            maxLength: 255
+      - $ref: '#/components/schemas/Auditable'
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A human-readable message describing the error.
+        error:
+          type: string
+          description: The error details. Typically error details may contain sensitive information not intended to be shown directly in the user interface.
+    Auditable:
+      type: object
+      properties:
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        updated:
+          type: string
+          format: date-time
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
+  responses:
+    400ClientError:
+      description: client error
+      content:
+        application/json:
+          schema: 
+            $ref: '#/components/schemas/ApiError'
+    500ServerError:
+      description: server error
+      content:
+        application/json:
+          schema: 
+            $ref: '#/components/schemas/ApiError'
