@@ -4,6 +4,9 @@
   "private": true,
   "scripts": {
     "use-development": "cp ./config/development.env .env",
+    "use-test": "cp ./config/test.env .env",
+    "package-test": "npm run use-test && sam package --profile medten --template-file sam-test.yaml --output-template-file package-test.yaml --s3-bucket med10-staging",
+    "deploy-test": "aws cloudformation deploy --profile medten --template-file package-test.yaml --stack-name dbtest",
     "use-dbpoc": "cp ./config/dbpoc.env .env",
     "package-dbpoc": "npm run use-dbpoc && sam package --profile medten --template-file sam-dbpoc.yaml --output-template-file package-dbpoc.yaml --s3-bucket med10-staging",
     "deploy-dbpoc": "aws cloudformation deploy --profile medten --template-file package-dbpoc.yaml --stack-name dbpoc",
@@ -18,6 +21,7 @@
     "aws-sdk": "^2.528.0",
     "aws-serverless-express": "^3.3.6",
     "commander": "^5.1.0",
+    "compression": "^1.7.4",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",

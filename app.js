@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 var createError = require('http-errors');
+// var compression = require('compression');
 var express = require('express');
 // var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -45,6 +46,7 @@ app.use(cors());
 if(process.env.NODE_ENV==="dbpoc" || process.env.NODE_ENV==="production"){
   app.use(awsServerlessExpressMiddleware.eventContext())
 }
+// app.use(compression());
 
 // view engine setup
 // app.set('views', path.join(__dirname, 'views'));
