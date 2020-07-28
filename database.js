@@ -20,6 +20,12 @@ module.exports = function (pool) {
 
   var factory = {};
 
+  // administrative tables
+  factory.User                  = ()=>{ return create_dao('t_user', 'user', standard_opts, null); };
+  factory.ApiKey                = ()=>{ return create_dao('t_api_key', 'api_key', standard_opts, null); };
+  
+
+  // product data tables
   factory.Brand                  = ()=>{ return create_dao('t_brand', 'brand', standard_opts, null); };
   factory.Category               = ()=>{ return create_dao('t_category', 'category', standard_opts, null); };
   factory.Certificate            = ()=>{ return create_dao('t_certificate', 'certificate', standard_opts, null); };

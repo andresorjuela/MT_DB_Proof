@@ -333,6 +333,47 @@ CREATE TABLE `t_packaging_factor` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Create syntax for TABLE 't_user'
+CREATE TABLE `t_user` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `first_name` varchar(255) NOT NULL,
+  `last_name` varchar(255) NOT NULL,
+  `mobile_phone` varchar(20) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `status` varchar(20) DEFAULT NULL,
+  `must_reset_password` tinyint(3) NOT NULL DEFAULT '0',
+  `bad_login_attempts` int(11) NOT NULL DEFAULT '0',
+  `last_login` timestamp NULL DEFAULT NULL,
+  `login_count` int(11) NOT NULL DEFAULT '0',
+  `reset_password_token` varchar(255) DEFAULT NULL,
+  `reset_password_token_expires` timestamp NULL DEFAULT NULL,
+  `default_account_id` int(11) DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `version` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username_UNIQUE` (`username`),
+  UNIQUE KEY `email_UNIQUE` (`email`),
+  FULLTEXT KEY `username` (`username`,`first_name`,`last_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Create syntax for TABLE 't_api_key'. Keys can be long-lived, or they can be generated on user login for temporary access.
+CREATE TABLE `t_api_key` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned DEFAULT NULL,
+  `account_id` int(11) unsigned NOT NULL,
+  `apikey` varchar(50) NOT NULL DEFAULT '',
+  `description` varchar(255) NOT NULL DEFAULT '',
+  `status` varchar(20) NOT NULL,
+  `expires` timestamp NULL DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `version` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8;
+
 /*
   Foreign Key relationships follow.
 */
