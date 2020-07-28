@@ -18,8 +18,10 @@
     "@apigrate/mysqlutils": "^4.4.0",
     "@apigrate/sdk": "^1.0.0",
     "@apigrate/slack": "^3.0.1",
+    "@sendgrid/mail": "^7.2.2",
     "aws-sdk": "^2.528.0",
     "aws-serverless-express": "^3.3.6",
+    "bcryptjs": "^2.4.3",
     "commander": "^5.1.0",
     "compression": "^1.7.4",
     "cookie-parser": "~1.4.4",
@@ -35,6 +37,7 @@
     "morgan": "~1.9.1",
     "mysql": "^2.17.1",
     "pug": "^2.0.4",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "uuidv4": "^6.2.0"
   }
 }
