@@ -333,6 +333,17 @@ CREATE TABLE `t_packaging_factor` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+
+-- Create syntax for TABLE 't_account'
+CREATE TABLE `t_account` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `version` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 -- Create syntax for TABLE 't_user'
 CREATE TABLE `t_user` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -349,7 +360,7 @@ CREATE TABLE `t_user` (
   `login_count` int(11) NOT NULL DEFAULT '0',
   `reset_password_token` varchar(255) DEFAULT NULL,
   `reset_password_token_expires` timestamp NULL DEFAULT NULL,
-  `default_account_id` int(11) DEFAULT NULL,
+  `default_account_id` int(11) unsigned DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
@@ -491,3 +502,14 @@ ALTER TABLE `t_product_set`
 
 ALTER TABLE `t_product_set` 
   ADD CONSTRAINT `fk_product_set_child_product` FOREIGN KEY (`child_product_id`) REFERENCES `t_product` (`id`);
+
+-- Auth relationships
+
+ALTER TABLE `t_user` 
+  ADD CONSTRAINT `fk_user_account` FOREIGN KEY (`default_account_id`) REFERENCES `t_account` (`id`);
+
+ALTER TABLE `t_api_key` 
+  ADD CONSTRAINT `fk_api_key_account` FOREIGN KEY (`account_id`) REFERENCES `t_account` (`id`);
+
+ALTER TABLE `t_api_key` 
+  ADD CONSTRAINT `fk_api_key_user` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`);
