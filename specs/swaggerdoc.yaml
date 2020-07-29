@@ -12,6 +12,115 @@ servers:
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/gaumeister/medten-product-api/1.0.0
 paths: 
+  /auth/login:
+    post:
+      summary: Logs in, obtaining api key and principal information.
+      tags: 
+        - authentication
+      requestBody:
+        description: The username and password login credentials are required.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/LoginResult'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        401:
+          description: Unauthorized. Invalid credentials.
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /auth/logout:
+    post:
+      summary: Logs out, removing the allocated apikey.
+      tags: 
+        - authentication
+      requestBody:
+        description: The username to logout. (The password portion of the payload should be omitted).
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/SimpleMessage'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /auth/password/forgot:
+    post:
+      summary: Handle a request to reset the users' password.
+      tags: 
+        - authentication
+      requestBody:
+        description: The email of the user requesting a password reset.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              allOf:
+                - type: object
+                  properties:
+                    email:
+                      type: string
+                      maxLength: 255
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/SimpleMessage'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /auth/password/reset:
+    post:
+      summary: Resets the password for a user.
+      tags: 
+        - authentication
+      requestBody:
+        description: The replacement password and password-reset-token.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              allOf:
+                - type: object
+                  properties:
+                    token:
+                      description: the temporary token received at the reset password URL for the user
+                      type: string
+                      maxLength: 255
+                    password:
+                      description: the new password for the user
+                      type: string
+                      maxLength: 255
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/SimpleMessage'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   /products:
     post:
       summary: creates a new product
@@ -198,7 +307,30 @@ paths:
   # /dataload:
 
 components:
-  schemas:    
+  schemas:
+    ApiError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A human-readable message describing the error.
+        error:
+          type: string
+          description: The error details. Typically error details may contain sensitive information not intended to be shown directly in the user interface.
+    Auditable:
+      type: object
+      properties:
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        updated:
+          type: string
+          format: date-time
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
     Brand:
       type: object
       description: An original equipment manufacturer (OEM) or brand.
@@ -259,6 +391,74 @@ components:
             type: string
             maxLength: 255
       - $ref: '#/components/schemas/Auditable'
+    ForgotPassword:
+      type: object
+      description: A forgot-password request payload. 
+      allOf:
+        - type: object
+          properties:
+            email:
+              type: string
+              maxLength: 255
+    Login:
+      type: object
+      description: A login payload. 
+      allOf:
+        - type: object
+          properties:
+            username:
+              type: string
+              maxLength: 255
+            password:
+              type: string
+              maxLength: 255
+    LoginResult:
+      type: object
+      description: The login result.
+      allOf:
+        - type: object
+          properties:
+            apikey:
+              description: Key to be used for client API access. Should be stored in a secure cookie for use by client-side apps.
+              type: string
+              maxLength: 255  
+            expires:
+              description: The expiration timestamp (GMT) of the apikey, in ISO-860 datetime format.
+              type: string
+              maxLength: 255
+            account_id: 
+              description: Identifies the account associated with the principal. Should be stored in a secure cookie for by client-side apps for API access.
+              type: integer
+            principal:
+              type: object
+              properties:
+                id:
+                  description: Identifies the user.
+                  type: integer
+                username:
+                  type: string
+                  maxLength: 255
+                email:
+                  type: string
+                  maxLength: 255
+                first_name:
+                  type: string
+                  maxLength: 255
+                last_name:
+                  type: string
+                  maxLength: 255
+                mobile_phone:
+                  type: string
+                  maxLength: 255
+                must_reset_password:
+                  type: integer
+                login_count:
+                  type: integer
+                default_account_id:
+                  type: integer
+                type:
+                  type: string
+                  maxLength: 255
     Product:
       type: object
       description: A medical product.
@@ -478,29 +678,18 @@ components:
             type: string
             maxLength: 255
       - $ref: '#/components/schemas/Auditable'
-    ApiError:
+    
+    
+    SimpleMessage:
       type: object
-      properties:
-        message:
-          type: string
-          description: A human-readable message describing the error.
-        error:
-          type: string
-          description: The error details. Typically error details may contain sensitive information not intended to be shown directly in the user interface.
-    Auditable:
-      type: object
-      properties:
-        created:
-          type: string
-          format: date-time
-          readOnly: true
-        updated:
-          type: string
-          format: date-time
-          readOnly: true
-        version:
-          type: integer
-          readOnly: true
+      description: A message from the server. 
+      allOf:
+        - type: object
+          properties:
+            message:
+              type: string
+              maxLength: 255
+    
   responses:
     400ClientError:
       description: client error

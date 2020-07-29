@@ -59,6 +59,10 @@ app.use(express.text({ limit: "1024kb", defaultCharset: "utf-8" }));
 app.use(cookieParser());
 
 // Routing .....................................................................
+var authRouter = require('./routes/auth');
+let {initAuthorizationCache, authorizer} = require('./routes/api/authorizer');
+initAuthorizationCache(app, {check_interval_ms: 5*60*1000});
+
 var productsApiRouter = require('./routes/api/products-api');
 var familiesApiRouter = require('./routes/api/families-api');
 var equipmentApiRouter = require('./routes/api/equipment-api');
@@ -66,6 +70,7 @@ var groupsApiRouter = require('./routes/api/groups-api');
 var apiRouter = require('./routes/api/api');
 var dataloadApiRouter = require('./routes/api/dataload-api');
 
+app.use('/auth', authRouter);
 
 // api related
 app.use('/api/v1/products', productsApiRouter);
