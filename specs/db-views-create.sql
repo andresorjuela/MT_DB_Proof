@@ -3,7 +3,7 @@
 create view v_product as select 
 p.id, p.sku, p.oem, p.name_en, p.description_en, p.name_zh, p.description_zh, 
 p.product_type_id, t.name_en as product_type_en, t.name_zh as product_type_zh, 
-p.family_id, f.family_code, f.family_connector_code,
+p.family_id, f.family_code, f.family_connector_code, f.name_en, f.video_link,
 p.oem_brand_id, b.name_en as oem_brand_en, b.name_zh as oem_brand_zh,
 p.category_id, c.name_en as category_en, c.name_zh as category_zh,
 nf.content as product_name_formula, 
@@ -44,9 +44,9 @@ left outer join t_filter f on f.id = fo.filter_id
 order by pfo.product_id asc, fo.filter_id asc;
 
 -- family with brand, group info
-create view v_family as select f.`id`, f.`family_code`, f.`family_connector_code`, 
+create view v_family as select f.`id`, f.`name_en`, f.`family_code`, f.`family_connector_code`, 
 f.`group_id`, g.`group_code`,
-f.`image_link_connector_distal`, f.`created`, f.`updated`
+f.`image_link_connector_distal`, f.`video_link`, f.`created`, f.`updated`
 from t_family f
 left outer join t_group g on g.id=f.group_id;
 
