@@ -66,7 +66,8 @@ async function initAuthorizationCache(app, opts){
   Alternatively a request parameter named 'gr8token' can be provided with the same base-64 encoded
   credentials.
   
-  F
+  Read-only methdods (i.e. GET API methods ) require no authentication (this allows the API to support the "browse" application).
+
   For admin roles and master account, allow access to urls matching `/*`.
 
   For non-admin accounts... TBD. Could be something like this:
@@ -86,9 +87,15 @@ async function initAuthorizationCache(app, opts){
 async function authorizer(req, res, next) {
 
   try {
+    if(req.method === 'GET'){
+      //TODO: a stricter policy should be implemented
+      debug(`Allowed (read-only).`);
+      next();
+      return;
+    }
 
     let token = auth(req); 
-    debug(`${req.originalUrl}`);
+    debug(`${req.method} ${req.originalUrl}`);
     if (!token){
       debug(`No credentials found.`);
       return deny(req, res);//No token present/parsed
