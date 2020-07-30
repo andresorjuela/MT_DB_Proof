@@ -21,26 +21,26 @@ insert into t_product_type (id, name_en) values
 (5, 'Repair Service'),
 (6, 'Repair');
 
-insert into t_category (id, name_en, inheritance, product_name_formula, product_description_formula, valid_image_types ) values 
-(1,	'Parts', 0, '', '', ''),
-(2,	'Accessories and Supplies', 0, '', '', ''),
-(3,	'Repair Service', 0, '', '', ''),
-(4,	'Fetal', 1, '', '', ''),
-(5,	'Telemetry', 1, '', '', ''),
-(6,	'Monitors/Modules', 1, '', '', ''),
-(7,	'Infusion Pumps', 1, '', '', ''),
-(8,	'Sp02', 2, '[OEM Part Number] + [Description]', '', '1, 2, 4, 7, 8'),
-(9,	'ECG', 2, '', '', ''),
-(10, 'EKG', 2, '', '', ''),
-(11, 'NIBP', 2, '', '', ''),
-(12, 'IBP', 2, '', '', ''),
-(13, 'Temperature', 2, '', '', ''),
-(14, 'Fetal', 2, '', '', ''),
-(15, 'O2', 2, '', '', ''),
-(16, 'EtCO2', 2, '', '', ''),
-(17, 'MVP', 2, '', '', ''),
-(18, 'Oxygen Sensors', 2, '', '', ''),
-(19, 'Flow Sensors', 2, '', '', '');
+insert into t_category (id, name_en, inheritance, product_name_formula, product_description_formula ) values 
+(1,	'Parts', 0, '', ''),
+(2,	'Accessories and Supplies', 0, '', ''),
+(3,	'Repair Service', 0, '', ''),
+(4,	'Fetal', 1, '', ''),
+(5,	'Telemetry', 1, '', ''),
+(6,	'Monitors/Modules', 1, '', ''),
+(7,	'Infusion Pumps', 1, '', ''),
+(8,	'Sp02', 2, '[OEM Part Number] + [Description]', ''),
+(9,	'ECG', 2, '', ''),
+(10, 'EKG', 2, '', ''),
+(11, 'NIBP', 2, '', ''),
+(12, 'IBP', 2, '', ''),
+(13, 'Temperature', 2, '', ''),
+(14, 'Fetal', 2, '', ''),
+(15, 'O2', 2, '', ''),
+(16, 'EtCO2', 2, '', ''),
+(17, 'MVP', 2, '', ''),
+(18, 'Oxygen Sensors', 2, '', ''),
+(19, 'Flow Sensors', 2, '', '');
 
 insert into t_supplier (id, name_en) values
 (1, 'Orantech');

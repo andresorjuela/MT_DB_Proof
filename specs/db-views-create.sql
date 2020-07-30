@@ -5,7 +5,7 @@ p.id, p.sku, p.oem, p.name_en, p.description_en, p.name_zh, p.description_zh,
 p.product_type_id, t.name_en as product_type_en, t.name_zh as product_type_zh, 
 p.family_id, f.family_code, f.family_connector_code,
 p.oem_brand_id, b.name_en as oem_brand_en, b.name_zh as oem_brand_zh,
-p.category_id, c.name_en as category_en, c.name_zh as category_zh, c.valid_image_types,
+p.category_id, c.name_en as category_en, c.name_zh as category_zh,
 nf.content as product_name_formula, 
 df.content as product_description_formula, 
 pf.value as packaging_factor, p.packaging_factor_id, p.price,
@@ -53,7 +53,7 @@ left outer join t_group g on g.id=f.group_id;
 -- equipment view, includes brand info.
 create view v_equipment as select e.id, e.model, 
 e.equipment_type_id, t.name_en as type_en, t.name_zh as type_zh,
-e.brand_id, b.name_en as brand_en, b.name_zh as brand_zh,
+e.brand_id, b.name_en as brand_en, b.name_zh as brand_zh, b.is_oem,
 e.created, e.updated
 from t_equipment e  
 left outer join t_equipment_type t on t.id = e.equipment_type_id 
@@ -99,7 +99,7 @@ join v_equipment e on e.id = pe.equipment_id;
 -- category view (to pick up formulas)
 create view v_category as select 
 c.id, c.name_en, c.name_zh, c.parent_id, nf.content as product_name_formula, df.content as product_description_formula,
-c.valid_image_types, c.created, c.updated, c.version
+c.created, c.updated, c.version
 from t_category c 
 left outer join t_formula      nf on nf.id = c.product_name_formula_id
 left outer join t_formula      df on df.id = c.product_description_formula_id;

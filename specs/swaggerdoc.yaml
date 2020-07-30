@@ -374,9 +374,7 @@ components:
             description: Identifies a stored **Formula** that can be used to auto-generate product descriptions.
             type: string
             maxLength: 255
-          valid_image_types:
-            type: string
-            maxLength: 255
+          
       - $ref: '#/components/schemas/Auditable'
     Certificate:
       type: object
@@ -570,9 +568,6 @@ components:
               type: string
               maxLength: 255
             category_zh:
-              type: string
-              maxLength: 255
-            valid_image_types:
               type: string
               maxLength: 255
             product_name_formula:
