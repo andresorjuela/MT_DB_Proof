@@ -3,8 +3,8 @@
   Expects a BASIC authentication header constructed from account_id (as username)
   and apikey (as password).
 */
+const debug = require('debug')('medten:security');
 const auth = require('basic-auth');
-const debug = require('debug')('gr8:security');
 const moment =  require('moment');
 /** Note: Authorization API (OAuth etc) urls are not handled by this authorizer. */
 const PATH_ANY_REGEX = /\/(.*)/i;
@@ -88,8 +88,9 @@ async function authorizer(req, res, next) {
   try {
 
     let token = auth(req); 
-    debug(req.originalUrl);
+    debug(`${req.originalUrl}`);
     if (!token){
+      debug(`No credentials found.`);
       return deny(req, res);//No token present/parsed
     } 
 
@@ -128,6 +129,7 @@ async function authorizer(req, res, next) {
       if (!match_result) return denyUnauthorized(req, res);
 
       //Permitted
+      debug(`Allowed (master).`);
       cacheAuth(req, principal);
       res.locals.principal = principal;
       next();
@@ -163,6 +165,7 @@ async function authorizer(req, res, next) {
       }
 
       //Permitted...
+      debug(`Allowed (standard).`);
       cacheAuth(req, principal);
       res.locals.principal = principal;
       next();
