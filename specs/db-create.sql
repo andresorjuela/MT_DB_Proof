@@ -400,6 +400,18 @@ CREATE TABLE `t_api_key` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8;
 
+-- Create syntax for TABLE 't_product_supplier'
+CREATE TABLE `t_product_supplier` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `product_id` int(11) unsigned DEFAULT NULL,
+  `supplier_id` int(11) unsigned DEFAULT NULL,
+  `supplier_price` decimal(9,2) DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `version` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 /*
   Foreign Key relationships follow.
 */
@@ -514,6 +526,13 @@ ALTER TABLE `t_product_set`
 
 ALTER TABLE `t_product_set` 
   ADD CONSTRAINT `fk_product_set_child_product` FOREIGN KEY (`child_product_id`) REFERENCES `t_product` (`id`);
+
+
+ALTER TABLE `t_product_supplier` 
+  ADD CONSTRAINT `fk_product_supplier_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
+
+ALTER TABLE `t_product_supplier` 
+  ADD CONSTRAINT `fk_product_supplier_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `t_supplier` (`id`);
 
 -- Auth relationships
 
