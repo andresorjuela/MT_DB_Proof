@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchById, fetchMany, parseQueryOptions, fetchCount, create, updateById } = require('@apigrate/mysqlutils/lib/express/db-api');
+let { fetchById, fetchMany, parseQueryOptions, fetchCount, create, updateById, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
 let CriteriaHelper = require('@apigrate/mysqlutils/helpers/criteria');
 
 const EQUIPMENT_QUERY_FIELDS = [
