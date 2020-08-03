@@ -8,7 +8,7 @@ p.oem_brand_id, b.name_en as oem_brand_en, b.name_zh as oem_brand_zh,
 p.category_id, c.name_en as category_en, c.name_zh as category_zh,
 nf.content as product_name_formula, 
 df.content as product_description_formula, 
-pf.value as packaging_factor, p.packaging_factor_id, p.price_us, p.price_zh, p.price_eu,
+pf.name as packaging_factor, p.packaging_factor_id, p.price_us, p.price_zh, p.price_eu,
 p.weight_kg, p.weight_lbs, p.warranty_duration_months, p.tags, p.video_link, p.note_internal, p.notes_client,
 p.lifecycle_id, l.name_en as lifecycle_en, l.name_zh as lifecycle_zh,
 p.created, p.updated, p.version
@@ -101,3 +101,23 @@ c.created, c.updated, c.version
 from t_category c 
 left outer join t_formula      nf on nf.id = c.product_name_formula_id
 left outer join t_formula      df on df.id = c.product_description_formula_id;
+
+-- product marketing region view
+create view v_product_marketing_region as select pm.id, 
+pm.product_id, 
+p.name_en as product_name_en, p.name_zh as product_name_zh, 
+pm.marketing_region_id, r.name_en as marketing_region_name_en,
+pm.created, pm.updated, pm.version
+from t_product_marketing_region pm
+left outer join t_product p on p.id = pm.product_id 
+left outer join t_marketing_region r on r.id = pm.marketing_region_id;
+
+-- equipment available region view
+create view v_equipment_available_region as select ea.id, 
+ea.equipment_id, 
+e.model as equipment_model, 
+ea.available_region_id, r.name_en as available_region_name_en,
+ea.created, ea.updated, ea.version
+from t_equipment_available_region ea
+left outer join t_equipment e on e.id = ea.equipment_id 
+left outer join t_available_region r on r.id = ea.available_region_id;
