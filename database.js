@@ -64,6 +64,7 @@ module.exports = function (pool) {
 
   //views
   factory.CategoryView                  = ()=>{ return create_dao('v_category', 'category_view', null, null); };
+  factory.EquipmentAvailableRegionView  = ()=>{ return create_dao('v_equipment_available_region', 'equipment_available_region_view', null, null); };
   factory.EquipmentGroupView            = ()=>{ return create_dao('v_equipment_group', 'equipment_group_view', null, null); };
   factory.EquipmentView                 = ()=>{ return create_dao('v_equipment', 'equipment_view', null, null); };
   factory.FamilyView                    = ()=>{ return create_dao('v_family', 'family_view', null, null); };
@@ -72,6 +73,7 @@ module.exports = function (pool) {
   factory.ProductEquipmentView          = ()=>{ return create_dao('v_product_equipment_connect', 'product_equipment_connect_view', null, null); };
   factory.ProductFilterOptionView       = ()=>{ return create_dao('v_product_filter_option', 'product_filter_option_view', null, null); };
   factory.ProductImageView              = ()=>{ return create_dao('v_product_image', 'product_image_view', null, null); };
+  factory.ProductMarketingRegionView    = ()=>{ return create_dao('v_product_marketing_region', 'product_marketing_region_view', null, null); };
   factory.ProductSetView                = ()=>{ return create_dao('v_product_set', 'product_set_view', null, null); };
   factory.ProductView                   = ()=>{ return create_dao('v_product', 'product_view', null, null); };
 
