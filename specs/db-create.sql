@@ -194,17 +194,26 @@ CREATE TABLE `t_product` (
   `family_id` int(11) unsigned DEFAULT NULL,
   `category_id` int(11) unsigned DEFAULT NULL,
   `name_en` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '',
+  `name_en_edit_user_id` int unsigned DEFAULT null,
+  `name_en_edit_timestamp` timestamp DEFAULT null,
   `description_en` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `name_zh` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '',
+  `name_zh_edit_user_id` int unsigned DEFAULT null,
+  `name_zh_edit_timestamp` timestamp DEFAULT null,
   `description_zh` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `packaging_factor_id` int(11) unsigned DEFAULT NULL,
   -- `packaging_factor` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT '1',
-  `price` decimal(9,2) DEFAULT NULL,
-  `supplier_id` int(11) unsigned DEFAULT NULL,
-  `weight` decimal(9,2) DEFAULT NULL,
+  `price_us` decimal(9,2) DEFAULT NULL,
+  `price_zh` decimal(9,2) DEFAULT NULL,
+  `price_eu` decimal(9,2) DEFAULT NULL,
+  `weight_kg` decimal(9,4) DEFAULT NULL,
+  `weight_lbs` decimal(9,4) DEFAULT NULL,
   `warranty_duration_months` smallint(6) DEFAULT '0',
   `tags` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `lifecycle_id` int(11) unsigned DEFAULT NULL,
+  `video_link` varchar(255) DEFAULT null,
+  `note_internal` varchar(512) DEFAULT null,
+  `notes_client` varchar(512) DEFAULT null,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
@@ -448,9 +457,6 @@ ALTER TABLE `t_product`
 
 ALTER TABLE `t_product` 
   ADD CONSTRAINT `fk_product_category` FOREIGN KEY (`category_id`) REFERENCES `t_category` (`id`);
-
-ALTER TABLE `t_product` 
-  ADD CONSTRAINT `fk_product_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `t_supplier` (`id`);
 
 ALTER TABLE `t_product` 
   ADD CONSTRAINT `fk_product_lifecycle` FOREIGN KEY (`lifecycle_id`) REFERENCES `t_lifecycle` (`id`);
