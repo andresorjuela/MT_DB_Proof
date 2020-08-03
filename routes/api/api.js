@@ -3,6 +3,16 @@ var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
 let { fetchMany, parseQueryOptions } = require('@apigrate/mysqlutils/lib/express/db-api');
 
+router.get('/available_regions', function (req, res, next) {
+  let  q = parseQueryOptions(req, ['name_en','id'], ['+name_en','+id'], 1000);
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.AvailableRegion(),
+    query: q.query,
+    query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
 router.get('/brands', function (req, res, next) {
   let  q = parseQueryOptions(req, ['name_en','name_zh','id'], ['+name_en','+id'], 1000);
   res.locals.dbInstructions = {
@@ -120,6 +130,17 @@ router.get('/lifecycles', function (req, res, next) {
   let  q = parseQueryOptions(req, ['name_en','id'], ['+name_en','+id'], 1000);
   res.locals.dbInstructions = {
     dao: req.app.locals.Database.Lifecycle(),
+    query: q.query,
+    query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
+
+router.get('/marketing_regions', function (req, res, next) {
+  let  q = parseQueryOptions(req, ['name_en','id'], ['+name_en','+id'], 1000);
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.MarketingRegion(),
     query: q.query,
     query_options: q.query_options
   }
