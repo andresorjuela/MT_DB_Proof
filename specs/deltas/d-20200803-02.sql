@@ -1,8 +1,5 @@
 /*
-  Delta script that adds/modifies the columns on the t_product table
-  to support international pricing, weights, name audit tracking, and
-  some internal notes fields.
-
+  Delta script that adds priority order for product filter options and product images.
   Created 8/3/2020
   Author: Derek Gau
 */
