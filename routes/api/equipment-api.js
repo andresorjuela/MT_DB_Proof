@@ -84,6 +84,29 @@ router.put('/:equipment_id', function (req, res, next) {
 }, updateById);
 
 
+// Get all equipment available regions
+router.get('/:equipment_id/available_regions', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.EquipmentAvailableRegionView(),
+    query: {equipment_id: req.params.equipment_id},
+    //query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
+
+/** Save all equipment available regions. */
+router.post('/:equipment_id/available_regions', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.EquipmentAvailableRegion(),
+    toSave: req.body, //assuming an array of objects
+    query: {equipment_id: req.params.equipment_id},
+    comparison: function(obj){ return `${obj.available_region_id}`; }
+  };
+  next();
+}, saveAll);
+
+
 //Default error handling
 router.use(function (err, req, res, next) {
   console.error(err);

@@ -4,9 +4,9 @@ info:
   title: 'Medten Product API'
   description: 'Interact with the Medten product database using this API.'
 servers:
-  - url: https://mgtwitxxi1.execute-api.ap-southeast-1.amazonaws.com/Prod/api/v1/
+  - url: https://mgtwitxxi1.execute-api.ap-southeast-1.amazonaws.com/Prod/
     description: API Test Environment
-  - url: https://v73kddyeqk.execute-api.ap-southeast-1.amazonaws.com/Prod/api/v1/
+  - url: https://v73kddyeqk.execute-api.ap-southeast-1.amazonaws.com/Prod/
     description: API POC (Proof of Concept) Environment
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
@@ -122,6 +122,106 @@ paths:
         500:
           $ref: '#/components/responses/500ServerError'
   /products:
+    get:
+      summary: searches for products
+      tags:
+        - products
+      parameters:
+        - in: query
+          name: search_term
+          schema:
+            type: string
+          description: Using the `search_term` parameter searches the `sku`, `oem`, `category_en`, and `category_zh` properties using a wildcard search. **Using this parameter overrides any other query parameters (i.e. other query parameters will be ignored).**
+        - in: query
+          name: product_id
+          schema:
+            type: integer
+        - in: query
+          name: sku
+          schema:
+            type: string
+        - in: query
+          name: oem
+          schema:
+            type: string
+        - in: query
+          name: name_en
+          schema:
+            type: string
+        - in: query
+          name: name_zh
+          schema:
+            type: string
+        - in: query
+          name: oem_brand_id
+          schema:
+            type: integer
+        - in: query
+          name: oem_brand_en
+          schema:
+            type: string
+        - in: query
+          name: oem_brand_zh
+          schema:
+            type: string
+        - in: query
+          name: description_en
+          schema:
+            type: string
+        - in: query
+          name: description_zh
+          schema:
+            type: string
+        - in: query
+          name: product_type_en
+          schema:
+            type: string
+        - in: query
+          name: product_type_zh
+          schema:
+            type: string
+        - in: query
+          name: family_id
+          schema:
+            type: integer
+        - in: query
+          name: family_code
+          schema:
+            type: string
+        - in: query
+          name: family_name_en
+          schema:
+            type: string
+        - in: query
+          name: category_id
+          schema:
+            type: integer
+        - in: query
+          name: category_en
+          schema:
+            type: string
+        - in: query
+          name: category_zh
+          schema:
+            type: string
+        
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+      
     post:
       summary: creates a new product
       tags:
@@ -184,7 +284,7 @@ paths:
           description: OK
           content:
             application/json:
-              schema: 
+              schema:
                 $ref: '#/components/schemas/ProductView'
         400:
           $ref: '#/components/responses/400ClientError'
@@ -243,12 +343,13 @@ paths:
         500:
           $ref: '#/components/responses/500ServerError'
     post:
-      summary: saves the current set of certificates for a product, adding those that need to be added, updating any existing, and removing any that no longer match the payload.
+      summary: replaces the current set of certificates for a product
+      description: Replaces the current set of certificates for a product, adding those that need to be added, updating any existing, and removing any that no longer match the payload.
       tags:
         - products
       requestBody:
         description: >
-          The product to be updated.
+          The new set of certificates for the product.
         required: true
         content:
           application/json:
@@ -292,7 +393,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  product_custom_attribute_view:
+                  product_custom_attribute_views:
                     type: array
                     items:  
                       $ref: '#/components/schemas/ProductCustomAttributeView'
@@ -300,8 +401,643 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+    post:
+      summary: replaces the current set of custom attributes for a product
+      description: Replaces the current set of custom attributes for a product, adding those that need to be added, updating any existing, and removing any that no longer match the payload. Custom attributes are differentiated by the distinct combination of `custom_attribute_id`, `value_en` and `value_zh`.
+      tags:
+        - products
+      requestBody:
+        description: >
+          The new set of custom attributes for the product
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:  
+                $ref: '#/components/schemas/ProductCustomAttribute'
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:  
+                  $ref: '#/components/schemas/ProductCustomAttribute'
+              
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /products/${id}/equipment:
+    summary: The equipment for a product.
+    parameters:
+    - name: id
+      in: path
+      description: the product id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets all equipment for a product
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_equipment_connect_views:
+                    type: array
+                    items:  
+                      $ref: '#/components/schemas/ProductEquipmentView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    post:
+      summary: replaces the current set of equipment for a product
+      description: Replaces the current set of equipment for a product, adding those that need to be added, updating any existing, and removing any that no longer match the payload. Equipment items are differentiated by the `equipment_id` property.
+      tags:
+        - products
+      requestBody:
+        description: >
+          The new set of equipment for the product
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:  
+                $ref: '#/components/schemas/ProductEquipment'
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:  
+                  $ref: '#/components/schemas/ProductEquipment'
+              
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /products/${id}/families:
+    summary: The families for a product.
+    parameters:
+    - name: id
+      in: path
+      description: the product id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets all families for a product
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_family_connects:
+                    type: array
+                    items:  
+                      $ref: '#/components/schemas/ProductFamily'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    post:
+      summary: replaces the current families for a product
+      description: Replaces the current familiest for a product, adding those that need to be added, updating any existing, and removing any that no longer match the payload. Family references are differentiated by `family_id` property.
+      tags:
+        - products
+      requestBody:
+        description: >
+          The new families for the product
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:  
+                $ref: '#/components/schemas/ProductFamily'
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:  
+                  $ref: '#/components/schemas/ProductFamily'
+              
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /products/${id}/filter_options:
+    summary: The filter options for a product.
+    parameters:
+    - name: id
+      in: path
+      description: the product id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets all filter options for a product
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_filter_option_views:
+                    type: array
+                    items:  
+                      $ref: '#/components/schemas/ProductFilterOptionView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    post:
+      summary: replaces the current filter options for a product
+      description: Replaces the current filter options for a product, adding those that need to be added, updating any existing, and removing any that no longer match the payload. Filter options are differentiated by the `filter_option_id` property.
+      tags:
+        - products
+      requestBody:
+        description: >
+          The new filter option for the product
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:  
+                $ref: '#/components/schemas/ProductFilterOption'
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:  
+                  $ref: '#/components/schemas/ProductFilterOption'
+              
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /products/${id}/images:
+    summary: The images for a product.
+    parameters:
+    - name: id
+      in: path
+      description: the product id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets all images for a product
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_image_views:
+                    type: array
+                    items:  
+                      $ref: '#/components/schemas/ProductImageView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    post:
+      summary: replaces the current images for a product
+      description: Replaces the current images for a product, adding those that need to be added, updating any existing, and removing any that no longer match the payload. Images are differentiated by a unique combination of the `image_link` and `image_type_id` properties.
+      tags:
+        - products
+      requestBody:
+        description: >
+          The new images for the product
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:  
+                $ref: '#/components/schemas/ProductImage'
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:  
+                  $ref: '#/components/schemas/ProductImage'
+              
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /products/${id}/marketing_regions:
+    summary: The marketing regions for a product.
+    parameters:
+    - name: id
+      in: path
+      description: the product id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets all marketing regions for a product
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_marketing_region_views:
+                    type: array
+                    items:  
+                      $ref: '#/components/schemas/ProductMarketingRegionView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    post:
+      summary: replaces the marketing regions for a product
+      description: Replaces the current marketing regions for a product, adding those that need to be added, updating any existing, and removing any that no longer match the payload. Marketing regions are differentiated by the `image_link` and `marketing_region_id` property.
+      tags:
+        - products
+      requestBody:
+        description: >
+          The new marketing regions for the product
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:  
+                $ref: '#/components/schemas/ProductMarketingRegion'
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:  
+                  $ref: '#/components/schemas/ProductMarketingRegion'
+              
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /products/${id}/oem_references:
+    summary: The oem references for a product.
+    parameters:
+    - name: id
+      in: path
+      description: the product id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets all oem references for a product
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_oem_references:
+                    type: array
+                    items:  
+                      $ref: '#/components/schemas/ProductOemReference'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    post:
+      summary: replaces the current oem references for a product
+      description: Replaces the current oem references for a product, adding those that need to be added, updating any existing, and removing any that no longer match the payload. OEM references are differentiated by a unique combination of the `brand_id` and `name` properties.
+      tags:
+        - products
+      requestBody:
+        description: >
+          The new oem references for the product
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:  
+                $ref: '#/components/schemas/ProductOemReference'
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:  
+                  $ref: '#/components/schemas/ProductOemReference'
+              
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /products/${id}/sets:
+    summary: The sets for a product. Product sets are products that are composed of child products.
+    parameters:
+    - name: id
+      in: path
+      description: the (parent) product id, defining the product set
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets all the child products for the product set
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_set_views:
+                    type: array
+                    items:  
+                      $ref: '#/components/schemas/ProductSetView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    post:
+      summary: replaces the components for a product set
+      description: Replaces the current child products for a product set, adding those that need to be added, updating any existing, and removing any that no longer match the payload. Child product references are differentiated by unique combinations of the  `child_product_id` and `quantity` properties.
+      tags:
+        - products
+      requestBody:
+        description: >
+          The new child products for the product set
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:  
+                $ref: '#/components/schemas/ProductSet'
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:  
+                  $ref: '#/components/schemas/ProductSet'
+              
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   # /families:
-  # /equipment:
+  /equipment:
+    get:
+      summary: searches for equipment
+      tags:
+        - equipment
+      parameters:
+        - in: query
+          name: search_term
+          schema:
+            type: string
+          description: Using the `search_term` parameter searches the `model`, `type_en`, `type_zh`, `brand_en`, and `brand_zh` properties using a wildcard search. **Using this parameter overrides any other query parameters (i.e. other query parameters will be ignored).**
+        - in: query
+          name: brand_id
+          schema:
+            type: integer
+        - in: query
+          name: brand_en
+          schema:
+            type: string
+        - in: query
+          name: brand_zh
+          schema:
+            type: string
+        - in: query
+          name: created
+          schema:
+            type: string
+          description: (ISO-8601 date format)
+        - in: query
+          name: id
+          description: the equipment id
+          schema:
+            type: integer
+        - in: query
+          name: model
+          schema:
+            type: string
+        - in: query
+          name: type_en
+          schema:
+            type: string
+          description: the name of the equipment type (English)
+        - in: query
+          name: type_zh
+          schema:
+            type: string
+          description: the name of the equipment type (Chinese)
+        - in: query
+          name: updated
+          schema:
+            type: string
+          description: (ISO-8601 date format)
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  equipment:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EquipmentView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+          
+    post:
+      summary: creates a new equipment item
+      tags:
+        - equipment
+      requestBody:
+        description: >
+          The equipment to be created. Note the `id` property should be excluded. It will be returned in the response.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Equipment'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Equipment'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'  
+  /equipment/${id}:
+    summary: Represents equipment.
+    description: An equipment is any entity having a model number that could potentially be assigned to a product.
+    parameters:
+    - name: id
+      in: path
+      description: the equipment id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets equipment by id
+      tags:
+        - equipment
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Equipment'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    put:
+      summary: updates an equipment item
+      tags:
+        - equipment
+      requestBody:
+        description: >
+          The equipment item to be updated.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Equipment'
+      responses:
+        200:
+          description: returns the equipment, including extended information
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Equipment'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /equipment/${id}/available_regions:
+    parameters:
+    - name: id
+      in: path
+      description: the equipment id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets available regions for a given equipment item
+      tags:
+        - equipment
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/EquipmentAvailableRegionView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    post:
+      summary: replaces the available regions for an equipment item
+      description: Replaces the available regions for an equipment item, adding those that need to be added, updating any existing, and removing any that no longer match the payload. Available regions are differentiated by the `available_region_id` property.
+      tags:
+        - equipment
+      requestBody:
+        description: >
+          The new available regions for the equipment item.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:  
+                $ref: '#/components/schemas/EquipmentAvailableRegion'
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:  
+                  $ref: '#/components/schemas/ProductFilterOption'
+              
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   # /groups:
   # /:
   # /dataload:
@@ -374,7 +1110,9 @@ components:
             description: Identifies a stored **Formula** that can be used to auto-generate product descriptions.
             type: string
             maxLength: 255
-          
+          valid_image_types:
+            type: string
+            maxLength: 255
       - $ref: '#/components/schemas/Auditable'
     Certificate:
       type: object
@@ -389,15 +1127,101 @@ components:
             type: string
             maxLength: 255
       - $ref: '#/components/schemas/Auditable'
-    ForgotPassword:
+    Equipment:
       type: object
-      description: A forgot-password request payload. 
+      description: An equipment model. Equipment represents items that a Product may be compatible with (e.g. can connect to).
       allOf:
-        - type: object
-          properties:
-            email:
-              type: string
-              maxLength: 255
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+          brand_id:
+            description: References the brand.
+            type: integer
+          equipment_type_id:
+            description: References the equipment type.
+            type: integer
+          model:
+            description: Model number/identifier.
+            type: string
+            maxLength: 255
+      - $ref: '#/components/schemas/Auditable'
+    EquipmentView:
+      type: object
+      description: The view of an equipment item that includes equipment type and brand information..
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+          model:
+            description: Model number/identifier.
+            type: string
+            maxLength: 255
+          equipment_type_id:
+            description: References the equipment type.
+            type: integer
+          type_en:
+            description: English equipment type name.
+            type: string
+            maxLength: 255
+          type_zh:
+            description: Chinese equipment type name.
+            type: string
+            maxLength: 255
+          brand_id:
+            description: References the brand.
+            type: integer
+          brand_en:
+            description: English brand name.
+            type: string
+            maxLength: 255
+          brand_zh:
+            description: Chinese brand name.
+            type: string
+            maxLength: 255
+          is_oem:
+            description: Whether the referenced brand is an oem.
+            type: boolean
+      - $ref: '#/components/schemas/Auditable'
+    EquipmentAvailableRegion:
+      type: object
+      description: A geographic region where an equipment item is available.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+          equipment_id:
+            description: References the equipment item.
+            type: integer
+          available_region_id:
+            description: References the available region.
+            type: integer
+      - $ref: '#/components/schemas/Auditable'
+    EquipmentAvailableRegionView:
+      type: object
+      description: A geographic region where an equipment item is available, including extended information.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+          equipment_id:
+            description: References the equipment item.
+            type: integer
+          equipment_model:: 
+            type: string
+          available_region_id:
+            description: References the available region.
+            type: integer
+          available_region_name_en:
+            type: string
+      - $ref: '#/components/schemas/Auditable'
     Login:
       type: object
       description: A login payload. 
@@ -661,9 +1485,11 @@ components:
           custom_attribute_id:
             type: integer
           custom_attribute_en:
+            description: the name of the attribute (English)
             type: string
             maxLength: 255
           custom_attribute_zh:
+            description: the name of the attribute (Chinese)
             type: string
             maxLength: 255
           value_en:
@@ -673,8 +1499,231 @@ components:
             type: string
             maxLength: 255
       - $ref: '#/components/schemas/Auditable'
-    
-    
+    ProductEquipment:
+      type: object
+      description: The equipment reference for a product.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+          product_id:
+            type: integer
+          equipment_id:
+            type: integer
+      - $ref: '#/components/schemas/Auditable'    
+    ProductEquipmentView:
+      type: object
+      description: Equipment reference for a product, including extend information.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+          product_id:
+            type: integer
+          equipment_id:
+            type: integer
+          model:
+            description: The model number for the equipment.
+            type: string
+            maxLength: 255
+          brand_en:
+            description: The equipment brand name (Chinese)
+            type: string
+            maxLength: 255
+          brand_zh:
+            description: The equipment brand name (Chinese)
+            type: string
+            maxLength: 255
+      - $ref: '#/components/schemas/Auditable'
+    ProductFamily:
+      type: object
+      description: The family reference for a product.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+          product_id:
+            type: integer
+          family_id:
+            type: integer
+      - $ref: '#/components/schemas/Auditable'    
+    ProductFilterOption:
+      type: object
+      description: The filter option reference for a product.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+          product_id:
+            type: integer
+          filter_option_id:
+            type: integer
+          priority_order:
+            description: the display order/priority of the option
+            type: integer
+      - $ref: '#/components/schemas/Auditable'
+    ProductFilterOptionView:
+      type: object
+      description: The filter option reference for a product, including extended properties.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+          product_id:
+            type: integer
+          filter_id:
+            description: reference to the filter associated with the filter option
+            type: integer
+          filter_en:
+            description: The name of the filter (English)
+            type: string
+          filter_zh:
+            description: The name of the filter (Chinese)
+            type: string
+          filter_option_id:
+            type: integer
+          option_en:
+            description: The name of the option (English)
+            type: string
+          option_zh:
+            description: The name of the option (Chinese)
+            type: string
+          priority_order:
+            description: the display order/priority of the option
+            type: integer
+      - $ref: '#/components/schemas/Auditable'
+    ProductImage:
+      type: object
+      description: The image reference for a product.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+          product_id:
+            type: integer
+          image_type_id:
+            type: integer
+          image_link:
+            type: string
+            maxLength: 255
+          priority_order:
+            type: integer
+      - $ref: '#/components/schemas/Auditable'
+    ProductImageView:
+      type: object
+      description: The image reference for a product, including extended properties.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+          product_id:
+            type: integer
+          image_type_id:
+            type: integer
+          image_type:
+            description: name of the image type
+            type: string
+          priority_order:
+            type: integer
+          image_link:
+            type: string
+            maxLength: 255
+      - $ref: '#/components/schemas/Auditable' 
+    ProductMarketingRegion:
+      type: object
+      description: The marketing region reference for a product.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+          product_id:
+            type: integer
+          marketing_region_id:
+            type: integer
+      - $ref: '#/components/schemas/Auditable'
+    ProductMarketingRegionView:
+      type: object
+      description: The marketing region reference for a product, including extended properties.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+          product_id:
+            type: integer
+          product_name_en:
+            type: string
+          product_name_zh:
+            type: string
+          marketing_region_id:
+            type: integer
+          marketing_region_name_en:
+            type: string
+      - $ref: '#/components/schemas/Auditable'
+    ProductOemReference:
+      type: object
+      description: The OEM reference for a product.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+          product_id:
+            type: integer
+          brand_id:
+            type: integer
+          name:
+            type: string
+            maxLength: 255
+      - $ref: '#/components/schemas/Auditable'
+    ProductSet:
+      type: object
+      description: The Set reference for a product.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+          parent_product_id:
+            type: integer
+          child_product_id:
+            type: integer
+          quantity:
+            type: string
+            description: the quantity (count) of the child product for the set
+            maxLength: 255
+      - $ref: '#/components/schemas/Auditable'
+    ProductSetView:
+      type: object
+      description: The Set reference for a product, including extended properties
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+          parent_product_id:
+            type: integer
+          parent_sku:
+            type: string
+          child_product_id:
+            type: integer
+          child_sku:
+            type: string
+          quantity:
+            type: string
+            description: the quantity (count) of the child product for the set
+            maxLength: 255
+      - $ref: '#/components/schemas/Auditable'
+   
     SimpleMessage:
       type: object
       description: A message from the server. 

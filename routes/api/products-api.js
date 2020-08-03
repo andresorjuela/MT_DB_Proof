@@ -21,6 +21,7 @@ let SEARCHABLE_PRODUCT_COLUMNS = [
   'product_type_zh',
   'family_id',
   'family_code',
+  'family_name_en',
   'category_id',
   'category_en',
   'category_zh',
@@ -258,6 +259,27 @@ router.post('/:product_id/images', function (req, res, next) {
 }, saveAll);
 
 
+// Get all product marketing regions
+router.get('/:product_id/marketing_regions', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductMarketingRegionView(),
+    query: {product_id: req.params.product_id},
+    //query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
+/** Save all product marketing regions. */
+router.post('/:product_id/marketing_regions', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductMarketingRegion(),
+    toSave: req.body, //assuming an array of objects
+    query: {product_id: req.params.product_id},
+    comparison: function(obj){ return `${obj.marketing_region_id}`; }
+  };
+  next();
+}, saveAll);
+
 // Get all product oem references
 router.get('/:product_id/oem_references', function (req, res, next) {
   res.locals.dbInstructions = {
@@ -278,16 +300,6 @@ router.post('/:product_id/oem_references', function (req, res, next) {
   };
   next();
 }, saveAll);
-
-router.get('/view/:product_id', function (req, res, next) {
-
-  res.locals.dbInstructions = {
-    dao: req.app.locals.Database.ProductView(),
-    id: req.params.product_id
-  }
-  next();
-
-}, fetchById);
 
 
 /** Get all set values for a product. */
