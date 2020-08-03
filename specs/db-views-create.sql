@@ -35,7 +35,7 @@ create view v_product_filter_option
 as select pfo.id, pfo.product_id, 
 f.id as filter_id, f.name_en as filter_en, f.name_zh as filter_zh,
 fo.id as filter_option_id, fo.option_en, fo.option_zh,
-pfo.created, pfo.updated, pfo.version
+pfo.priority_order, pfo.created, pfo.updated, pfo.version
 from t_product_filter_option pfo
 left outer join t_filter_option fo on fo.id = pfo.filter_option_id
 left outer join t_filter f on f.id = fo.filter_id
@@ -77,7 +77,7 @@ left outer join t_custom_attribute ca on ca.id = pca.custom_attribute_id;
 -- product iamge view
 create view v_product_image as select pi.id, pi.product_id, pi.image_type_id,
 it.name as image_type, 
-pi.image_link, pi.created, pi.updated, pi.version 
+pi.priority_order, pi.image_link, pi.created, pi.updated, pi.version 
 from t_product_image pi 
 left outer join t_image_type it on it.id = pi.image_type_id;
 
