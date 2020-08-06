@@ -73,6 +73,7 @@ var dataloadApiRouter = require('./routes/api/dataload-api');
 app.use('/auth', authRouter);
 
 // api related
+// app.use(authorizer);
 app.use('/api/v1/products', productsApiRouter);
 app.use('/api/v1/families', familiesApiRouter);
 app.use('/api/v1/equipment', equipmentApiRouter);
