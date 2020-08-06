@@ -122,6 +122,7 @@ CREATE TABLE `t_family` (
   `name_edit_user_id` int unsigned DEFAULT null,
   `name_edit_timestamp` timestamp DEFAULT null,
   `video_link` varchar(255) DEFAULT null,
+  `family_name_formula_id` int unsigned DEFAULT null
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
@@ -589,6 +590,10 @@ ALTER TABLE `t_product_marketing_region`
 
 ALTER TABLE `t_product_marketing_region` 
   ADD CONSTRAINT `fk_prod_mkt_reg_region` FOREIGN KEY (`marketing_region_id`) REFERENCES `t_marketing_region` (`id`);
+
+ALTER TABLE `t_family` 
+  ADD CONSTRAINT `fk_family_name_formula` FOREIGN KEY (`family_name_formula_id`) REFERENCES `t_formula` (`id`);
+
 
 -- Auth relationships
 
