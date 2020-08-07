@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@apigrate/logger": "^3.0.0",
-    "@apigrate/mysqlutils": "^4.4.0",
+    "@apigrate/mysqlutils": "^4.5.0",
     "@apigrate/sdk": "^1.0.0",
     "@apigrate/slack": "^3.0.1",
     "@sendgrid/mail": "^7.2.2",

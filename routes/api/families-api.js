@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
 let { fetchOne, fetchById, fetchMany, parseQueryOptions, fetchCount, create, updateById } = require('@apigrate/mysqlutils/lib/express/db-api');
-let CriteriaHelper = require('@apigrate/mysqlutils/helpers/criteria');
+const {CriteriaHelper} = require('@apigrate/mysqlutils');
 
 const FAMILY_QUERY_FIELDS = [
   'id', 'family_connector_code', 'family_code', 'image_link_connector_distal', 'created', 'updated',
