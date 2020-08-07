@@ -131,7 +131,12 @@ paths:
           name: search_term
           schema:
             type: string
-          description: Using the `search_term` parameter searches the `sku`, `oem`, `category_en`, and `category_zh` properties using a wildcard search. **Using this parameter overrides any other query parameters (i.e. other query parameters will be ignored).**
+          description: Using the `search_term` parameter will perform a wildcard search in whichever queryable fields are provided in the `search_term_fields` query parameter
+        - in: query
+          name: search_term_fields
+          schema:
+            type: string
+          description: The fields that should be searched using the `search_term`. Specify multiple fields by including this query parameter multiple times on the query string, e.g. `&search_term_fields=sku&search_term_fields=oem` etc.
         - in: query
           name: product_id
           schema:
