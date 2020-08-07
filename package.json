@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@apigrate/logger": "^3.0.0",
-    "@apigrate/mysqlutils": "^4.6.0",
+    "@apigrate/mysqlutils": "^4.7.0",
     "@apigrate/sdk": "^1.0.0",
     "@apigrate/slack": "^3.0.1",
     "@sendgrid/mail": "^7.2.2",
@@ -35,7 +35,7 @@
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.26",
     "morgan": "~1.9.1",
-    "mysql": "^2.17.1",
+    "mysql": "^2.18.1",
     "pug": "^2.0.4",
     "request": "^2.88.0",
     "uuidv4": "^6.2.0"

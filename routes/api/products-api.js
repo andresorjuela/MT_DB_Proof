@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
 const _ = require('lodash');
-const { fetchById, fetchCount, fetchMany, parseQueryOptions, updateById, create, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
+const { fetchById, fetchCount, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, updateById, create, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
 const debug = require('debug')('medten:routes');
 const {CriteriaHelper} = require('@apigrate/mysqlutils');
 
 const SEARCHABLE_PRODUCT_COLUMNS = [ 
-  'product_id', 
+  'id', 
   'sku',
   'oem',
   'name_en', 
@@ -25,14 +25,12 @@ const SEARCHABLE_PRODUCT_COLUMNS = [
   'category_en',
   'category_zh',
   'search_term',
-  'search_term_fields' //list of fields the search term will be checked against.
+  'search_term_fields'
 ];
 
-/** Query for products. */
+/** Query for products using a simple parametric search. Array values not supported. */
 router.get('/', async function (req, res, next) {
-  //console.log(`raw query in express: ${JSON.stringify(req.query,null,2)}`);
   let q = parseQueryOptions(req, SEARCHABLE_PRODUCT_COLUMNS, ['+name_en', '+id'], 1000);
-  //console.log(`after parsing: ${JSON.stringify(req.query,null,2)}`);
   
   let dbInstructions = {
     dao: req.app.locals.Database.ProductView(),
@@ -40,37 +38,45 @@ router.get('/', async function (req, res, next) {
     with_total: true,
   };
 
-  if(q.query.search_term){
-    dbInstructions.criteria = parseSearchTermCriteria(q);
-  } else {
-    dbInstructions.query = q.query;
-  }
+  dbInstructions.query = q.query;
   res.locals.dbInstructions = dbInstructions;
   next();
   
 }, fetchMany);
 
-/** @deprecated */
-router.get('/count', async function (req, res, next) {
-  debug(`Counting products for query...`);
-  let q = parseQueryOptions(req, SEARCHABLE_PRODUCT_COLUMNS);
+/** 
+ * Query for products using an advanced search.
+ * 
+ * Expected body:
+ * @example 
+ * {
+ *   search_term: "SA-024",
+ *   search_term_fields: ["oem", "model"],
+ *   category_id: [5, 7],
+ *   oem_brand_id: 3,
+ *   order_by: ["sku"],
+ *   limit: 10,
+ *   offset: 0
+ * }
+ * In this example, the oem and model fields will be wildcard searched for "SA-024", and the other 
+ * criteria on the search payload will be used to further filter the selection.
+ * 
+*/
+router.post('/search', async function (req, res, next) {
+  let qopts = parseQueryOptionsFromObject(req.body, SEARCHABLE_PRODUCT_COLUMNS, ['+name_en', '+id'], 1000);
+  
+  let dbInstructions = {
+    dao: req.app.locals.Database.ProductView(),
+    query_options: qopts.query_options,
+    with_total: true,
+    criteria: parseSearchTermCriteria(qopts)
+  };
 
-  let ProductView = req.app.locals.Database.ProductView();
-  if(q.query.search_term){
-    let criteria = parseSearchTermCriteria(q);
+  res.locals.dbInstructions = dbInstructions;
+  next();
+  
+}, fetchMany);
 
-    let qresult = await ProductView.callDb(`SELECT count(*) as count FROM ${ProductView.table} WHERE ${criteria.whereClause}`, criteria.parms);
-
-    res.status(200).json(qresult[0].count);
-
-  } else {
-    res.locals.dbInstructions = {
-      dao: req.app.locals.Database.ProductView(),
-      query: q.query
-    }
-    next();
-  }
-}, fetchCount);
 
 /**
  * Provide consistent search term queries.
@@ -83,7 +89,10 @@ function parseSearchTermCriteria(q){
   let criteria = new CriteriaHelper();
     criteria.andGroup();
     for(let field_name of q.query.search_term_fields){
-      criteria.or(field_name, 'LIKE', `%${q.query.search_term}%`)
+      if(SEARCHABLE_PRODUCT_COLUMNS.includes(field_name)){
+        criteria.or(field_name, 'LIKE', `%${q.query.search_term}%`);
+      }
+      //just ignore anything not searchable.
     }
     criteria.groupEnd();
 

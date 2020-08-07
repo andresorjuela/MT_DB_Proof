@@ -123,20 +123,11 @@ paths:
           $ref: '#/components/responses/500ServerError'
   /products:
     get:
-      summary: searches for products
+      summary: find products using a simple search
+      description: If you need to perform more sophisticated searches, please use the `/products/search` API.
       tags:
         - products
       parameters:
-        - in: query
-          name: search_term
-          schema:
-            type: string
-          description: Using the `search_term` parameter will perform a wildcard search in whichever queryable fields are provided in the `search_term_fields` query parameter
-        - in: query
-          name: search_term_fields
-          schema:
-            type: string
-          description: The fields that should be searched using the `search_term`. Specify multiple fields by including this query parameter multiple times on the query string, e.g. `&search_term_fields=sku&search_term_fields=oem` etc.
         - in: query
           name: product_id
           schema:
@@ -246,6 +237,90 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/Product'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'   
+  /products/search:
+    post:
+      summary: Perform an advanced search for products.
+      description: Extends basic search capabilities, allowing a search term to be used across many different product fields. Additional filter criteria can be used to further narrow the search-term search.
+      tags:
+        - products
+      requestBody:
+        description: >
+          The search criteria to use for the search.
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/SearchCriteria'
+              - type: object
+                properties:
+                  id:
+                    type: integer
+                    description: the product id
+                  sku:
+                    type: string
+                  oem:
+                    type: string
+                  name_en:
+                    type: string
+                  name_zh:
+                    type: string
+                  oem_brand_id:
+                    type: integer
+                  oem_brand_en:
+                    type: string
+                  oem_brand_zh:
+                    type: string
+                  description_en:
+                    type: string
+                  description_zh:
+                    type: string
+                  product_type_en:
+                    type: string
+                  product_type_zh:
+                    type: string
+                  family_id:
+                    type: integer
+                  family_code:
+                    type: string
+                  family_name_en:
+                    type: string
+                  category_id:
+                    type: integer
+                    description: The category for the product search. Note, the API can  accept multiple values, which will be treated together as a UNION (OR) criteria. *If specifying multiple category_id options, provide the value as an array of integers.*
+                  category_en:
+                    type: string
+                  category_zh:
+                    type: string        
+            examples:
+              example1:
+                description: Search for products having a `sku` and `oem` for `SA-024` (wildcard), **and** that have `oem_brand_id` = `3`, **and** that belong to either `category_id` `3` or `4`. Order the results by `oem`. Skip the first result, and limit the results to `10` entries.
+                value:
+                  offset: 1
+                  limit: 10
+                  order_by:
+                    - oem
+                  search_term: SA-024
+                  search_term_fields:
+                    - sku
+                    - oem
+                  oem_brand_id: 3
+                  category_id:
+                    - 4
+                    - 7
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductView'    
         400:
           $ref: '#/components/responses/400ClientError'
         500:
@@ -1728,7 +1803,30 @@ components:
             description: the quantity (count) of the child product for the set
             maxLength: 255
       - $ref: '#/components/schemas/Auditable'
-   
+    SearchCriteria:
+      type: object
+      allOf:
+      - type: object
+        properties:
+          offset:
+            type: integer
+            description: for pagination. A zero-indexed value indicating where to begin the output with in the set of all possible search results.
+          limit:
+            type: integer
+            description: for pagination. The number of records to return in a single query (up to 1000).
+          order_by:
+            type: array
+            description: Describes the ordering of the search results. Provide the field names to order by. Prefix the field name with a `-` if you want ordering to be in descending order.
+            items:
+              type: string
+          search_term:
+            type: string
+            description: the search term value. It will be treated as a wildcard search within the `search_term_fields` values.
+          search_term_fields:
+            type: array
+            description: the list of fields you want the `search_term` to apply to. The criteria will be applied as a (OR) when conducting the search across more than one field.
+            items:
+              type: string
     SimpleMessage:
       type: object
       description: A message from the server. 
