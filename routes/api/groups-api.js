@@ -1,17 +1,22 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchById, fetchMany, parseQueryOptions, fetchCount, create, updateById, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
-const {CriteriaHelper} = require('@apigrate/mysqlutils');
+let { fetchById, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, fetchCount, create, updateById, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
+const {parseSearchTermCriteria} = require('./common');
 
-const GROUP_QUERY_FIELDS = [
-  'id', 'group_code','created', 'updated', 'search_term'
+const ALLOWED_SEARCH_PARAMETERS = [
+  'id', 
+  'group_code',
+  'created', 
+  'updated', 
+  'search_term',
+  'search_term_fields'
 ];
 
 /** Query for group */
 router.get('/', async function (req, res, next) {
 
-  let q = parseQueryOptions(req, GROUP_QUERY_FIELDS, ['+group_code', '+id'], 1000);
+  let q = parseQueryOptions(req, ALLOWED_SEARCH_PARAMETERS, ['+group_code', '+id'], 1000);
   
   let dbInstructions = {
     dao: req.app.locals.Database.Group(),
@@ -19,27 +24,44 @@ router.get('/', async function (req, res, next) {
     with_total: true,
   };
   
-  if(q.query.search_term){
-    dbInstructions.criteria = parseSearchTermCriteria(q);
-  } else {
-    dbInstructions.query = q.query;
-  }
+  dbInstructions.query = q.query;
   res.locals.dbInstructions = dbInstructions;
   next();
   
 }, fetchMany);
 
-/**
- * Provide consistent search term queries.
- * @param {object} q a parsed query options object.
- * @returns a criteria helper object containing a whereClause and parms property
- * that can be used for queries
- */
-function parseSearchTermCriteria(q){
-  let criteria = new CriteriaHelper();
-    criteria.or('group_code', 'LIKE', `%${q.query.search_term}%`);
-  return criteria;
-}
+
+/** 
+ * Query for groups using an advanced search.
+ * 
+ * Expected body:
+ * @example 
+ * {
+ *   search_term: "028",
+ *   search_term_fields: ["group_code"],
+ *   order_by: ["group_code"],
+ *   limit: 10,
+ *   offset: 0
+ * }
+ * In this example, the group_code field will be wildcard searched for "028", and the other 
+ * criteria on the search payload will be used to further filter the selection.
+ * 
+*/
+router.post('/search', async function (req, res, next) {
+  let qopts = parseQueryOptionsFromObject(req.body, ALLOWED_SEARCH_PARAMETERS, ['+group_code', '+id'], 1000);
+  
+  let dbInstructions = {
+    dao: req.app.locals.Database.Group(),
+    query_options: qopts.query_options,
+    with_total: true,
+    criteria: parseSearchTermCriteria(ALLOWED_SEARCH_PARAMETERS, qopts)
+  };
+
+  res.locals.dbInstructions = dbInstructions;
+  next();
+  
+}, fetchMany);
+
 
 /** Get a single group. */
 router.get('/:group_id', function (req, res, next) {
