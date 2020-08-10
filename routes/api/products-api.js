@@ -3,9 +3,9 @@ const router = express.Router({ mergeParams: true });
 const _ = require('lodash');
 const { fetchById, fetchCount, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, updateById, create, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
 const debug = require('debug')('medten:routes');
-const {CriteriaHelper} = require('@apigrate/mysqlutils');
+const {parseSearchTermCriteria} = require('./common');
 
-const SEARCHABLE_PRODUCT_COLUMNS = [ 
+const ALLOWED_SEARCH_PARAMETERS = [ 
   'id', 
   'sku',
   'oem',
@@ -30,7 +30,7 @@ const SEARCHABLE_PRODUCT_COLUMNS = [
 
 /** Query for products using a simple parametric search. Array values not supported. */
 router.get('/', async function (req, res, next) {
-  let q = parseQueryOptions(req, SEARCHABLE_PRODUCT_COLUMNS, ['+name_en', '+id'], 1000);
+  let q = parseQueryOptions(req, ALLOWED_SEARCH_PARAMETERS, ['+name_en', '+id'], 1000);
   
   let dbInstructions = {
     dao: req.app.locals.Database.ProductView(),
@@ -63,13 +63,13 @@ router.get('/', async function (req, res, next) {
  * 
 */
 router.post('/search', async function (req, res, next) {
-  let qopts = parseQueryOptionsFromObject(req.body, SEARCHABLE_PRODUCT_COLUMNS, ['+name_en', '+id'], 1000);
+  let qopts = parseQueryOptionsFromObject(req.body, ALLOWED_SEARCH_PARAMETERS, ['+name_en', '+id'], 1000);
   
   let dbInstructions = {
     dao: req.app.locals.Database.ProductView(),
     query_options: qopts.query_options,
     with_total: true,
-    criteria: parseSearchTermCriteria(qopts)
+    criteria: parseSearchTermCriteria(ALLOWED_SEARCH_PARAMETERS, qopts)
   };
 
   res.locals.dbInstructions = dbInstructions;
@@ -77,49 +77,6 @@ router.post('/search', async function (req, res, next) {
   
 }, fetchMany);
 
-
-/**
- * Provide consistent search term queries.
- * @param {object} q a **parsed query options** object. 
- * @returns a criteria helper object containing a whereClause and parms property
- * that can be used for queries
- * 
- */
-function parseSearchTermCriteria(q){
-  let criteria = new CriteriaHelper();
-    criteria.andGroup();
-    for(let field_name of q.query.search_term_fields){
-      if(SEARCHABLE_PRODUCT_COLUMNS.includes(field_name)){
-        criteria.or(field_name, 'LIKE', `%${q.query.search_term}%`);
-      }
-      //just ignore anything not searchable.
-    }
-    criteria.groupEnd();
-
-    delete q.query.search_term_fields;
-    delete q.query.search_term;
-
-    let hasOtherFilters = false;
-    for(let field_name in q.query){
-      hasOtherFilters = true; break;
-    }
-
-    if(hasOtherFilters){
-      criteria.andGroup();
-      //The rest of the "filters" are ANDed on to the search term query.
-      for(let field_name in q.query){
-        if( _.isArray(q.query[field_name]) ){
-          criteria.and(field_name, 'IN', q.query[field_name]);
-        } else {
-          criteria.and(field_name, '=', `${q.query[field_name]}`);
-        }
-        
-      }
-      criteria.groupEnd();
-    }
-
-    return criteria;
-}
 
 /** Gets an array of all distinct SKUs across all products. Used for validation. A SKU should be globally unique. */
 router.get('/skus', async function (req, res, next) {
