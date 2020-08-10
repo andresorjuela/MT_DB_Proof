@@ -1118,10 +1118,182 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
-  # /groups:
-  # /:
-  # /dataload:
+  /equipment/search:
+    post:
+      summary: Perform an advanced search for equipment.
+      description: Extends basic search capabilities, allowing a search term to be used across many different equipment fields. Additional filter criteria can be used to further narrow the search-term search.
+      tags:
+        - equipment
+      requestBody:
+        description: >
+          The search criteria to use for the search.
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/SearchCriteria'
+              - type: object
+                properties:
+                  id:
+                    type: integer
+                    description: the equipment id
+                  model:
+                    type: string
+                  equipment_type_id:
+                    type: string
+                  type_en:
+                    type: string
+                  type_zh:
+                    type: string
+                  brand_id:
+                    type: integer
+                    description: Note, the API can  accept multiple values, which will be treated together as a UNION (OR) criteria. *If specifying multiple brand_id options, provide the value as an array of integers.*
+                  brand_en:
+                    type: string
+                  brand_zh:
+                    type: string
+                  is_oem:
+                    type: boolean
+            examples:
+              example1:
+                description: Search for equipment having a `type_en` and `model` for `X3` (wildcard), **and** that have `brand_id` = `3` . Order the results by `oem`. Limit the results to `100` entries.
+                value:
+                  offset: 0
+                  limit: 100
+                  order_by:
+                    - model
+                  search_term: X3
+                  search_term_fields:
+                    - type_en
+                    - model
+                  brand_id: 3
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EquipmentView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'   
 
+  /families/search:
+    post:
+      summary: Perform an advanced search for families.
+      description: Extends basic search capabilities, allowing a search term to be used across many different family fields. Additional filter criteria can be used to further narrow the search-term search.
+      tags:
+        - families
+      requestBody:
+        description: >
+          The search criteria to use for the search.
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/SearchCriteria'
+              - type: object
+                properties:
+                  id:
+                    type: integer
+                    description: the equipment id
+                  family_connector_code:
+                    type: string
+                  family_code:
+                    type: string
+                  group_id:
+                    type: integer
+                    description: Note, the API can  accept multiple values, which will be treated together as a UNION (OR) criteria. *If specifying multiple group_id options, provide the value as an array of integers.*
+                  group_code:
+                    type: string
+                  name_en:
+                    type: string
+            examples:
+              example1:
+                description: Search for families having a `family_code` and `family_connector_code` for `140B` (wildcard), **and** that have `group_id` = `28` or '29' . Order the results by `family_code`. Limit the results to `100` entries.
+                value:
+                  offset: 0
+                  limit: 100
+                  order_by:
+                    - family_code
+                  search_term: 140B
+                  search_term_fields:
+                    - family_code
+                    - family_connector_code
+                  group_id:
+                    - 28
+                    - 29
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FamilyView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'   
+  
+
+  /groups/search:
+    post:
+      summary: Perform an advanced search for groups.
+      description: Extends basic search capabilities, allowing a search term to be used across many different group fields. Additional filter criteria can be used to further narrow the search-term search.
+      tags:
+        - groups
+      requestBody:
+        description: >
+          The search criteria to use for the search.
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/SearchCriteria'
+              - type: object
+                properties:
+                  id:
+                    type: integer
+                    description: the group id
+                  group_code:
+                    type: string
+                  
+            examples:
+              example1:
+                description: Search for groups having a `group_code` of `028` (wildcard). Order the results by `group_code`. Limit the results to `100` entries.
+                value:
+                  offset: 0
+                  limit: 100
+                  order_by:
+                    - group_code
+                  search_term: 028
+                  search_term_fields:
+                    - group_code
+                  
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'   
 components:
   schemas:
     ApiError:
@@ -1301,6 +1473,54 @@ components:
             type: integer
           available_region_name_en:
             type: string
+      - $ref: '#/components/schemas/Auditable'
+    FamilyView:
+      type: object
+      description: The view of a family including extended information.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+          name_en:
+            description: Name (English) of the family.
+            type: string
+            maxLength: 255
+          family_code:
+            type: string
+            maxLength: 255
+          family_connector_code:
+            type: string
+            maxLength: 255
+          group_id:
+            description: References the group.
+            type: integer
+          group_code:
+            type: string
+            maxLength: 255
+          image_link_connector_distal:
+            description: URL to a connector distal image.
+            type: string
+            maxLength: 255
+          video_link:
+            description: URL to a video for the family.
+            type: string
+            maxLength: 255
+      - $ref: '#/components/schemas/Auditable'
+    Group:
+      type: object
+      description: The group used to group together families.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+          group_code:
+            description: Code for the group
+            type: string
+            maxLength: 255
       - $ref: '#/components/schemas/Auditable'
     Login:
       type: object
