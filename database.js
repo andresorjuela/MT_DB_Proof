@@ -84,6 +84,46 @@ module.exports = function (pool) {
   factory.pool = ()=> { return pool; }
 
   /**
+   * Lists available table entity names this factory can support. Does not list views.
+   */
+  factory.available_tables = ()=>{
+    return [
+      'available_region',
+      'brand',
+      'category',
+      'certificate',
+      'custom_attribute',
+      'product_custom_attribute',
+      'equipment',
+      'equipment_available_region',
+      'equipment_group',
+      'equipment_image',
+      'equipment_type',
+      'family',
+      'family_group',
+      'filter',
+      'filter_option',
+      'group',
+      'image_type',
+      'lifecycle',
+      'marketing_region',
+      'packaging_factor',
+      'product',
+      'product_certificate',
+      'product_equipment_connect',
+      'product_family_connect',
+      'product_image',
+      'product_marketing_region',
+      'product_oem_reference',
+      'product_filter_option',
+      'product_set',
+      'product_supplier',
+      'product_type',
+      'supplier',
+    ];
+  };
+
+  /**
    * Gets a data access object (DAO) for the given name.
    * @returns a dao registered for the given name. If the name is not found, null is returned.
    */

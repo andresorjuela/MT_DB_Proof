@@ -8,6 +8,16 @@ let debug = require('debug')('medten:routes');
 
 
 /** Get all the fields for a given entity (table) */
+router.get('/tables', async function (req, res, next) {
+  
+  res.status(200).json({
+    tables: req.app.locals.Database.available_tables()
+  });
+
+});
+
+
+/** Get all the fields for a given entity (table) */
 router.get('/:entity/metadata', validateDao, async function (req, res, next) {
   let metadata = [];
 

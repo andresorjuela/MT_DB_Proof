@@ -121,6 +121,152 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /dataload/tables:
+    get:
+      summary: get the list of table entity names for use in the other dataload API calls.
+      tags:
+        - dataload
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tables:
+                    type: array
+                    items: 
+                      type: string
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /dataload/${entity}/metadata:
+    get:
+      summary: get table metadata (field and data-type information).
+      tags:
+        - dataload
+      parameters:
+        - in: path
+          required: true
+          name: entity
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: entity name of the table
+                  plural:
+                    type: string
+                    description: plural entity name of the table
+                  table:
+                    type: string
+                    description: actual db table name
+                  columns:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        column:
+                          type: string
+                          description: name of the db column
+                        sql_type:
+                          type: string
+                          description: the data type (including length, precision) of the column
+                        pk:
+                          type: boolean
+                          description: whether the column is/is part of the primary key
+                        nullable:
+                          type: boolean
+                        default:
+                          type: string
+                          description: the default value, if any
+  /dataload/${entity}/bulkupdate:
+    post:
+      summary: mass update data ina a table
+      tags:
+        - dataload
+      parameters:
+        - in: path
+          required: true
+          name: entity
+          schema:
+            type: string
+      requestBody:
+        description: The data to be loaded. The expected content is a tab-delimited list of data to load. The data should contain a first row matching table columns (see the `/dataload/${entity}/metadata` API for these details). Column(s) matching the primary key of the table **must** be provided to establish a match. All data provided will be updated. Data that does not match a row in the database will be ignored.
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+            example: id\tname_en\tname_zh\tparent_id\tis_oem\n1\tGE Healthcare\t通用\t0\t0\n2\tMindray\t迈瑞\t0\t0
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  inserted:
+                    type: integer
+                  skipped:
+                    type: integer
+                  updated:
+                    type: integer
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /dataload/${entity}/bulkinsert:
+    post:
+      summary: mass insert data into a table
+      tags:
+        - dataload
+      parameters:
+        - in: path
+          required: true
+          name: entity
+          schema:
+            type: string
+      requestBody:
+        description: The data to be loaded. The expected content is a tab-delimited list of data to load. The data should contain a first row matching table columns (see the `/dataload/${entity}/metadata` API for these details). All data provided will be inserted, regardless of whether matching data exists.
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+            example: id\tname_en\tname_zh\tparent_id\tis_oem\n1\tGE Healthcare\t通用\t0\t0\n2\tMindray\t迈瑞\t0\t0
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  inserted:
+                    type: integer
+                  skipped:
+                    type: integer
+                  updated:
+                    type: integer
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   /products:
     get:
       summary: find products using a simple search
