@@ -125,6 +125,18 @@ router.put('/:product_id', function (req, res, next) {
 }, updateById);
 
 
+/** Delete a product (database cascades related entities) */
+router.delete('/:product_id', function (req, res, next) {
+
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.Product(),
+    id: req.params.product_id
+  }
+  next();
+
+}, deleteById);
+
+
 // Get all product certificates
 router.get('/:product_id/certificates', function (req, res, next) {
   res.locals.dbInstructions = {

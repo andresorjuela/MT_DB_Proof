@@ -473,7 +473,7 @@ ALTER TABLE `t_product_custom_attribute`
   ADD CONSTRAINT `fk_custom_attribute_option` FOREIGN KEY (`custom_attribute_id`) REFERENCES `t_custom_attribute` (`id`);
 
 ALTER TABLE `t_product_custom_attribute` 
-  ADD CONSTRAINT `fk_custom_attribute_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
+  ADD CONSTRAINT `fk_custom_attribute_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`) ON DELETE CASCADE;
 
 
 ALTER TABLE `t_equipment` 
@@ -523,56 +523,56 @@ ALTER TABLE `t_product`
 
 
 ALTER TABLE `t_product_certificate` 
-  ADD CONSTRAINT `fk_product_certificate_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
+  ADD CONSTRAINT `fk_product_certificate_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`)  ON DELETE CASCADE;
 
 ALTER TABLE `t_product_certificate` 
   ADD CONSTRAINT `fk_product_certificate_cert` FOREIGN KEY (`certificate_id`) REFERENCES `t_certificate` (`id`);
 
 
 ALTER TABLE `t_product_equipment_connect` 
-  ADD CONSTRAINT `fk_product_equipment_connect_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
+  ADD CONSTRAINT `fk_product_equipment_connect_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`)  ON DELETE CASCADE;
 
 ALTER TABLE `t_product_equipment_connect` 
   ADD CONSTRAINT `fk_product_equipment_connect_equipment` FOREIGN KEY (`equipment_id`) REFERENCES `t_equipment` (`id`);
   
 
 ALTER TABLE `t_product_family_connect` 
-  ADD CONSTRAINT `fk_product_family_connect_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
+  ADD CONSTRAINT `fk_product_family_connect_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `t_product_family_connect` 
   ADD CONSTRAINT `fk_product_family_connect_family` FOREIGN KEY (`family_id`) REFERENCES `t_family` (`id`);
 
 
 ALTER TABLE `t_product_image` 
-  ADD CONSTRAINT `fk_product_image_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
+  ADD CONSTRAINT `fk_product_image_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `t_product_image` 
   ADD CONSTRAINT `fk_product_image_type` FOREIGN KEY (`image_type_id`) REFERENCES `t_image_type` (`id`);
 
 
 ALTER TABLE `t_product_oem_reference` 
-  ADD CONSTRAINT `fk_product_oem_reference_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
+  ADD CONSTRAINT `fk_product_oem_reference_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `t_product_oem_reference` 
   ADD CONSTRAINT `fk_product_oem_reference_brand` FOREIGN KEY (`brand_id`) REFERENCES `t_brand` (`id`);
 
 
 ALTER TABLE `t_product_filter_option` 
-  ADD CONSTRAINT `fk_product_option_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
+  ADD CONSTRAINT `fk_product_option_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `t_product_filter_option` 
   ADD CONSTRAINT `fk_product_option_option` FOREIGN KEY (`filter_option_id`) REFERENCES `t_filter_option` (`id`);
 
 
 ALTER TABLE `t_product_set` 
-  ADD CONSTRAINT `fk_product_set_parent_product` FOREIGN KEY (`parent_product_id`) REFERENCES `t_product` (`id`);
+  ADD CONSTRAINT `fk_product_set_parent_product` FOREIGN KEY (`parent_product_id`) REFERENCES `t_product` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `t_product_set` 
-  ADD CONSTRAINT `fk_product_set_child_product` FOREIGN KEY (`child_product_id`) REFERENCES `t_product` (`id`);
+  ADD CONSTRAINT `fk_product_set_child_product` FOREIGN KEY (`child_product_id`) REFERENCES `t_product` (`id`) ON DELETE CASCADE;
 
 
 ALTER TABLE `t_product_supplier` 
-  ADD CONSTRAINT `fk_product_supplier_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
+  ADD CONSTRAINT `fk_product_supplier_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `t_product_supplier` 
   ADD CONSTRAINT `fk_product_supplier_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `t_supplier` (`id`);
@@ -586,7 +586,7 @@ ALTER TABLE `t_equipment_available_region`
 
 
 ALTER TABLE `t_product_marketing_region` 
-  ADD CONSTRAINT `fk_prod_mkt_reg_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`);
+  ADD CONSTRAINT `fk_prod_mkt_reg_product` FOREIGN KEY (`product_id`) REFERENCES `t_product` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `t_product_marketing_region` 
   ADD CONSTRAINT `fk_prod_mkt_reg_region` FOREIGN KEY (`marketing_region_id`) REFERENCES `t_marketing_region` (`id`);
