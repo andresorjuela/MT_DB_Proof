@@ -386,7 +386,8 @@ paths:
         400:
           $ref: '#/components/responses/400ClientError'
         500:
-          $ref: '#/components/responses/500ServerError'   
+          $ref: '#/components/responses/500ServerError'
+      
   /products/search:
     post:
       summary: Perform an advanced search for products.
@@ -539,6 +540,24 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+    delete:
+      summary: deletes a product
+      tags:
+        - products
+      responses:
+        200:
+          description: returns the product, including extended information
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/DeleteConfirmation'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        410:
+          $ref: '#/components/responses/410ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+          
   /products/${id}/certificates:
     summary: The certificates a product is qualified for.
     parameters:
@@ -1525,6 +1544,16 @@ components:
             type: string
             maxLength: 255
       - $ref: '#/components/schemas/Auditable'
+    DeleteConfirmation:
+      type: object
+      description: The payload of an entity deletion confirmation.
+      allOf:
+        - type: object
+          properties:
+            _affectedRows:
+              type: integer
+              readOnly: true
+            
     Equipment:
       type: object
       description: An equipment model. Equipment represents items that a Product may be compatible with (e.g. can connect to).
@@ -2206,6 +2235,12 @@ components:
   responses:
     400ClientError:
       description: client error
+      content:
+        application/json:
+          schema: 
+            $ref: '#/components/schemas/ApiError'
+    410ClientError:
+      description: client error issued when an id was provided for deletion, but the entity no longer exists
       content:
         application/json:
           schema: 
