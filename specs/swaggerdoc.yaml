@@ -465,9 +465,15 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProductView'    
+                type: object
+                properties:
+                  total:
+                    description: The total number of matching products in the database.
+                    type: integer
+                  product_views:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductView'    
         400:
           $ref: '#/components/responses/400ClientError'
         500:
@@ -1340,9 +1346,15 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/EquipmentView'
+                type: object
+                properties:
+                  total:
+                    description: The total number of matching equipment entities in the database.
+                    type: integer
+                  equipment_views:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EquipmentView'
         400:
           $ref: '#/components/responses/400ClientError'
         500:
@@ -1401,9 +1413,15 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/FamilyView'
+                type: object
+                properties:
+                  total:
+                    description: The total number of matching families in the database.
+                    type: integer
+                  family_views:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FamilyView'
         400:
           $ref: '#/components/responses/400ClientError'
         500:
@@ -1452,9 +1470,15 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Group'
+                type: object
+                properties:
+                  total:
+                    description: The total number of matching groups in the database.
+                    type: integer
+                  groups:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Group'
         400:
           $ref: '#/components/responses/400ClientError'
         500:
