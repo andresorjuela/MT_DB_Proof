@@ -2,8 +2,10 @@ const express = require('express');
 const router = express.Router({ mergeParams: true });
 const _ = require('lodash');
 const { deleteById, fetchById, fetchCount, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, updateById, create, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
+const { fetchManyAnd, resultToCsv} = require('./db-api-ext');
 const debug = require('debug')('medten:routes');
 const {parseSearchTermCriteria} = require('./common');
+const { result } = require('lodash');
 
 const ALLOWED_SEARCH_PARAMETERS = [ 
   'id', 
@@ -76,6 +78,38 @@ router.post('/search', async function (req, res, next) {
   next();
   
 }, fetchMany);
+
+/**
+ * Similar to search endpoint, except all search results are downloaded (up to 100,000 records).
+ */
+router.post('/search/download', async function (req, res, next) {
+  let qopts = parseQueryOptionsFromObject(req.body, ALLOWED_SEARCH_PARAMETERS, ['+id'], 100000);
+  
+  let dao = req.app.locals.Database.ProductView();
+  await dao.fetchMetadata();
+
+  //Which columns are output...
+  qopts.query_options.columns = [];
+  dao.metadata.forEach(m=>{
+    if(['product_name_formula', 'product_description_formula'].includes(m.column)){
+      return;//exclude the formulas from download
+    } else {
+      qopts.query_options.columns.push(m.column);
+    }
+  }); 
+
+  let dbInstructions = {
+    dao: dao,
+    query_options: qopts.query_options,
+    with_total: true,
+    criteria: parseSearchTermCriteria(ALLOWED_SEARCH_PARAMETERS, qopts),
+  };
+
+  res.locals.dbInstructions = dbInstructions;
+  next();
+  
+}, fetchManyAnd, resultToCsv);
+
 
 
 /** Gets an array of all distinct SKUs across all products. Used for validation. A SKU should be globally unique. */

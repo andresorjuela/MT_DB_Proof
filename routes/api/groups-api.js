@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
 let { fetchById, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, fetchCount, create, updateById, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
+const { fetchManyAnd, resultToCsv} = require('./db-api-ext');
 const {parseSearchTermCriteria} = require('./common');
 
 const ALLOWED_SEARCH_PARAMETERS = [
@@ -61,6 +62,33 @@ router.post('/search', async function (req, res, next) {
   next();
   
 }, fetchMany);
+
+/**
+ * Similar to search endpoint, except all search results are downloaded (up to 100,000 records).
+ */
+router.post('/search/download', async function (req, res, next) {
+  let qopts = parseQueryOptionsFromObject(req.body, ALLOWED_SEARCH_PARAMETERS, ['+id'], 100000);
+  
+  let dao = req.app.locals.Database.Group();
+  await dao.fetchMetadata();
+
+  //Which columns are output...
+  qopts.query_options.columns = [];
+  dao.metadata.forEach(m=>{
+    qopts.query_options.columns.push(m.column);
+  }); 
+
+  let dbInstructions = {
+    dao: dao,
+    query_options: qopts.query_options,
+    with_total: true,
+    criteria: parseSearchTermCriteria(ALLOWED_SEARCH_PARAMETERS, qopts),
+  };
+
+  res.locals.dbInstructions = dbInstructions;
+  next();
+  
+}, fetchManyAnd, resultToCsv);
 
 
 /** Get a single group. */

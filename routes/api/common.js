@@ -16,6 +16,7 @@ const _ = require('lodash');
  */
 function parseSearchTermCriteria(allowed_fields, qopts){
   let criteria = new CriteriaHelper();
+  if(qopts.query.search_term_fields){
     criteria.andGroup();
     for(let field_name of qopts.query.search_term_fields){
       if(allowed_fields.includes(field_name)){
@@ -24,30 +25,32 @@ function parseSearchTermCriteria(allowed_fields, qopts){
       //just ignore anything not searchable.
     }
     criteria.groupEnd();
-
+    
     delete qopts.query.search_term_fields;
     delete qopts.query.search_term;
+  }
+  
 
-    let hasOtherFilters = false;
+  let hasOtherFilters = false;
+  for(let field_name in qopts.query){
+    hasOtherFilters = true; break;
+  }
+
+  if(hasOtherFilters){
+    criteria.andGroup();
+    //The rest of the "filters" are ANDed on to the search term query.
     for(let field_name in qopts.query){
-      hasOtherFilters = true; break;
-    }
-
-    if(hasOtherFilters){
-      criteria.andGroup();
-      //The rest of the "filters" are ANDed on to the search term query.
-      for(let field_name in qopts.query){
-        if( _.isArray(qopts.query[field_name]) ){
-          criteria.and(field_name, 'IN', qopts.query[field_name]);
-        } else {
-          criteria.and(field_name, '=', `${qopts.query[field_name]}`);
-        }
-        
+      if( _.isArray(qopts.query[field_name]) ){
+        criteria.and(field_name, 'IN', qopts.query[field_name]);
+      } else {
+        criteria.and(field_name, '=', `${qopts.query[field_name]}`);
       }
-      criteria.groupEnd();
+      
     }
+    criteria.groupEnd();
+  }
 
-    return criteria;
+  return criteria;
 }
 
 exports.parseSearchTermCriteria = parseSearchTermCriteria;
