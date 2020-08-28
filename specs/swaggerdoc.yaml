@@ -267,6 +267,30 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /dataload/${entity}/download:
+    post:
+      summary: download the contents of a database table (up to 100,000 rows)
+      tags:
+        - dataload
+      parameters:
+        - in: path
+          required: true
+          name: entity
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content: {}
+          
+      responses:
+        200:
+          description: OK
+          content:
+            text/csv: {}
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   /products:
     get:
       summary: find products using a simple search
