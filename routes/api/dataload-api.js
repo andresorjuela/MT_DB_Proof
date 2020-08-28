@@ -3,7 +3,9 @@ const _ = require('lodash');
 const {parse} = require('fast-csv');
 
 let router = express.Router({ mergeParams: true });
-let { fetchOne, fetchById, fetchCount, fetchMany, deleteMatching, parseQueryOptions, updateById, create, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
+const { parseQueryOptionsFromObject } = require('@apigrate/mysqlutils/lib/express/db-api');
+const {fetchManyAnd, resultToCsv} = require('./db-api-ext');
+
 let debug = require('debug')('medten:routes');
 
 
@@ -137,6 +139,31 @@ router.post('/:entity/bulkupdate', validateDao, async function (req, res, next) 
 
   
 });
+
+
+/** Downloads an entire table of data. */
+router.post('/:entity/download', validateDao, async function (req, res, next) {
+ //Which columns are output...
+  let query_options = {
+    columns: [],
+    limit: 100000
+  };
+  
+  res.locals.dao.metadata.forEach(m=>{
+    query_options.columns.push(m.column);
+  }); 
+
+  let dbInstructions = {
+    dao: res.locals.dao,
+    query_options: query_options,
+    with_total: true,
+    criteria: {}
+  };
+
+  res.locals.dbInstructions = dbInstructions;
+  next();
+  
+}, fetchManyAnd, resultToCsv);
 
 
 /**
