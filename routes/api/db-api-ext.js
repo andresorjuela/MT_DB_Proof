@@ -2,7 +2,8 @@
 
 const _ = require('lodash');
 const { writeToStream } = require('@fast-csv/format');
-
+const debug = require('debug')('medten:routes');
+const dbdebug = require('debug')('gr8:db');
 
 /**
   Handles a request to query entities by a criteria where many entities can be returned, but instead of returning a JSON response, it 
@@ -94,6 +95,67 @@ exports.fetchManyAnd = async function(req, res, next) {
 }
 
 
+
+/**
+ * Intended for complex queries. This runs a native SQL statement (you must provide it on the dbInstructions.sql), returning the results on a `res.locals.result` object.
+ * @param {*} req 
+ * @param {*} res
+ * @param {object} res.locals.dbInstructions provide a `dbInstructions` object as documented below.
+ * @param {object} res.locals.dbInstructions.dao connector to provide database access
+ * @param {object} res.locals.dbInstructions.sql  (optional) if a total is desired of all matching entities, submit this with `statement` (string) and `parms` (array) properties 
+ * @param {object} res.locals.dbInstructions.sql_count (optional) if a total is desired of all matching entities, submit this with `statement` and `parms` properties
+ * 
+ * @param {*} next 
+ */
+exports.fetchManySqlAnd = async function(req, res, next){
+  try {
+    let dbi = res.locals.dbInstructions;
+    if (_.isEmpty(dbi)) {
+      res.status(400).json({message:'Unable to get data.',error:'Missing payload.'});
+      return;
+    }
+    if (_.isEmpty(dbi.sql)){
+      res.status(400).json({ message:'Unable to get data.',error: "Missing query." });
+      return;
+    }
+
+    let result = {};
+
+    if (dbi.sql_count){
+      dbdebug(`sql count statement...`);
+      dbdebug(`  query sql: ${dbi.sql_count.statement}\n  query parms: ${JSON.stringify(dbi.sql_count.parms)}`);
+      let temp = await dbi.dao.sqlCommand(dbi.sql_count.statement, dbi.sql_count.parms);
+      dbdebug(`result: ${JSON.stringify(temp)}`);
+      result.total = temp[0].count;
+      if(result.total === 0){
+        //Don't bother with the full query and return immediately.
+        result[dbi.dao.plural] = [];
+        
+        res.locals.result = result;
+        
+        next();
+        return;
+      }
+    }
+
+    if (dbi.sql){
+      dbdebug(`sql statement...`);
+      dbdebug(`  query sql: ${dbi.sql.statement}\n  query parms: ${JSON.stringify(dbi.sql.parms)}`);
+      let temp = await dbi.dao.sqlCommand(dbi.sql.statement, dbi.sql.parms);
+      dbdebug(`  result count: ${temp.length}`);
+      // debug(JSON.stringify(temp));
+      result[dbi.dao.plural] = temp;
+    }
+    
+    res.locals.result = result;
+    next();
+
+  } catch (ex) {
+    next(ex);
+  }
+}
+
+
 exports.resultToCsv = async function(req, res, next){
   try{
     let dbi = res.locals.dbInstructions;
@@ -116,6 +178,23 @@ exports.resultToCsv = async function(req, res, next){
     res.status(200);
     res.type("csv");
     writeToStream(res, res.locals.result[dbi.dao.plural], fileOpts );
+
+    return;    
+    
+  }catch(ex){
+    next(ex);
+  }
+}
+
+exports.resultToJson = async function(req, res, next){
+  try{
+
+    if (!res.locals.result){
+      res.status(500).json({ message:'Invalid configuration.',error: "The expected parameters/query result were not available." });
+      return;
+    }
+
+    res.status(200).json(res.locals.result);
 
     return;    
     

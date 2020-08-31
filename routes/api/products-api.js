@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router({ mergeParams: true });
 const _ = require('lodash');
 const { deleteById, fetchById, fetchCount, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, updateById, create, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
-const { fetchManyAnd, resultToCsv} = require('./db-api-ext');
+const { CriteriaHelper } = require('@apigrate/mysqlutils');
+const { fetchManySqlAnd, resultToCsv, resultToJson} = require('./db-api-ext');
 const debug = require('debug')('medten:routes');
 const {parseSearchTermCriteria} = require('./common');
 const { result } = require('lodash');
@@ -26,9 +27,57 @@ const ALLOWED_SEARCH_PARAMETERS = [
   'category_id',
   'category_en',
   'category_zh',
+  'certificate_id',
   'search_term',
-  'search_term_fields'
+  'search_term_fields',
+  'created',
+  'updated'
 ];
+
+const SEARCH_FILTERS = {
+  "brand": {
+    where_column: "oem_brand_id",
+  },
+  "certificate": {
+    table: "t_product_certificate",
+    join_column: "product_id",
+    where_column: "certificate_id",
+  },
+  "custom attribute": {
+    table: "t_product_custom_attribute",
+    join_column: "product_id",
+    where_column: "custom_attribute_id",
+  },
+  "image type": {
+    table: "t_product_image",
+    join_column: "product_id",
+    where_column: "image_type_id",
+  },
+  "lifecycle": {
+    where_column: "lifecycle_id",
+  },
+  "marketing region": {
+    table: "t_product_marketing_region",
+    join_column: "product_id",
+    where_column: "marketing_region_id",
+  },
+  "packaging factor": {
+    where_column: "packaging_factor_id",
+  },
+  "supplier": {
+    table: "t_product_supplier",
+    join_column: "product_id",
+    where_column: "supplier_id",
+  },
+  "oem reference": {
+    table: "t_product_oem_reference",
+    join_column: "product_id",
+    where_column: "name",
+  },
+  "product type": {
+    where_column: "product_type_id",
+  },
+};
 
 /** Query for products using a simple parametric search. Array values not supported. */
 router.get('/', async function (req, res, next) {
@@ -65,50 +114,174 @@ router.get('/', async function (req, res, next) {
  * 
 */
 router.post('/search', async function (req, res, next) {
-  let qopts = parseQueryOptionsFromObject(req.body, ALLOWED_SEARCH_PARAMETERS, ['+name_en', '+id'], 1000);
+  // let qopts = parseQueryOptionsFromObject(req.body, ALLOWED_SEARCH_PARAMETERS, ['+name_en', '+id'], 1000);
+
+  let payload = {};
+  Object.assign(payload, req.body);
+  let dao = req.app.locals.Database.ProductView();
+
+  let queries = await parseProductSearchRequest(dao, payload);
   
   let dbInstructions = {
-    dao: req.app.locals.Database.ProductView(),
-    query_options: qopts.query_options,
-    with_total: true,
-    criteria: parseSearchTermCriteria(ALLOWED_SEARCH_PARAMETERS, qopts)
+    dao: dao,
+    sql: queries.sql,
+    sql_count: queries.sql_count,
   };
 
   res.locals.dbInstructions = dbInstructions;
   next();
   
-}, fetchMany);
+}, fetchManySqlAnd, resultToJson);
+
 
 /**
  * Similar to search endpoint, except all search results are downloaded (up to 100,000 records).
  */
 router.post('/search/download', async function (req, res, next) {
-  let qopts = parseQueryOptionsFromObject(req.body, ALLOWED_SEARCH_PARAMETERS, ['+id'], 100000);
   
+  let payload = {};
+  Object.assign(payload, req.body);
   let dao = req.app.locals.Database.ProductView();
+
+  let queries = await parseProductSearchRequest(dao, payload);
+  
+  let dbInstructions = {
+    dao: dao,
+    sql: queries.sql,
+    sql_count: queries.sql_count,
+  };
+
+  res.locals.dbInstructions = dbInstructions;
+  
+  next();
+  
+}, fetchManySqlAnd, resultToCsv);
+
+/**
+ * Parses a search and search count query for use with complex product searches.
+ * @param {object} payload typically the req.body
+ */
+async function parseProductSearchRequest(dao, payload){
+  // parse search term fields
+  // parse category search fields
+  // parse filter fields
+  // parse standard query options (offset, limit, order_by)
+  
+
+  let result = {sql:{statement:null, parms:null}, sql_count:{statement:null, parms:null}};
+
   await dao.fetchMetadata();
 
   //Which columns are output...
-  qopts.query_options.columns = [];
+  let columns = [];
   dao.metadata.forEach(m=>{
     if(['product_name_formula', 'product_description_formula'].includes(m.column)){
       return;//exclude the formulas from download
     } else {
-      qopts.query_options.columns.push(m.column);
+      columns.push(`v.${m.column}`);
     }
   }); 
 
-  let dbInstructions = {
-    dao: dao,
-    query_options: qopts.query_options,
-    with_total: true,
-    criteria: parseSearchTermCriteria(ALLOWED_SEARCH_PARAMETERS, qopts),
-  };
 
-  res.locals.dbInstructions = dbInstructions;
-  next();
+  let qs =  `select ${columns.join(',')} from ${dao.table} v `;
+  let count_qs = `select count(*) as count from ${dao.table} v `;
+  let join = ``; 
+  let optsclause = ``;
+  let criteria = new CriteriaHelper();
   
-}, fetchManyAnd, resultToCsv);
+  // parse search term fields.
+  if(payload.search_term_fields){
+    criteria.andGroup();
+    for(let field_name of payload.search_term_fields){
+      if(ALLOWED_SEARCH_PARAMETERS.includes(field_name)){
+        criteria.or(field_name, 'LIKE', `%${payload.search_term}%`);
+      }
+      //just ignore anything not searchable.
+    }
+    criteria.groupEnd();
+    
+    delete payload.search_term_fields;
+    delete payload.search_term;
+  }
+
+  // parse category search fields
+  if(payload.category_id){
+    criteria.andGroup();
+    if( _.isArray(payload.category_id) ){
+      criteria.and('category_id', 'IN', payload.category_id);
+    } else {
+      criteria.and('category_id', '=', `${payload.category_id}`);
+    }
+    criteria.groupEnd();
+  }
+
+  // parse search filters
+  if(payload.search_filter){
+    let filter = SEARCH_FILTERS[payload.search_filter];
+    if(filter){
+      criteria.andGroup();
+      if(filter.table){
+        //Need to do a join.
+        join = `JOIN ${filter.table} J on J.product_id = v.id`; //CUSTOMIZE THIS
+        criteria.and(`J.${filter.where_column}`, '=', payload.search_filter_value);
+      } else {
+        criteria.and(filter.where_column, '=', payload.search_filter_value);
+      }
+      criteria.groupEnd();
+    }
+    delete payload.search_filter;
+    delete payload.search_filter_value;
+  }
+
+  //Done building the where.
+  where = criteria.whereClause;
+
+  // parse options clause
+  if(payload.order_by && ALLOWED_SEARCH_PARAMETERS.includes(payload.order_by)){
+    optsclause += ` ORDER BY`;
+    let tmp = ``;
+    payload.order_by.forEach(col=>{
+      if(tmp) tmp += `,`;
+      if(col.startsWith('+')){
+        tmp += ` ${col.substring(1)} ASC`;
+      } else if (col.startsWith('-')){
+        tmp += ` ${col.substring(1)} DESC`;
+      } else {
+        tmp += ` ${col} ASC`;
+      }
+    });
+    optsclause += tmp;
+  }
+  if(payload.limit && _.isFinite(payload.limit)){
+    if(payload.limit < 0 || payload.limit > 100000){
+      payload.limit = 100000;
+    }
+    optsclause += ` LIMIT ${payload.limit}`;
+  }
+  if(payload.offset && _.isFinite(payload.offset)){
+    if(payload.offset < 0 || payload.offset > 100000){
+      payload.offset = 100000;
+    }
+    optsclause += ` OFFSET ${payload.offset}`;
+  }
+
+  let fullQuery = `${qs} ${join} WHERE ${criteria.whereClause} ${optsclause}`;
+  let fullCountQuery = `${count_qs} ${join} WHERE ${criteria.whereClause}`;
+  debug(fullQuery);
+  debug(fullCountQuery);
+
+  result.sql = {
+    statement: fullQuery,
+    parms: criteria.parms,
+  }
+  result.sql_count = {
+    statement: fullCountQuery,
+    parms: criteria.parms,
+  }
+  return result;
+}
+
+
 
 
 
@@ -354,12 +527,35 @@ router.get('/:product_id/sets', function (req, res, next) {
 }, fetchMany);
 
 /** Save all product sets values. */
-router.post('/:product_id/set', function (req, res, next) {
+router.post('/:product_id/sets', function (req, res, next) {
   res.locals.dbInstructions = {
     dao: req.app.locals.Database.ProductSet(),
     toSave: req.body, //assuming an array of objects
     query: {parent_product_id: req.params.product_id},
     comparison: function(obj){ return `${obj.child_product_id}|${obj.quantity}`; }
+  };
+  next();
+}, saveAll);
+
+
+/** Get product supplier values. */
+router.get('/:product_id/suppliers', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductSupplier(),
+    query: {product_id: req.params.product_id},
+    //query_options: q.query_options
+  }
+  next();
+}, fetchMany);
+
+
+/** Save all product supplier values. */
+router.post('/:product_id/suppliers', function (req, res, next) {
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.ProductSupplier(),
+    toSave: req.body, //assuming an array of objects
+    query: {product_id: req.params.product_id},
+    comparison: function(obj){ return `${obj.supplier_id}|${obj.supplier_price}`; }
   };
   next();
 }, saveAll);
