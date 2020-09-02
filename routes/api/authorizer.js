@@ -97,8 +97,16 @@ async function authorizer(req, res, next) {
     let token = auth(req); 
     debug(`${req.method} ${req.originalUrl}`);
     if (!token){
-      debug(`No credentials found.`);
-      return deny(req, res);//No token present/parsed
+
+      //Allow it to be provided as a request parameter.
+      if(req.query.token){
+        token = auth.parse(req.query.token);
+      }
+
+      if(!token){
+        debug(`No credentials found.`);
+        return deny(req, res);//No token present/parsed
+      }
     } 
 
     let principal = lookupAuthFromCache(req, token.pass);
