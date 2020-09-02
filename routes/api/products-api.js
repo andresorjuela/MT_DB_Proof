@@ -114,24 +114,21 @@ router.get('/', async function (req, res, next) {
  * 
 */
 router.post('/search', async function (req, res, next) {
-  // let qopts = parseQueryOptionsFromObject(req.body, ALLOWED_SEARCH_PARAMETERS, ['+name_en', '+id'], 1000);
-
+  
   let payload = {};
   Object.assign(payload, req.body);
-  let dao = req.app.locals.Database.ProductView();
-
-  let queries = await parseProductSearchRequest(dao, payload);
   
-  let dbInstructions = {
-    dao: dao,
-    sql: queries.sql,
-    sql_count: queries.sql_count,
+  res.locals.dbInstructions = {
+    search_payload: payload,
+    dao: req.app.locals.Database.ProductView(),
+    sql: null,
+    sql_count: null
   };
-
-  res.locals.dbInstructions = dbInstructions;
+  
   next();
   
-}, fetchManySqlAnd, resultToJson);
+}, parseProductSearchRequest, fetchManySqlAnd, resultToJson);
+
 
 
 /**
@@ -141,144 +138,215 @@ router.post('/search/download', async function (req, res, next) {
   
   let payload = {};
   Object.assign(payload, req.body);
-  let dao = req.app.locals.Database.ProductView();
-
-  let queries = await parseProductSearchRequest(dao, payload);
   
-  let dbInstructions = {
-    dao: dao,
-    sql: queries.sql,
-    sql_count: queries.sql_count,
+  res.locals.dbInstructions = {
+    search_payload: payload,
+    dao: req.app.locals.Database.ProductView(),
+    sql: null,
+    sql_count: null
   };
+  
+  next();
+}, parseProductSearchRequest, fetchManySqlAnd, resultToCsv);
 
-  res.locals.dbInstructions = dbInstructions;
+/**
+ * Similar to search endpoint, except all search results are downloaded (up to 100,000 records).
+ */
+router.post('/search/download', async function (req, res, next) {
+  
+  let payload = {};
+  Object.assign(payload, req.body);
+  
+  res.locals.dbInstructions = {
+    search_payload: payload,
+    dao: req.app.locals.Database.ProductView(),
+    sql: null,
+    sql_count: null
+  };
   
   next();
   
-}, fetchManySqlAnd, resultToCsv);
+}, parseProductSearchRequest, fetchManySqlAnd, resultToCsv);
+
+router.get('/search/download', async function (req, res, next) {
+  if(!req.query.token){
+    //TODO: handle in authorizer.
+    res.status(403).end();
+  }
+  if(!req.query.payload){
+    res.status(400).json({message: "Unable to download.", error: "Invalid parameters."});
+  }
+  try{
+    let payload = {};
+    Object.assign(payload, JSON.parse(req.query.payload));
+    
+    res.locals.dbInstructions = {
+      search_payload: payload,
+      dao: req.app.locals.Database.ProductView(),
+      sql: null,
+      sql_count: null
+    };
+   
+    next();
+  }catch(ex){
+    console.error(ex);
+    res.status(400).json({message: "Download failed.", error: ex.message});
+  }
+
+  
+}, parseProductSearchRequest, fetchManySqlAnd, resultToCsv);
 
 /**
- * Parses a search and search count query for use with complex product searches.
+ * Middleware that Parses a search and search count query for use with complex product searches.
+ * 
+ * A `res.locals.dbInstructions` object must be present with dao and search_payload properties set.
+ * 
+ * Upon completion it places res.local.dbInstructions with a `sql` and `sql_count` object as appropriate.
  * @param {object} payload typically the req.body
  */
-async function parseProductSearchRequest(dao, payload){
-  // parse search term fields
-  // parse category search fields
-  // parse filter fields
-  // parse standard query options (offset, limit, order_by)
+async function parseProductSearchRequest(req, res, next){
   
+  try {
+    // parse search term fields
+    // parse category search fields
+    // parse filter fields
+    // parse standard query options (offset, limit, order_by)
+    let dao = res.locals.dbInstructions.dao;
+    let payload = res.locals.dbInstructions.search_payload;
 
-  let result = {sql:{statement:null, parms:null}, sql_count:{statement:null, parms:null}};
+    await dao.fetchMetadata();
 
-  await dao.fetchMetadata();
-
-  //Which columns are output...
-  let columns = [];
-  dao.metadata.forEach(m=>{
-    if(['product_name_formula', 'product_description_formula'].includes(m.column)){
-      return;//exclude the formulas from download
-    } else {
-      columns.push(`v.${m.column}`);
-    }
-  }); 
-
-
-  let qs =  `select ${columns.join(',')} from ${dao.table} v `;
-  let count_qs = `select count(*) as count from ${dao.table} v `;
-  let join = ``; 
-  let optsclause = ``;
-  let criteria = new CriteriaHelper();
-  
-  // parse search term fields.
-  if(payload.search_term_fields){
-    criteria.andGroup();
-    for(let field_name of payload.search_term_fields){
-      if(ALLOWED_SEARCH_PARAMETERS.includes(field_name)){
-        criteria.or(field_name, 'LIKE', `%${payload.search_term}%`);
-      }
-      //just ignore anything not searchable.
-    }
-    criteria.groupEnd();
-    
-    delete payload.search_term_fields;
-    delete payload.search_term;
-  }
-
-  // parse category search fields
-  if(payload.category_id){
-    criteria.andGroup();
-    if( _.isArray(payload.category_id) ){
-      criteria.and('category_id', 'IN', payload.category_id);
-    } else {
-      criteria.and('category_id', '=', `${payload.category_id}`);
-    }
-    criteria.groupEnd();
-  }
-
-  // parse search filters
-  if(payload.search_filter){
-    let filter = SEARCH_FILTERS[payload.search_filter];
-    if(filter){
-      criteria.andGroup();
-      if(filter.table){
-        //Need to do a join.
-        join = `JOIN ${filter.table} J on J.product_id = v.id`; //CUSTOMIZE THIS
-        criteria.and(`J.${filter.where_column}`, '=', payload.search_filter_value);
+    //Which columns are output...
+    let columns = [];
+    dao.metadata.forEach(m=>{
+      if(['product_name_formula', 'product_description_formula'].includes(m.column)){
+        return;//exclude the formulas from download
       } else {
-        criteria.and(filter.where_column, '=', payload.search_filter_value);
+        columns.push(`v.${m.column}`);
+      }
+    }); 
+
+
+    let qs =  `select ${columns.join(',')} from ${dao.table} v `;
+    let count_qs = `select count(*) as count from ${dao.table} v `;
+    let join = ``; 
+    let optsclause = ``;
+    let criteria = new CriteriaHelper({omitIfEmpty: false});
+    
+    // parse search term fields.
+    if(payload.search_term_fields && payload.search_term_fields.length > 0){
+      criteria.andGroup();
+      for(let field_name of payload.search_term_fields){
+        if(ALLOWED_SEARCH_PARAMETERS.includes(field_name)){
+          criteria.or(field_name, 'LIKE', `%${payload.search_term}%`);
+        }
+        //just ignore anything not searchable.
+      }
+      criteria.groupEnd();
+      
+      delete payload.search_term_fields;
+      delete payload.search_term;
+    }
+
+    // parse category search fields
+    if(payload.category_id){
+      criteria.andGroup();
+      if( _.isArray(payload.category_id) ){
+        criteria.and('category_id', 'IN', payload.category_id);
+      } else {
+        criteria.and('category_id', '=', `${payload.category_id}`);
       }
       criteria.groupEnd();
     }
-    delete payload.search_filter;
-    delete payload.search_filter_value;
-  }
 
-  //Done building the where.
-  where = criteria.whereClause;
-
-  // parse options clause
-  if(payload.order_by && ALLOWED_SEARCH_PARAMETERS.includes(payload.order_by)){
-    optsclause += ` ORDER BY`;
-    let tmp = ``;
-    payload.order_by.forEach(col=>{
-      if(tmp) tmp += `,`;
-      if(col.startsWith('+')){
-        tmp += ` ${col.substring(1)} ASC`;
-      } else if (col.startsWith('-')){
-        tmp += ` ${col.substring(1)} DESC`;
+    // parse search filters
+    if(payload.search_filter && payload.search_filter_value){
+      let filter = SEARCH_FILTERS[payload.search_filter];
+      // if(!payload.search_filter_value){
+      //   res.status(400).json({
+      //     message:`Missing search_filter_value.`,
+      //     error: `When using the search_filter parameter, the search_filter_value is parameter is required and may not be empty.`
+      //   });
+      // }
+      if(filter){
+        criteria.andGroup();
+        if(filter.table){
+          //Need to do a join.
+          join = `JOIN ${filter.table} J on J.product_id = v.id`; //CUSTOMIZE THIS
+          criteria.and(`J.${filter.where_column}`, '=', payload.search_filter_value);
+        } else {
+          criteria.and(filter.where_column, '=', payload.search_filter_value);
+        }
+        criteria.groupEnd();
       } else {
-        tmp += ` ${col} ASC`;
+        let allowed = [];
+        for(let f in SEARCH_FILTERS){
+          allowed.push(f);
+        }
+        res.status(400).json({
+          message:`Invalid search_filter "${payload.search_filter}".`,
+          error: `When using the search_filter parameter, you may use any of: [${allowed.join(", ")}].`
+        });
       }
+      delete payload.search_filter;
+      delete payload.search_filter_value;
+    }
+
+    //Done building the where.
+
+    // parse options clause
+    if(payload.order_by && ALLOWED_SEARCH_PARAMETERS.includes(payload.order_by)){
+      optsclause += ` ORDER BY`;
+      let tmp = ``;
+      payload.order_by.forEach(col=>{
+        if(tmp) tmp += `,`;
+        if(col.startsWith('+')){
+          tmp += ` ${col.substring(1)} ASC`;
+        } else if (col.startsWith('-')){
+          tmp += ` ${col.substring(1)} DESC`;
+        } else {
+          tmp += ` ${col} ASC`;
+        }
+      });
+      optsclause += tmp;
+    }
+    if(payload.limit && _.isFinite(payload.limit)){
+      if(payload.limit < 0 || payload.limit > 100000){
+        payload.limit = 100000;
+      }
+      optsclause += ` LIMIT ${payload.limit}`;
+    }
+    if(payload.offset && _.isFinite(payload.offset)){
+      if(payload.offset < 0 || payload.offset > 100000){
+        payload.offset = 100000;
+      }
+      optsclause += ` OFFSET ${payload.offset}`;
+    }
+
+    let where = '';
+    if(criteria.whereClause){
+      where = `WHERE ${criteria.whereClause}`;
+    }
+    let fullQuery = `${qs} ${join} ${where} ${optsclause}`;
+    let fullCountQuery = `${count_qs} ${join} ${where}`;
+
+    res.locals.dbInstructions.sql = {
+      statement: fullQuery,
+      parms: criteria.parms,
+    }
+    res.locals.dbInstructions.sql_count = {
+      statement: fullCountQuery,
+      parms: criteria.parms,
+    }
+
+    next(); 
+  } catch (ex){
+    console.error(ex);
+    res.status(400).json({
+      message:`Unable to parse search.`,
+      error: ex.message
     });
-    optsclause += tmp;
   }
-  if(payload.limit && _.isFinite(payload.limit)){
-    if(payload.limit < 0 || payload.limit > 100000){
-      payload.limit = 100000;
-    }
-    optsclause += ` LIMIT ${payload.limit}`;
-  }
-  if(payload.offset && _.isFinite(payload.offset)){
-    if(payload.offset < 0 || payload.offset > 100000){
-      payload.offset = 100000;
-    }
-    optsclause += ` OFFSET ${payload.offset}`;
-  }
-
-  let fullQuery = `${qs} ${join} WHERE ${criteria.whereClause} ${optsclause}`;
-  let fullCountQuery = `${count_qs} ${join} WHERE ${criteria.whereClause}`;
-  debug(fullQuery);
-  debug(fullCountQuery);
-
-  result.sql = {
-    statement: fullQuery,
-    parms: criteria.parms,
-  }
-  result.sql_count = {
-    statement: fullCountQuery,
-    parms: criteria.parms,
-  }
-  return result;
 }
 
 

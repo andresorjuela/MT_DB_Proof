@@ -429,47 +429,60 @@ paths:
               - $ref: '#/components/schemas/SearchCriteria'
               - type: object
                 properties:
-                  id:
-                    type: integer
-                    description: the product id
-                  sku:
+                  search_term:
                     type: string
-                  oem:
+                    description: wildcard search value to be used for searching any/all of the `search_term_fields`
+                  search_term_fields:
+                    description: which product fields the search term is applied to
+                    type: array
+                    items:
+                      type: string
+                      enum: [sku, oem, name_en, category_en]
+                  search_filter:
                     type: string
-                  name_en:
-                    type: string
-                  name_zh:
-                    type: string
-                  oem_brand_id:
-                    type: integer
-                  oem_brand_en:
-                    type: string
-                  oem_brand_zh:
-                    type: string
-                  description_en:
-                    type: string
-                  description_zh:
-                    type: string
-                  product_type_en:
-                    type: string
-                  product_type_zh:
-                    type: string
-                  family_id:
-                    type: integer
-                  family_code:
-                    type: string
-                  family_name_en:
-                    type: string
+                    enum: [brand, certificate, custom attribute, image type, lifecycle, marketing region, packaging factor, supplier, oem reference, product type]
+                    description: >
+                      the type of filtering criteria to further refine results.
+                  search_filter_value:
+                    oneOf:
+                      - type: integer
+                      - type: string
+                    description: >
+                      The value to be used in the search filter criteria depends on the
+                      value used for the `search_filter`
+
+                        | search_filter | value is a(n) | matching |
+                        |---------------|------------|----------|
+                        | brand | integer | brand id 
+                        | certificate | integer | certificate id
+                        | custom attribute | integer | attribute id 
+                        | image type | integer | image type id
+                        | lifecycle | integer | lifecycle id
+                        | marketing region | integer | marketing region id
+                        | packaging factor | integer | packaging factor id
+                        | supplier | integer | supplier id
+                        | oem reference | string | name of oem reference 
+                        | product type | integer | product type id
                   category_id:
-                    type: integer
-                    description: The category for the product search. Note, the API can  accept multiple values, which will be treated together as a UNION (OR) criteria. *If specifying multiple category_id options, provide the value as an array of integers.*
-                  category_en:
-                    type: string
-                  category_zh:
-                    type: string        
+                    type: array
+                    description: The categories to add to the product search filtering. Specifying more than one category widens the search results.
+                   
             examples:
               example1:
-                description: Search for products having a `sku` and `oem` for `SA-024` (wildcard), **and** that have `oem_brand_id` = `3`, **and** that belong to either `category_id` `3` or `4`. Order the results by `oem`. Skip the first result, and limit the results to `10` entries.
+                description: >
+                  Search for products having a `sku` and `oem` for `SA-024` (wildcard),
+
+                  
+                  **and** that belong to either `category_id` `4` or `7`. 
+                  
+                  
+                  **and** further apply a filter to get results that are associated with `brand` = `3`.
+                  
+                  
+                  Order the results by `oem`. 
+                  
+
+                  Skip the first result, and limit the results to `10` entries.
                 value:
                   offset: 1
                   limit: 10
@@ -479,10 +492,12 @@ paths:
                   search_term_fields:
                     - sku
                     - oem
-                  oem_brand_id: 3
                   category_id:
                     - 4
                     - 7
+                  search_filter: brand
+                  search_filter_value: 3
+                  
       responses:
         200:
           description: OK
@@ -503,6 +518,31 @@ paths:
         500:
           $ref: '#/components/responses/500ServerError'
   /products/search/download:
+    get: 
+      summary: Downlaod a search for products with CSV output.
+      description: Identical to `/products/search` except the output is downloaded as a CSV file
+      tags:
+        - products
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+          description: API token - same as used during BASIC Authentication
+        - in: query
+          name: payload
+          schema:
+            type: string
+          description: Build an object as you would for the `/products/search` endpoint, stringify it, and urlencode it. 
+      responses:
+        200:
+          description: OK
+          content:
+            text/csv: {}
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
     post:
       summary: Downlaod a search for products with CSV output.
       description: Identical to `/products/search` except the output is downloaded as a CSV file
@@ -1053,7 +1093,7 @@ paths:
           $ref: '#/components/responses/500ServerError'
     post:
       summary: replaces the marketing regions for a product
-      description: Replaces the current marketing regions for a product, adding those that need to be added, updating any existing, and removing any that no longer match the payload. Marketing regions are differentiated by the `image_link` and `marketing_region_id` property.
+      description: Replaces the current marketing regions for a product, adding those that need to be added, updating any existing, and removing any that no longer match the payload. Marketing regions are differentiated by the `marketing_region_id` property.
       tags:
         - products
       requestBody:
@@ -2508,6 +2548,7 @@ components:
             description: the list of fields you want the `search_term` to apply to. The criteria will be applied as a (OR) when conducting the search across more than one field.
             items:
               type: string
+          
     SimpleMessage:
       type: object
       description: A message from the server. 
