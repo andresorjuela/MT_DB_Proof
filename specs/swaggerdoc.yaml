@@ -1337,6 +1337,68 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /products/${id}/suppliers:
+    summary: The suppliers for a product. 
+    parameters:
+    - name: id
+      in: path
+      description: the product id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets all suppliers for a product
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product_suppliers:
+                    type: array
+                    items:  
+                      $ref: '#/components/schemas/ProductSupplier'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    post:
+      summary: replaces the suppliers for a product.
+      description: >
+        Replaces the current suppliers for a product, adding those that need to be added, updating any existing, 
+        and removing any that no longer match the payload. 
+        Supplier references are differentiated by the `supplier_id` property.
+      tags:
+        - products
+      requestBody:
+        description: >
+          The suppliers for the product
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:  
+                $ref: '#/components/schemas/ProductSupplier'
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:  
+                  $ref: '#/components/schemas/ProductSupplier'
+              
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   /equipment:
     get:
       summary: searches for equipment
@@ -2631,6 +2693,22 @@ components:
             type: string
             description: the quantity (count) of the child product for the set
             maxLength: 255
+      - $ref: '#/components/schemas/Auditable'
+    ProductSupplier:
+      type: object
+      description: The Supplier reference for a product.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+          product_id:
+            type: integer
+          supplier_id:
+            type: integer
+          supplier_price:
+            type: number
+            description: the supplier price for the product
       - $ref: '#/components/schemas/Auditable'
     SearchCriteria:
       type: object
