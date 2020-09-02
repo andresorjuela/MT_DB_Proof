@@ -23,6 +23,7 @@ module.exports = function (pool) {
   // administrative tables
   factory.Account               = ()=>{ return create_dao('t_account', 'account', standard_opts, null); };
   factory.User                  = ()=>{ return create_dao('t_user', 'user', standard_opts, null); };
+  factory.UserRole              = ()=>{ return create_dao('t_user_role', 'user_role', standard_opts, null); };
   factory.ApiKey                = ()=>{ return create_dao('t_api_key', 'api_key', standard_opts, null); };
   
 

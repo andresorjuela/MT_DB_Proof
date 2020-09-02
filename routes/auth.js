@@ -133,9 +133,9 @@ router.post('/login', async function(req, res, next) {
     let principal = user;
     principal.type = "user"
 
-    //Lastly get the roles for the user if any. (future?)
-    // let user_roles = await res.app.locals.Database.UserRole().find({user_id: user.id});
-    // principal.roles = user_roles ? user_roles.map(ur=>{return ur.role}) : [];
+    //Lastly get the roles for the user if any. 
+    let user_roles = await res.app.locals.Database.UserRole().find({user_id: user.id});
+    principal.roles = user_roles && user_roles.length > 0 ? user_roles.map(ur=>{return ur.role}) : ["regular"];
 
     res.status(200).json({
       apikey,

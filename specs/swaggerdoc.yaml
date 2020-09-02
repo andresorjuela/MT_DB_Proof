@@ -188,6 +188,57 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /suppliers:
+    summary: Suppliers of equipment.
+    parameters:
+    - name: id
+      in: query
+      description: a specific supplier id
+      required: false
+      schema:
+        type: integer
+    - name: name_en
+      in: query
+      description: name of the supplier (Englisth)
+      required: false
+      schema:
+        type: string
+    - name: name_zh
+      in: query
+      description: name of the supplier (Chinese)
+      required: false
+      schema:
+        type: string
+    get:
+      summary: searches for equipment models
+      tags:
+        - general
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  equipment_models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        model:
+                          type: string
+                        brand_id:
+                          type: integer
+                        brand_en:
+                          type: string
+                        brand_zh:
+                          type: string
+
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
     
   /dataload/${entity}/metadata:
     get:
@@ -2132,6 +2183,13 @@ components:
                 type:
                   type: string
                   maxLength: 255
+                roles:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - regular
+                      - admin
     Product:
       type: object
       description: A medical product.
