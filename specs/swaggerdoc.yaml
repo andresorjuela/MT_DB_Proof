@@ -142,6 +142,53 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /equipment_models:
+    summary: Models used across all equipment.
+    description: An equipment is any entity having a model number that could potentially be assigned to a product.
+    parameters:
+    - name: brand_id
+      in: query
+      description: the brand id to narrow the search
+      required: false
+      schema:
+        type: integer
+    - name: model_search
+      in: query
+      description: the search string to perform a wildcard search across all models 
+      required: false
+      schema:
+        type: string
+    get:
+      summary: searches for equipment models
+      tags:
+        - general
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  equipment_models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        model:
+                          type: string
+                        brand_id:
+                          type: integer
+                        brand_en:
+                          type: string
+                        brand_zh:
+                          type: string
+
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    
   /dataload/${entity}/metadata:
     get:
       summary: get table metadata (field and data-type information).
@@ -1239,7 +1286,6 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
-  # /families:
   /equipment:
     get:
       summary: searches for equipment
@@ -1846,11 +1892,15 @@ components:
             type: string
             maxLength: 255
           product_name_formula_id:
-            description: Identifies a stored **Formula** that can be used to auto-generate product names.
+            description: Identifies a stored **Formula** that can be used to auto-generate product names (title)
             type: string
             maxLength: 255
           product_description_formula_id:
             description: Identifies a stored **Formula** that can be used to auto-generate product descriptions.
+            type: string
+            maxLength: 255
+          family_name_formula_id:
+            description: Identifies a stored **Formula** that can be used to auto-generate family names (title).
             type: string
             maxLength: 255
           valid_image_types:

@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
 let { fetchMany, parseQueryOptions } = require('@apigrate/mysqlutils/lib/express/db-api');
+const { fetchManySqlAnd, resultToJson } = require('./db-api-ext');
+const { CriteriaHelper } = require('@apigrate/mysqlutils/lib/criteria-helper');
 
 router.get('/available_regions', function (req, res, next) {
   let  q = parseQueryOptions(req, ['name_en','id'], ['+name_en','+id'], 1000);
@@ -72,6 +74,41 @@ router.get('/equipment_types', function (req, res, next) {
   }
   next();
 }, fetchMany);
+
+router.get('/equipment_models', function (req, res, next) {
+  let criteria = new CriteriaHelper();
+  if(req.query.model_search){
+    criteria.and('model', 'LIKE', `%${req.query.model_search}%`);
+  }
+  if(req.query.brand_id){
+    criteria.and('brand_id', '=',  req.query.brand_id)
+  } 
+  
+  let where= ``;
+  if(criteria.whereClause){
+    where= `WHERE ${criteria.whereClause}`;
+  }
+
+  let fullQuery = `select model, brand_id, brand_en, brand_zh from v_equipment ${where} group by model, brand_id, brand_en, brand_zh order by model asc`;
+  let countQuery = `select count(distinct(model)) as count from v_equipment ${where}`;
+  let sql = {
+    statement: fullQuery,
+    parms: criteria.parms
+  };
+  let sql_count = {
+    statement: countQuery,
+    parms: criteria.parms
+  };
+
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.EquipmentView(),
+    sql: sql,
+    sql_count: sql_count,
+    collection_name: `equipment_models`
+  };
+  
+  next();
+}, fetchManySqlAnd, resultToJson);
 
 router.get('/filter_option_views', function (req, res, next) {
   let  q = parseQueryOptions(req, ['category_id','filter_id','filter_option_id','filter_en','filter_zh','option_en','option_zh'], ['+filter_id','+filter_option_id'],  1000);
