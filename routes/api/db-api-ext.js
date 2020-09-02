@@ -120,7 +120,8 @@ exports.fetchManySqlAnd = async function(req, res, next){
     }
 
     let result = {};
-
+    let collection_name = dbi.collection_name || dbi.dao.plural;
+      
     if (dbi.sql_count){
       dbdebug(`sql count statement...`);
       dbdebug(`  query sql: ${dbi.sql_count.statement}\n  query parms: ${JSON.stringify(dbi.sql_count.parms)}`);
@@ -129,7 +130,7 @@ exports.fetchManySqlAnd = async function(req, res, next){
       result.total = temp[0].count;
       if(result.total === 0){
         //Don't bother with the full query and return immediately.
-        result[dbi.dao.plural] = [];
+        result[collection_name] = [];
         
         res.locals.result = result;
         
@@ -144,7 +145,7 @@ exports.fetchManySqlAnd = async function(req, res, next){
       let temp = await dbi.dao.sqlCommand(dbi.sql.statement, dbi.sql.parms);
       dbdebug(`  result count: ${temp.length}`);
       // debug(JSON.stringify(temp));
-      result[dbi.dao.plural] = temp;
+      result[collection_name] = temp;
     }
     
     res.locals.result = result;
