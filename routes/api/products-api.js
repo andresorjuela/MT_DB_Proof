@@ -3,7 +3,7 @@ const router = express.Router({ mergeParams: true });
 const _ = require('lodash');
 const { deleteById, fetchById, fetchCount, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, updateById, create, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
 const { CriteriaHelper } = require('@apigrate/mysqlutils');
-const { fetchManySqlAnd, resultToCsv, resultToJson} = require('./db-api-ext');
+const { fetchManySqlAnd, resultToCsv, resultToJson, resultToAccept} = require('./db-api-ext');
 const debug = require('debug')('medten:routes');
 const {parseSearchTermCriteria} = require('./common');
 const { result } = require('lodash');
@@ -127,46 +127,8 @@ router.post('/search', async function (req, res, next) {
   
   next();
   
-}, parseProductSearchRequest, fetchManySqlAnd, resultToJson);
+}, parseProductSearchRequest, fetchManySqlAnd, resultToAccept);
 
-
-
-/**
- * Similar to search endpoint, except all search results are downloaded (up to 100,000 records).
- */
-router.post('/search/download', async function (req, res, next) {
-  
-  let payload = {};
-  Object.assign(payload, req.body);
-  
-  res.locals.dbInstructions = {
-    search_payload: payload,
-    dao: req.app.locals.Database.ProductView(),
-    sql: null,
-    sql_count: null
-  };
-  
-  next();
-}, parseProductSearchRequest, fetchManySqlAnd, resultToCsv);
-
-/**
- * Similar to search endpoint, except all search results are downloaded (up to 100,000 records).
- */
-router.post('/search/download', async function (req, res, next) {
-  
-  let payload = {};
-  Object.assign(payload, req.body);
-  
-  res.locals.dbInstructions = {
-    search_payload: payload,
-    dao: req.app.locals.Database.ProductView(),
-    sql: null,
-    sql_count: null
-  };
-  
-  next();
-  
-}, parseProductSearchRequest, fetchManySqlAnd, resultToCsv);
 
 router.get('/search/download', async function (req, res, next) {
   if(!req.query.token){
@@ -295,17 +257,20 @@ async function parseProductSearchRequest(req, res, next){
     //Done building the where.
 
     // parse options clause
-    if(payload.order_by && ALLOWED_SEARCH_PARAMETERS.includes(payload.order_by)){
+    if(payload.order_by){
       optsclause += ` ORDER BY`;
       let tmp = ``;
       payload.order_by.forEach(col=>{
-        if(tmp) tmp += `,`;
+        let order = 'ASC';
         if(col.startsWith('+')){
-          tmp += ` ${col.substring(1)} ASC`;
+          col = col.substring(1);
         } else if (col.startsWith('-')){
-          tmp += ` ${col.substring(1)} DESC`;
-        } else {
-          tmp += ` ${col} ASC`;
+          col = col.substring(1);
+          order = 'DESC';
+        }
+        if( ALLOWED_SEARCH_PARAMETERS.includes(col) ){
+          if(tmp) tmp += ',';
+          tmp += ` ${col} ${order}`;
         }
       });
       optsclause += tmp;
