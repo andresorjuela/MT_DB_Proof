@@ -156,8 +156,7 @@ exports.fetchManySqlAnd = async function(req, res, next){
   }
 }
 
-
-exports.resultToCsv = async function(req, res, next){
+let resultToCsv = async function(req, res, next){
   try{
     let dbi = res.locals.dbInstructions;
     if (_.isEmpty(dbi) || !res.locals.result){
@@ -185,19 +184,43 @@ exports.resultToCsv = async function(req, res, next){
   }catch(ex){
     next(ex);
   }
-}
+};
+exports.resultToCsv = resultToCsv;
 
-exports.resultToJson = async function(req, res, next){
+let resultToJson = async function(req, res, next){
   try{
 
     if (!res.locals.result){
-      res.status(500).json({ message:'Invalid configuration.',error: "The expected parameters/query result were not available." });
+      res.status(500).json({ message:'Invalid configuration.',error: "The expected query result were not available." });
       return;
     }
 
     res.status(200).json(res.locals.result);
 
     return;    
+    
+  }catch(ex){
+    next(ex);
+  }
+};
+exports.resultToJson = resultToJson
+
+exports.resultToAccept = async function(req, res, next){
+  try{
+
+    res.format({
+      'text/csv': function(){
+        resultToCsv(req, res, next);
+      },
+
+      'application/json': function(){
+        resultToJson(req, res, next);
+      },
+
+      default: function(){
+        resultToJson(req, res, next);
+      },
+    });
     
   }catch(ex){
     next(ex);

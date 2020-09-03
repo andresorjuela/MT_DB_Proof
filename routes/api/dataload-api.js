@@ -4,7 +4,7 @@ const {parse} = require('fast-csv');
 
 let router = express.Router({ mergeParams: true });
 const { parseQueryOptionsFromObject } = require('@apigrate/mysqlutils/lib/express/db-api');
-const {fetchManyAnd, resultToCsv} = require('./db-api-ext');
+const {fetchManyAnd, resultToCsv, resultToAccept} = require('./db-api-ext');
 
 let debug = require('debug')('medten:routes');
 
@@ -163,7 +163,7 @@ router.post('/:entity/download', validateDao, async function (req, res, next) {
   res.locals.dbInstructions = dbInstructions;
   next();
   
-}, fetchManyAnd, resultToCsv);
+}, fetchManyAnd, resultToAccept);
 
 
 /**
