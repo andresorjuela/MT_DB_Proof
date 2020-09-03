@@ -209,12 +209,14 @@ exports.resultToAccept = async function(req, res, next){
   try{
 
     res.format({
-      'text/csv': function(){
-        resultToCsv(req, res, next);
-      },
+      //Note, if Accept is */* or omitted, the first callback is matched.
 
       'application/json': function(){
         resultToJson(req, res, next);
+      },
+
+      'text/csv': function(){
+        resultToCsv(req, res, next);
       },
 
       default: function(){
