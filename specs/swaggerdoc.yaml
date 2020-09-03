@@ -4,10 +4,12 @@ info:
   title: 'Medten Product API'
   description: 'Interact with the Medten product database using this API.'
 servers:
-  - url: https://mgtwitxxi1.execute-api.ap-southeast-1.amazonaws.com/Prod/
+  - url: https://mgtwitxxi1.execute-api.ap-southeast-1.amazonaws.com/Prod/api/v1/
     description: API Test Environment
-  - url: https://v73kddyeqk.execute-api.ap-southeast-1.amazonaws.com/Prod/
+  - url: https://v73kddyeqk.execute-api.ap-southeast-1.amazonaws.com/Prod/api/v1/
     description: API POC (Proof of Concept) Environment
+  - url: http://localhost:3000/api/v1/
+    description: Developer Local Test Environments
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/gaumeister/medten-product-api/1.0.0
