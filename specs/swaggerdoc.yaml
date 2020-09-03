@@ -1580,7 +1580,7 @@ paths:
             examples:
               example1:
                 description: >
-                  Search for families having a `model` matching `SureSigns` (wildcard),
+                  Search for equipment having a `model` matching `SureSigns` (wildcard),
                   
                   
                   **and** further apply a filter to get results where equipment has **equipment type** (`equipment_type_id`) = `1`.
@@ -1611,12 +1611,12 @@ paths:
                 type: object
                 properties:
                   total:
-                    description: The total number of matching families in the database.
+                    description: The total number of matching equipment in the database.
                     type: integer
                   product_views:
                     type: array
                     items:
-                      $ref: '#/components/schemas/FamilyView'
+                      $ref: '#/components/schemas/EquipmentView'
             text/csv: {} 
         400:
           $ref: '#/components/responses/400ClientError'
@@ -1812,25 +1812,34 @@ paths:
               - $ref: '#/components/schemas/SearchCriteria'
               - type: object
                 properties:
-                  id:
-                    type: integer
-                    description: the group id
-                  group_code:
+                  search_term:
                     type: string
+                    description: wildcard search value to be used for searching any/all of the `search_term_fields`
+                  search_term_fields:
+                    description: which group fields the search term is applied to
+                    type: array
+                    items:
+                      type: string
+                      enum: [group_code]
                   
             examples:
               example1:
-                description: Search for groups having a `group_code` of `028` (wildcard). Order the results by `group_code`. Limit the results to `100` entries.
+                description: >
+                  Search for group having a `group_code` matching `028` (wildcard),
+                  
+                  
+                  Order the results by `id` (group id). 
+                  
+
+                  Do not skip any results, but limit the output to `10` entries.
                 value:
                   offset: 0
-                  limit: 100
+                  limit: 10
                   order_by:
-                    - group_code
+                    - id
                   search_term: 028
                   search_term_fields:
                     - group_code
-                  
-                  
       responses:
         200:
           description: OK

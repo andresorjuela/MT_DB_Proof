@@ -60,7 +60,6 @@ router.get('/', async function (req, res, next) {
  * {
  *   search_term: "X3",
  *   search_term_fields: ["type_en", "model"],
- *   brand_id: 3,
  *   order_by: ["model"],
  *   limit: 10,
  *   offset: 0
