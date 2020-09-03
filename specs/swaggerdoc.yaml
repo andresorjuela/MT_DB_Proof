@@ -510,8 +510,7 @@ paths:
         400:
           $ref: '#/components/responses/400ClientError'
         500:
-          $ref: '#/components/responses/500ServerError'
-      
+          $ref: '#/components/responses/500ServerError'  
   /products/search:
     post:
       summary: Perform an advanced search for products.
@@ -653,7 +652,6 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
-    
   /products/skus:
     summary: Gets the distinct skus currently in the database.
     description: Gets the distinct skus currently in the database. SKU should be a unique value.
@@ -738,8 +736,7 @@ paths:
         410:
           $ref: '#/components/responses/410ClientError'
         500:
-          $ref: '#/components/responses/500ServerError'
-          
+          $ref: '#/components/responses/500ServerError'       
   /products/${id}/certificates:
     summary: The certificates a product is qualified for.
     parameters:
@@ -1659,9 +1656,19 @@ paths:
   /families/search:
     post:
       summary: Perform an advanced search for families.
-      description: Extends basic search capabilities, allowing a search term to be used across many different family fields. Additional filter criteria can be used to further narrow the search-term search.
+      description: Extends basic search capabilities, allowing a search term to be used across different family fields. Additional filter criteria can be used to further narrow the search-term search.
       tags:
         - families
+      parameters:
+        - in: header
+          name: Accept
+          required: false
+          description: If omitted, `application/json` is assumed.
+          schema:
+            type: string
+            enum:
+              - application/json
+              - text/csv
       requestBody:
         description: >
           The search criteria to use for the search.
@@ -1673,36 +1680,72 @@ paths:
               - $ref: '#/components/schemas/SearchCriteria'
               - type: object
                 properties:
-                  id:
-                    type: integer
-                    description: the equipment id
-                  family_connector_code:
+                  search_term:
                     type: string
-                  family_code:
+                    description: wildcard search value to be used for searching any/all of the `search_term_fields`
+                  search_term_fields:
+                    description: which family fields the search term is applied to
+                    type: array
+                    items:
+                      type: string
+                      enum: [family_code, oem_brand_en, name_en, category_en]
+                  search_filter:
                     type: string
-                  group_id:
-                    type: integer
-                    description: Note, the API can  accept multiple values, which will be treated together as a UNION (OR) criteria. *If specifying multiple group_id options, provide the value as an array of integers.*
-                  group_code:
-                    type: string
-                  name_en:
-                    type: string
+                    enum: [oem brand, product type]
+                    description: >
+                      the type of filtering criteria to further refine results.
+                  search_filter_value:
+                    oneOf:
+                      - type: integer
+                      - type: string
+                    description: >
+                      The value to be used in the search filter criteria depends on the
+                      value used for the `search_filter`
+
+                        | search_filter | value is a(n) | matching |
+                        |---------------|------------|----------|
+                        | oem brand id | integer | oem_brand_id of any matching product linked to the family
+                        | product type | integer | product_type_id of any matching product linked to the family
+                        
+                  category_id:
+                    type: array
+                    description: >
+                      The categories to add to the family search filtering. 
+                      Specifying more than one category widens the search results. 
+                      Note: The filtering actually looks for **the category on products linked to the family.**
+                   
             examples:
               example1:
-                description: Search for families having a `family_code` and `family_connector_code` for `140B` (wildcard), **and** that have `group_id` = `28` or '29' . Order the results by `family_code`. Limit the results to `100` entries.
+                description: >
+                  Search for families having a `family_code` or `name_en` matching `F` (wildcard),
+
+                  
+                  **and** that are linked with products belonging to `category_id` = `5`, `6`, `7`, or `8`. 
+                  
+                  
+                  **and** further apply a filter to get results where familes have any products associated with **product type** (`product_type_id`) = `2`.
+                  
+                  
+                  Order the results by `id` (family id). 
+                  
+
+                  Do not skip any results, but limit the output to `10` entries.
                 value:
                   offset: 0
-                  limit: 100
+                  limit: 10
                   order_by:
-                    - family_code
-                  search_term: 140B
+                    - id
+                  search_term: F
                   search_term_fields:
                     - family_code
-                    - family_connector_code
-                  group_id:
-                    - 28
-                    - 29
-                  
+                    - name_en
+                  category_id:
+                    - 4
+                    - 5
+                    - 6
+                    - 7
+                  search_filter: product type
+                  search_filter_value: 2
       responses:
         200:
           description: OK
@@ -1714,10 +1757,11 @@ paths:
                   total:
                     description: The total number of matching families in the database.
                     type: integer
-                  family_views:
+                  product_views:
                     type: array
                     items:
                       $ref: '#/components/schemas/FamilyView'
+            text/csv: {} 
         400:
           $ref: '#/components/responses/400ClientError'
         500:

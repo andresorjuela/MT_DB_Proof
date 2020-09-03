@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchOne, fetchById, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, fetchCount, create, updateById } = require('@apigrate/mysqlutils/lib/express/db-api');
-const { fetchManyAnd, resultToCsv} = require('./db-api-ext');
-const {parseSearchTermCriteria} = require('./common');
+let { fetchById, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, create, updateById } = require('@apigrate/mysqlutils/lib/express/db-api');
+const { fetchManyAnd, fetchManySqlAnd, resultToCsv, resultToAccept} = require('./db-api-ext');
+const {parseAdvancedSearchRequest} = require('./common');
 
 const ALLOWED_SEARCH_PARAMETERS = [
   'id',
@@ -16,8 +16,33 @@ const ALLOWED_SEARCH_PARAMETERS = [
   'created',
   'updated',
   'search_term',
-  'search_term_fields'
+  'search_term_fields',
 ];
+
+const SEARCH_FILTERS = {
+  "oem brand": {
+    join_table: "v_product",
+    join_column: "family_id",
+    where_column: "oem_brand_id",
+  },
+  "product type": {
+    join_table: "v_product",
+    join_column: "family_id",
+    where_column: "product_type_id",
+  },
+  /* These are special cases that are actually handled thru search term functionality
+  "oem brand en": {
+    join_table: "v_product",
+    join_column: "family_id",
+    where_column: "oem_brand_en",
+  },
+  "category en": {
+    join_table: "v_product",
+    join_column: "family_id",
+    where_column: "category_en",
+  },
+  */
+};
 
 /** Query for families */
 router.get('/', async function (req, res, next) {
@@ -54,48 +79,23 @@ router.get('/', async function (req, res, next) {
  * 
 */
 router.post('/search', async function (req, res, next) {
-  let qopts = parseQueryOptionsFromObject(req.body, ALLOWED_SEARCH_PARAMETERS, ['+family_code', '+id'], 1000);
   
-  let dbInstructions = {
+  let payload = {};
+  Object.assign(payload, req.body);
+  
+  res.locals.dbInstructions = {
+    searchable_columns: ALLOWED_SEARCH_PARAMETERS,
+    filter_definitions: SEARCH_FILTERS,
+    exclude_columns_on_output: null,
+    search_payload: payload,
     dao: req.app.locals.Database.FamilyView(),
-    query_options: qopts.query_options,
-    with_total: true,
-    criteria: parseSearchTermCriteria(ALLOWED_SEARCH_PARAMETERS, qopts)
+    sql: null,
+    sql_count: null
   };
-
-  res.locals.dbInstructions = dbInstructions;
+  
   next();
   
-}, fetchMany);
-
-
-/**
- * Similar to search endpoint, except all search results are downloaded (up to 100,000 records).
- */
-router.post('/search/download', async function (req, res, next) {
-  let qopts = parseQueryOptionsFromObject(req.body, ALLOWED_SEARCH_PARAMETERS, ['+id'], 100000);
-  
-  let dao = req.app.locals.Database.FamilyView();
-  await dao.fetchMetadata();
-
-  //Which columns are output...
-  qopts.query_options.columns = [];
-  dao.metadata.forEach(m=>{
-    qopts.query_options.columns.push(m.column);
-  }); 
-
-  let dbInstructions = {
-    dao: dao,
-    query_options: qopts.query_options,
-    with_total: true,
-    criteria: parseSearchTermCriteria(ALLOWED_SEARCH_PARAMETERS, qopts),
-  };
-
-  res.locals.dbInstructions = dbInstructions;
-  next();
-  
-}, fetchManyAnd, resultToCsv);
-
+}, parseAdvancedSearchRequest, fetchManySqlAnd, resultToAccept);
 
 
 /** Get a single family. */

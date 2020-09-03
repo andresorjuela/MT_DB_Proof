@@ -3,10 +3,9 @@ const router = express.Router({ mergeParams: true });
 const _ = require('lodash');
 const { deleteById, fetchById, fetchCount, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, updateById, create, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
 const { CriteriaHelper } = require('@apigrate/mysqlutils');
-const { fetchManySqlAnd, resultToCsv, resultToJson, resultToAccept} = require('./db-api-ext');
+const { fetchManySqlAnd, resultToCsv, resultToAccept} = require('./db-api-ext');
 const debug = require('debug')('medten:routes');
-const {parseSearchTermCriteria} = require('./common');
-const { result } = require('lodash');
+const {parseAdvancedSearchRequest} = require('./common');
 
 const ALLOWED_SEARCH_PARAMETERS = [ 
   'id', 
@@ -39,17 +38,17 @@ const SEARCH_FILTERS = {
     where_column: "oem_brand_id",
   },
   "certificate": {
-    table: "t_product_certificate",
+    join_table: "t_product_certificate",
     join_column: "product_id",
     where_column: "certificate_id",
   },
   "custom attribute": {
-    table: "t_product_custom_attribute",
+    join_table: "t_product_custom_attribute",
     join_column: "product_id",
     where_column: "custom_attribute_id",
   },
   "image type": {
-    table: "t_product_image",
+    join_table: "t_product_image",
     join_column: "product_id",
     where_column: "image_type_id",
   },
@@ -57,7 +56,7 @@ const SEARCH_FILTERS = {
     where_column: "lifecycle_id",
   },
   "marketing region": {
-    table: "t_product_marketing_region",
+    join_table: "t_product_marketing_region",
     join_column: "product_id",
     where_column: "marketing_region_id",
   },
@@ -65,12 +64,12 @@ const SEARCH_FILTERS = {
     where_column: "packaging_factor_id",
   },
   "supplier": {
-    table: "t_product_supplier",
+    join_table: "t_product_supplier",
     join_column: "product_id",
     where_column: "supplier_id",
   },
   "oem reference": {
-    table: "t_product_oem_reference",
+    join_table: "t_product_oem_reference",
     join_column: "product_id",
     where_column: "name",
   },
@@ -119,6 +118,9 @@ router.post('/search', async function (req, res, next) {
   Object.assign(payload, req.body);
   
   res.locals.dbInstructions = {
+    searchable_columns: ALLOWED_SEARCH_PARAMETERS,
+    filter_definitions: SEARCH_FILTERS,
+    exclude_columns_on_output: ['product_name_formula', 'product_description_formula'],
     search_payload: payload,
     dao: req.app.locals.Database.ProductView(),
     sql: null,
@@ -127,7 +129,7 @@ router.post('/search', async function (req, res, next) {
   
   next();
   
-}, parseProductSearchRequest, fetchManySqlAnd, resultToAccept);
+}, parseAdvancedSearchRequest, fetchManySqlAnd, resultToAccept);
 
 
 router.get('/search/download', async function (req, res, next) {
@@ -143,6 +145,9 @@ router.get('/search/download', async function (req, res, next) {
     Object.assign(payload, JSON.parse(req.query.payload));
     
     res.locals.dbInstructions = {
+      searchable_columns: ALLOWED_SEARCH_PARAMETERS,
+      filter_definitions: SEARCH_FILTERS,
+      exclude_columns_on_output: ['product_name_formula', 'product_description_formula'],
       search_payload: payload,
       dao: req.app.locals.Database.ProductView(),
       sql: null,
@@ -156,166 +161,7 @@ router.get('/search/download', async function (req, res, next) {
   }
 
   
-}, parseProductSearchRequest, fetchManySqlAnd, resultToCsv);
-
-/**
- * Middleware that Parses a search and search count query for use with complex product searches.
- * 
- * A `res.locals.dbInstructions` object must be present with dao and search_payload properties set.
- * 
- * Upon completion it places res.local.dbInstructions with a `sql` and `sql_count` object as appropriate.
- * @param {object} payload typically the req.body
- */
-async function parseProductSearchRequest(req, res, next){
-  
-  try {
-    // parse search term fields
-    // parse category search fields
-    // parse filter fields
-    // parse standard query options (offset, limit, order_by)
-    let dao = res.locals.dbInstructions.dao;
-    let payload = res.locals.dbInstructions.search_payload;
-
-    await dao.fetchMetadata();
-
-    //Which columns are output...
-    let columns = [];
-    dao.metadata.forEach(m=>{
-      if(['product_name_formula', 'product_description_formula'].includes(m.column)){
-        return;//exclude the formulas from download
-      } else {
-        columns.push(`v.${m.column}`);
-      }
-    }); 
-
-
-    let qs =  `select ${columns.join(',')} from ${dao.table} v `;
-    let count_qs = `select count(*) as count from ${dao.table} v `;
-    let join = ``; 
-    let optsclause = ``;
-    let criteria = new CriteriaHelper({omitIfEmpty: false});
-    
-    // parse search term fields.
-    if(payload.search_term_fields && payload.search_term_fields.length > 0){
-      criteria.andGroup();
-      for(let field_name of payload.search_term_fields){
-        if(ALLOWED_SEARCH_PARAMETERS.includes(field_name)){
-          criteria.or(field_name, 'LIKE', `%${payload.search_term}%`);
-        }
-        //just ignore anything not searchable.
-      }
-      criteria.groupEnd();
-      
-      delete payload.search_term_fields;
-      delete payload.search_term;
-    }
-
-    // parse category search fields
-    if(payload.category_id){
-      criteria.andGroup();
-      if( _.isArray(payload.category_id) ){
-        criteria.and('category_id', 'IN', payload.category_id);
-      } else {
-        criteria.and('category_id', '=', `${payload.category_id}`);
-      }
-      criteria.groupEnd();
-    }
-
-    // parse search filters
-    if(payload.search_filter && payload.search_filter_value){
-      let filter = SEARCH_FILTERS[payload.search_filter];
-      // if(!payload.search_filter_value){
-      //   res.status(400).json({
-      //     message:`Missing search_filter_value.`,
-      //     error: `When using the search_filter parameter, the search_filter_value is parameter is required and may not be empty.`
-      //   });
-      // }
-      if(filter){
-        criteria.andGroup();
-        if(filter.table){
-          //Need to do a join.
-          join = `JOIN ${filter.table} J on J.product_id = v.id`; //CUSTOMIZE THIS
-          criteria.and(`J.${filter.where_column}`, '=', payload.search_filter_value);
-        } else {
-          criteria.and(filter.where_column, '=', payload.search_filter_value);
-        }
-        criteria.groupEnd();
-      } else {
-        let allowed = [];
-        for(let f in SEARCH_FILTERS){
-          allowed.push(f);
-        }
-        res.status(400).json({
-          message:`Invalid search_filter "${payload.search_filter}".`,
-          error: `When using the search_filter parameter, you may use any of: [${allowed.join(", ")}].`
-        });
-      }
-      delete payload.search_filter;
-      delete payload.search_filter_value;
-    }
-
-    //Done building the where.
-
-    // parse options clause
-    if(payload.order_by){
-      optsclause += ` ORDER BY`;
-      let tmp = ``;
-      payload.order_by.forEach(col=>{
-        let order = 'ASC';
-        if(col.startsWith('+')){
-          col = col.substring(1);
-        } else if (col.startsWith('-')){
-          col = col.substring(1);
-          order = 'DESC';
-        }
-        if( ALLOWED_SEARCH_PARAMETERS.includes(col) ){
-          if(tmp) tmp += ',';
-          tmp += ` ${col} ${order}`;
-        }
-      });
-      optsclause += tmp;
-    }
-    if(payload.limit && _.isFinite(payload.limit)){
-      if(payload.limit < 0 || payload.limit > 100000){
-        payload.limit = 100000;
-      }
-      optsclause += ` LIMIT ${payload.limit}`;
-    }
-    if(payload.offset && _.isFinite(payload.offset)){
-      if(payload.offset < 0 || payload.offset > 100000){
-        payload.offset = 100000;
-      }
-      optsclause += ` OFFSET ${payload.offset}`;
-    }
-
-    let where = '';
-    if(criteria.whereClause){
-      where = `WHERE ${criteria.whereClause}`;
-    }
-    let fullQuery = `${qs} ${join} ${where} ${optsclause}`;
-    let fullCountQuery = `${count_qs} ${join} ${where}`;
-
-    res.locals.dbInstructions.sql = {
-      statement: fullQuery,
-      parms: criteria.parms,
-    }
-    res.locals.dbInstructions.sql_count = {
-      statement: fullCountQuery,
-      parms: criteria.parms,
-    }
-
-    next(); 
-  } catch (ex){
-    console.error(ex);
-    res.status(400).json({
-      message:`Unable to parse search.`,
-      error: ex.message
-    });
-  }
-}
-
-
-
+}, parseAdvancedSearchRequest, fetchManySqlAnd, resultToCsv);
 
 
 /** Gets an array of all distinct SKUs across all products. Used for validation. A SKU should be globally unique. */
