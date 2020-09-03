@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchById, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, fetchCount, create, updateById, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
-const { fetchManyAnd, resultToCsv} = require('./db-api-ext');
-const {parseSearchTermCriteria} = require('./common');
+let { fetchById, fetchMany, parseQueryOptions, create, updateById, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
+const { fetchManySqlAnd, resultToAccept} = require('./db-api-ext');
+const {parseAdvancedSearchRequest} = require('./common');
 
 
 const ALLOWED_SEARCH_PARAMETERS = [
@@ -21,6 +21,18 @@ const ALLOWED_SEARCH_PARAMETERS = [
   'search_term',
   'search_term_fields'
 ];
+
+
+const SEARCH_FILTERS = {
+  "brand": {
+    where_column: "brand_id",
+  },
+  "equipment type": {
+    where_column: "equipment_type_id",
+  },
+  
+};
+
 
 /** Query for equipment */
 router.get('/', async function (req, res, next) {
@@ -58,47 +70,24 @@ router.get('/', async function (req, res, next) {
  * 
 */
 router.post('/search', async function (req, res, next) {
-  let qopts = parseQueryOptionsFromObject(req.body, ALLOWED_SEARCH_PARAMETERS, ['+model', '+id'], 1000);
   
-  let dbInstructions = {
+  let payload = {};
+  Object.assign(payload, req.body);
+  
+  res.locals.dbInstructions = {
+    searchable_columns: ALLOWED_SEARCH_PARAMETERS,
+    filter_definitions: SEARCH_FILTERS,
+    exclude_columns_on_output: null,
+    search_payload: payload,
     dao: req.app.locals.Database.EquipmentView(),
-    query_options: qopts.query_options,
-    with_total: true,
-    criteria: parseSearchTermCriteria(ALLOWED_SEARCH_PARAMETERS, qopts)
+    sql: null,
+    sql_count: null
   };
-
-  res.locals.dbInstructions = dbInstructions;
+  
   next();
   
-}, fetchMany);
+}, parseAdvancedSearchRequest, fetchManySqlAnd, resultToAccept);
 
-
-/**
- * Similar to search endpoint, except all search results are downloaded (up to 100,000 records).
- */
-router.post('/search/download', async function (req, res, next) {
-  let qopts = parseQueryOptionsFromObject(req.body, ALLOWED_SEARCH_PARAMETERS, ['+id'], 100000);
-  
-  let dao = req.app.locals.Database.EquipmentView();
-  await dao.fetchMetadata();
-
-  //Which columns are output...
-  qopts.query_options.columns = [];
-  dao.metadata.forEach(m=>{
-    qopts.query_options.columns.push(m.column);
-  }); 
-
-  let dbInstructions = {
-    dao: dao,
-    query_options: qopts.query_options,
-    with_total: true,
-    criteria: parseSearchTermCriteria(ALLOWED_SEARCH_PARAMETERS, qopts),
-  };
-
-  res.locals.dbInstructions = dbInstructions;
-  next();
-  
-}, fetchManyAnd, resultToCsv);
 
 
 /** Get a single equipment. */
