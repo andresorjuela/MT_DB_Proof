@@ -1523,6 +1523,59 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /equipment/${id}/images:
+    parameters:
+    - name: id
+      in: path
+      description: the equipment id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets images for a given equipment item
+      tags:
+        - equipment
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/EquipmentImage'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    post:
+      summary: replaces the images for an equipment item
+      description: Replaces the imagesfor an equipment item, adding those that need to be added, updating any existing, and removing any that no longer match the payload. Images are differentiated by the `image_link` property.
+      tags:
+        - equipment
+      requestBody:
+        description: >
+          The current images for the equipment item.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:  
+                $ref: '#/components/schemas/EquipmentImage'
+                  
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:  
+                  $ref: '#/components/schemas/ProductFilterOption'
+              
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   /equipment/search:
     post:
       summary: Perform an advanced search for equipment.
@@ -2051,6 +2104,22 @@ components:
             description: References the available region.
             type: integer
           available_region_name_en:
+            type: string
+      - $ref: '#/components/schemas/Auditable'
+    EquipmentImage:
+      type: object
+      description: An equipment-specific image.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+          equipment_id:
+            description: References the equipment item.
+            type: integer
+          image_link:
+            description: The image URL.
             type: string
       - $ref: '#/components/schemas/Auditable'
     FamilyView:
