@@ -214,7 +214,7 @@ CREATE TABLE `t_product` (
   `lifecycle_id` int(11) unsigned DEFAULT NULL,
   `video_link` varchar(255) DEFAULT null,
   `note_internal` varchar(512) DEFAULT null,
-  `notes_client` varchar(512) DEFAULT null,
+  `note_client` varchar(512) DEFAULT null,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',

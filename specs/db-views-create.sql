@@ -9,7 +9,7 @@ p.category_id, c.name_en as category_en, c.name_zh as category_zh,
 nf.content as product_name_formula, 
 df.content as product_description_formula, 
 pf.name as packaging_factor, p.packaging_factor_id, p.price_us, p.price_zh, p.price_eu,
-p.weight_kg, p.weight_lbs, p.warranty_duration_months, p.tags, p.video_link, p.note_internal, p.notes_client,
+p.weight_kg, p.weight_lbs, p.warranty_duration_months, p.tags, p.video_link, p.note_internal, p.note_client,
 p.lifecycle_id, l.name_en as lifecycle_en, l.name_zh as lifecycle_zh,
 p.created, p.updated, p.version
 from t_product p
