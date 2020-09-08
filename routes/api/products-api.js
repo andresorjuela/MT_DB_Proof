@@ -376,7 +376,7 @@ router.post('/:product_id/marketing_regions', function (req, res, next) {
 // Get all product oem references
 router.get('/:product_id/oem_references', function (req, res, next) {
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.ProductOemReference(),
+    dao: req.app.locals.Database.ProductOemReferenceView(),
     query: {product_id: req.params.product_id},
     //query_options: q.query_options
   }

@@ -122,3 +122,9 @@ ea.created, ea.updated, ea.version
 from t_equipment_available_region ea
 left outer join t_equipment e on e.id = ea.equipment_id 
 left outer join t_available_region r on r.id = ea.available_region_id;
+
+-- product oem reference view
+create view v_product_oem_reference as
+select por.*, b.is_oem
+from t_product_oem_reference por
+left outer join t_brand b on b.id = por.brand_id; 

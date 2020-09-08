@@ -1171,10 +1171,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  product_oem_references:
+                  product_oem_reference_views:
                     type: array
                     items:  
-                      $ref: '#/components/schemas/ProductOemReference'
+                      $ref: '#/components/schemas/ProductOemReferenceView'
         400:
           $ref: '#/components/responses/400ClientError'
         500:
@@ -2667,6 +2667,24 @@ components:
           name:
             type: string
             maxLength: 255
+      - $ref: '#/components/schemas/Auditable'
+    ProductOemReferenceView:
+      type: object
+      description: An extended view of the OEM reference for a product.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+          product_id:
+            type: integer
+          brand_id:
+            type: integer
+          name:
+            type: string
+            maxLength: 255
+          is_oem:
+            type: boolean
       - $ref: '#/components/schemas/Auditable'
     ProductSet:
       type: object
