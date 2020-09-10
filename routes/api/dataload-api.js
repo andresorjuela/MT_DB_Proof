@@ -166,6 +166,33 @@ router.post('/:entity/download', validateDao, async function (req, res, next) {
 }, fetchManyAnd, resultToAccept);
 
 
+
+
+/** Downloads an entire table of data. */
+router.get('/:entity/download', validateDao, async function (req, res, next) {
+  //Which columns are output...
+   let query_options = {
+     columns: [],
+     limit: 100000
+   };
+   
+   res.locals.dao.metadata.forEach(m=>{
+     query_options.columns.push(m.column);
+   }); 
+ 
+   let dbInstructions = {
+     dao: res.locals.dao,
+     query_options: query_options,
+     with_total: true,
+     criteria: {}
+   };
+ 
+   res.locals.dbInstructions = dbInstructions;
+   next();
+   
+ }, fetchManyAnd, resultToCsv);
+
+
 /**
  * Middleware which loads a dao into the `res.locals.dao` property based on 
  * the entity name. The dao is initialized with database metadata.

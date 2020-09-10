@@ -205,6 +205,35 @@ let resultToJson = async function(req, res, next){
 };
 exports.resultToJson = resultToJson
 
+/** @deprecated */
+let resultToJsonDownload = async function(req, res, next){
+  try{
+
+    if (!res.locals.result){
+      res.status(500).json({ message:'Invalid configuration.',error: "The expected query result were not available." });
+      return;
+    }
+
+    let dao = res.locals.dbInstructions.dao;
+
+    let headersName = `headers`;
+
+    res.locals.result[headersName] = {};
+    dao.metadata.forEach( (meta) => {
+      res.locals.result[headersName][meta.column] = meta.column.toUpperCase();
+    }),
+
+    res.status(200).json(res.locals.result);
+
+    return;    
+    
+  }catch(ex){
+    next(ex);
+  }
+};
+exports.resultToJsonDownload = resultToJsonDownload;
+
+
 exports.resultToAccept = async function(req, res, next){
   try{
 

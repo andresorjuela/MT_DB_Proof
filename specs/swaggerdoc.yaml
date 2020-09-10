@@ -633,11 +633,11 @@ paths:
       tags:
         - products
       parameters:
-        - in: query
-          name: token
-          schema:
-            type: string
-          description: API token - same as used during BASIC Authentication
+        # - in: query
+        #   name: token
+        #   schema:
+        #     type: string
+        #   description: API token - same as used during BASIC Authentication
         - in: query
           name: payload
           schema:
@@ -648,6 +648,125 @@ paths:
           description: OK
           content:
             text/csv: {}
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    post:
+      summary: Perform an advanced search for products with download output.
+      description: Extends basic search capabilities, allowing a search term to be used across many different product fields. Additional filter criteria can be used to further narrow the search-term search.
+      tags:
+        - products
+      parameters:
+        - in: header
+          name: Accept
+          required: false
+          description: If omitted, `application/json` is assumed.
+          schema:
+            type: string
+            enum:
+              - application/json
+              - text/csv
+      requestBody:
+        description: >
+          The search criteria to use for the search.
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/SearchCriteria'
+              - type: object
+                properties:
+                  search_term:
+                    type: string
+                    description: wildcard search value to be used for searching any/all of the `search_term_fields`
+                  search_term_fields:
+                    description: which product fields the search term is applied to
+                    type: array
+                    items:
+                      type: string
+                      enum: [sku, oem, name_en, category_en]
+                  search_filter:
+                    type: string
+                    enum: [brand, certificate, custom attribute, image type, lifecycle, marketing region, packaging factor, supplier, oem reference, product type]
+                    description: >
+                      the type of filtering criteria to further refine results.
+                  search_filter_value:
+                    oneOf:
+                      - type: integer
+                      - type: string
+                    description: >
+                      The value to be used in the search filter criteria depends on the
+                      value used for the `search_filter`
+
+                        | search_filter | value is a(n) | matching |
+                        |---------------|------------|----------|
+                        | brand | integer | brand id 
+                        | certificate | integer | certificate id
+                        | custom attribute | integer | attribute id 
+                        | image type | integer | image type id
+                        | lifecycle | integer | lifecycle id
+                        | marketing region | integer | marketing region id
+                        | packaging factor | integer | packaging factor id
+                        | supplier | integer | supplier id
+                        | oem reference | string | name of oem reference 
+                        | product type | integer | product type id
+                  category_id:
+                    type: array
+                    description: The categories to add to the product search filtering. Specifying more than one category widens the search results.
+                   
+            examples:
+              example1:
+                description: >
+                  Search for products having a `sku` and `oem` for `SA-024` (wildcard),
+
+                  
+                  **and** that belong to either `category_id` `4` or `7`. 
+                  
+                  
+                  **and** further apply a filter to get results that are associated with `brand` = `3`.
+                  
+                  
+                  Order the results by `oem`. 
+                  
+
+                  Skip the first result, and limit the results to `10` entries.
+                value:
+                  offset: 1
+                  limit: 10
+                  order_by:
+                    - oem
+                  search_term: SA-024
+                  search_term_fields:
+                    - sku
+                    - oem
+                  category_id:
+                    - 4
+                    - 7
+                  search_filter: brand
+                  search_filter_value: 3
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    description: The total number of matching products in the database.
+                    type: integer
+                  product_views:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductView'
+                  headers:
+                    type: array
+                    items:
+                      type: object
+                      description: a single object whose properties can be used to create headers for CSV/table rendering.
+            
         400:
           $ref: '#/components/responses/400ClientError'
         500:
@@ -1675,62 +1794,73 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
-  /equipment/search/download:
+  /families:
+    summary: Represents a product family
     post:
-      summary: Download an advanced search for equipment.
-      description: Identical to `/equipment/search` except the results are output in CSV format.
+      summary: creates a family
       tags:
-        - equipment
+        - families
       requestBody:
-        description: >
-          The search criteria to use for the search.
+        description:  The family to be created.
         required: true
         content:
           application/json:
             schema:
-              allOf:
-              - $ref: '#/components/schemas/SearchCriteria'
-              - type: object
-                properties:
-                  id:
-                    type: integer
-                    description: the equipment id
-                  model:
-                    type: string
-                  equipment_type_id:
-                    type: string
-                  type_en:
-                    type: string
-                  type_zh:
-                    type: string
-                  brand_id:
-                    type: integer
-                    description: Note, the API can  accept multiple values, which will be treated together as a UNION (OR) criteria. *If specifying multiple brand_id options, provide the value as an array of integers.*
-                  brand_en:
-                    type: string
-                  brand_zh:
-                    type: string
-                  is_oem:
-                    type: boolean
-            examples:
-              example1:
-                description: Search for equipment having a `type_en` and `model` for `X3` (wildcard), **and** that have `brand_id` = `3` . Order the results by `oem`. Limit the results to `100` entries.
-                value:
-                  offset: 0
-                  limit: 100
-                  order_by:
-                    - model
-                  search_term: X3
-                  search_term_fields:
-                    - type_en
-                    - model
-                  brand_id: 3
-                  
+              $ref: '#/components/schemas/Family'
+      responses:
+        200:
+          description: returns the family 
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Family'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /families/${id}:
+    summary: Represents a product family.
+    parameters:
+    - name: id
+      in: path
+      description: the family id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets family by id
+      tags:
+        - families
       responses:
         200:
           description: OK
           content:
-            text/csv: {}
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/FamilyView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    put:
+      summary: updates a family
+      tags:
+        - families
+      requestBody:
+        description: >
+          The family to be updated.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Family'
+      responses:
+        200:
+          description: returns the family 
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Family'
         400:
           $ref: '#/components/responses/400ClientError'
         500:
@@ -1844,6 +1974,77 @@ paths:
                     items:
                       $ref: '#/components/schemas/FamilyView'
             text/csv: {} 
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /groups:
+    summary: Represents a product group
+    post:
+      summary: creates a group
+      tags:
+        - groups
+      requestBody:
+        description:  The group to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        200:
+          description: returns the group 
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Group'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /groups/${id}:
+    summary: Represents a product group.
+    parameters:
+    - name: id
+      in: path
+      description: the group id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets group by id
+      tags:
+        - groups
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Group'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    put:
+      summary: updates a group
+      tags:
+        - groups
+      requestBody:
+        description: >
+          The group to be updated.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        200:
+          description: returns the group 
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Group'
         400:
           $ref: '#/components/responses/400ClientError'
         500:
@@ -2122,6 +2323,44 @@ components:
           image_link:
             description: The image URL.
             type: string
+      - $ref: '#/components/schemas/Auditable'
+    Family:
+      type: object
+      description: The product family .
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+          name_en:
+            description: Name (English) of the family.
+            type: string
+            maxLength: 255
+          family_code:
+            type: string
+            maxLength: 255
+          family_connector_code:
+            type: string
+            maxLength: 255
+          group_id:
+            description: References the group.
+            type: integer
+          name_edit_user_id:
+            description: user id who last edited the name
+            type: integer
+          name_edit_timestamp:
+            description: timestamp of last name edit
+            type: string
+            format: date-time
+          image_link_connector_distal:
+            description: URL to a connector distal image.
+            type: string
+            maxLength: 255
+          video_link:
+            description: URL to a video for the family.
+            type: string
+            maxLength: 255
       - $ref: '#/components/schemas/Auditable'
     FamilyView:
       type: object

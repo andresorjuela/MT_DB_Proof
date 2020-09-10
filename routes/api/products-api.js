@@ -3,7 +3,7 @@ const router = express.Router({ mergeParams: true });
 const _ = require('lodash');
 const { deleteById, fetchById, fetchCount, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, updateById, create, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
 const { CriteriaHelper } = require('@apigrate/mysqlutils');
-const { fetchManySqlAnd, resultToCsv, resultToAccept} = require('./db-api-ext');
+const { fetchManySqlAnd, resultToCsv, resultToJsonDownload, resultToAccept} = require('./db-api-ext');
 const debug = require('debug')('medten:routes');
 const {parseAdvancedSearchRequest} = require('./common');
 
@@ -163,6 +163,32 @@ router.get('/search/download', async function (req, res, next) {
   
 }, parseAdvancedSearchRequest, fetchManySqlAnd, resultToCsv);
 
+/** @deprecated */
+router.post('/search/download', async function (req, res, next) {
+ 
+  try{
+    let payload = {};
+    Object.assign(payload, req.body);
+    
+    res.locals.dbInstructions = {
+      searchable_columns: ALLOWED_SEARCH_PARAMETERS,
+      filter_definitions: SEARCH_FILTERS,
+      exclude_columns_on_output: ['product_name_formula', 'product_description_formula'],
+      search_payload: payload,
+      dao: req.app.locals.Database.ProductView(),
+      sql: null,
+      sql_count: null
+    };
+   
+    next();
+  }catch(ex){
+    console.error(ex);
+    res.status(400).json({message: "Download failed.", error: ex.message});
+  }
+
+  
+}, parseAdvancedSearchRequest, fetchManySqlAnd, resultToJsonDownload);
+
 
 /** Gets an array of all distinct SKUs across all products. Used for validation. A SKU should be globally unique. */
 router.get('/skus', async function (req, res, next) {
@@ -199,16 +225,74 @@ router.post('/', function (req, res, next) {
 
 
 /** Update a product */
-router.put('/:product_id', function (req, res, next) {
+router.put('/:product_id', async function (req, res, next) {
 
   let entity = req.body;
+  let productDao = req.app.locals.Database.Product();
+  
+  let existing = await productDao.get(entity.id);
+
+  //If new category is or is underneath one of the major categories, err.
+  if(entity.category_id && entity.category_id != existing.category_id){
+    debug(`A product category change has been detected...`);
+    let categoryDao = req.app.locals.Database.Category();
+
+    let sourceCategory = await topCategoryFor(categoryDao, existing.category_id);
+    let targetCategory = await topCategoryFor(categoryDao, entity.category_id);
+    
+    if(sourceCategory.id !== targetCategory.id){
+      res.status(400).json({message: "Unable to save product.", error: "Changing categories to another top level category hierarchy is not allowed."});
+      return;
+    }
+
+    //Delete category-dependent data.
+    //Filter Options
+    debug(`...deleting old filter options.`)
+    await req.app.locals.Database.ProductFilterOption().deleteMatching({product_id: existing.product_id});
+    //Custom attributes
+    debug(`...deleting old custom attributes.`)
+    await req.app.locals.Database.ProductCustomAttribute().deleteMatching({product_id: existing.product_id});
+
+  }
+
   res.locals.dbInstructions = {
-    dao: req.app.locals.Database.Product(),
+    dao: productDao,
     toUpdate: entity
   }
   next();
 
 }, updateById);
+
+/**
+ * Returns the top-level category for a given subcategory id.
+ * @param {object} categoryDao @apigrate/mysql category dao
+ * @param {integer} categoryId category id
+ * @return the category entity
+ * @throws error if category ids refer to nonexistent categories in the database.
+ */
+async function topCategoryFor(categoryDao, categoryId){
+  let current = await categoryDao.get(categoryId);
+  if(!current) throw new Error(`No category for id=${categoryId}`);
+  if(current.parent_id === 0){
+    return current;
+  }
+
+  let maxDepth = 7;
+  let count = 1;
+  let category = current;
+  
+  do{
+    category = await categoryDao.get(category.parent_id);
+    if(!category) throw new Error(`No category for id=${categoryId}`);
+    if(category.parent_id === 0){
+      return category;
+    }
+    count++;
+  }while(count <= maxDepth)
+
+  debug(`Max depth reached, returning highest ancestor found.`);
+  return category;
+}
 
 
 /** Delete a product (database cascades related entities) */
