@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
 let { fetchById, fetchMany, parseQueryOptions, create, updateById, saveAll } = require('@apigrate/mysqlutils/lib/express/db-api');
-const { fetchManySqlAnd, resultToAccept} = require('./db-api-ext');
+const { fetchManySqlAnd, resultToAccept, resultToJsonDownload} = require('./db-api-ext');
 const {parseAdvancedSearchRequest} = require('./common');
 
 const ALLOWED_SEARCH_PARAMETERS = [
@@ -66,6 +66,27 @@ router.post('/search', async function (req, res, next) {
   next();
   
 }, parseAdvancedSearchRequest, fetchManySqlAnd, resultToAccept);
+
+
+/** @deprecated */
+router.post('/search/download', async function (req, res, next) {
+  
+  let payload = {};
+  Object.assign(payload, req.body);
+  
+  res.locals.dbInstructions = {
+    searchable_columns: ALLOWED_SEARCH_PARAMETERS,
+    filter_definitions: null,
+    exclude_columns_on_output: null,
+    search_payload: payload,
+    dao: req.app.locals.Database.Group(),
+    sql: null,
+    sql_count: null
+  };
+  
+  next();
+
+}, parseAdvancedSearchRequest, fetchManySqlAnd, resultToJsonDownload);
 
 
 /** Get a single group. */

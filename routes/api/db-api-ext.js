@@ -205,7 +205,10 @@ let resultToJson = async function(req, res, next){
 };
 exports.resultToJson = resultToJson
 
-/** @deprecated */
+/** 
+ * @deprecated 
+ * a specifically-requested output format that will not be used in later phases.
+*/
 let resultToJsonDownload = async function(req, res, next){
   try{
 
@@ -216,12 +219,14 @@ let resultToJsonDownload = async function(req, res, next){
 
     let dao = res.locals.dbInstructions.dao;
 
-    let headersName = `headers`;
-
-    res.locals.result[headersName] = {};
+    
+    let theHeaders = {};
     dao.metadata.forEach( (meta) => {
-      res.locals.result[headersName][meta.column] = meta.column.toUpperCase();
-    }),
+      theHeaders[meta.column] = meta.column.toUpperCase();
+    });
+
+    let headersName = `headers`;
+    res.locals.result[headersName] = [theHeaders];
 
     res.status(200).json(res.locals.result);
 

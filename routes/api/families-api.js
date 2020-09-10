@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
 let { fetchById, fetchMany, parseQueryOptions, parseQueryOptionsFromObject, create, updateById } = require('@apigrate/mysqlutils/lib/express/db-api');
-const { fetchManyAnd, fetchManySqlAnd, resultToCsv, resultToAccept} = require('./db-api-ext');
+const { fetchManyAnd, fetchManySqlAnd, resultToCsv, resultToAccept, resultToJsonDownload} = require('./db-api-ext');
 const {parseAdvancedSearchRequest} = require('./common');
 
 const ALLOWED_SEARCH_PARAMETERS = [
@@ -96,6 +96,26 @@ router.post('/search', async function (req, res, next) {
   next();
   
 }, parseAdvancedSearchRequest, fetchManySqlAnd, resultToAccept);
+
+
+router.post('/search/download', async function (req, res, next) {
+  
+  let payload = {};
+  Object.assign(payload, req.body);
+  
+  res.locals.dbInstructions = {
+    searchable_columns: ALLOWED_SEARCH_PARAMETERS,
+    filter_definitions: SEARCH_FILTERS,
+    exclude_columns_on_output: null,
+    search_payload: payload,
+    dao: req.app.locals.Database.FamilyView(),
+    sql: null,
+    sql_count: null
+  };
+  
+  next();
+  
+}, parseAdvancedSearchRequest, fetchManySqlAnd, resultToJsonDownload);
 
 
 /** Get a single family. */
