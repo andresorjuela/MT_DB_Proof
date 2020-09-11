@@ -825,6 +825,12 @@ paths:
           $ref: '#/components/responses/500ServerError'
     put:
       summary: updates a product
+      description: >
+        Updates a product. Note, there are certain business rules that are enforced before an update is performed.
+        
+
+        * A product category may not be changed from any of the 3 major branches of categories (Accessories, Parts and Repair Service) to another. Attempting to update a category from a category within one branch to another branch will result in an HTTP 400 error.
+        * When a product category is changed from to another category within the same major branch, all *product filter options* and *product custom attributes* will be removed automatically, because they are directly related to the category of the product.
       tags:
         - products
       requestBody:
