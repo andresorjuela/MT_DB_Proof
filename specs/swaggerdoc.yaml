@@ -3110,6 +3110,9 @@ components:
           option_zh:
             description: The name of the option (Chinese)
             type: string
+          option_us:
+            description: The name of the option (US English). Typically only used if imperial units are needed for an option.
+            type: string
           priority_order:
             description: the display order/priority of the option
             type: integer
