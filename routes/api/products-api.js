@@ -430,7 +430,7 @@ router.post('/:product_id/images', function (req, res, next) {
     dao: req.app.locals.Database.ProductImage(),
     toSave: req.body, //assuming an array of objects
     query: {product_id: req.params.product_id},
-    comparison: function(obj){ return `${obj.image_link}|${obj.image_type_id}`; }
+    comparison: function(obj){ return `${obj.image_link}|${obj.image_type_id}|${obj.priority_order}`; }
   };
   next();
 }, saveAll);
