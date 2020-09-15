@@ -2020,7 +2020,7 @@ paths:
                       enum: [family_code, oem_brand_en, name_en, category_en]
                   search_filter:
                     type: string
-                    enum: [oem brand, product type]
+                    enum: [oem_brand, product_type]
                     description: >
                       the type of filtering criteria to further refine results.
                   search_filter_value:
@@ -2033,8 +2033,8 @@ paths:
 
                         | search_filter | value is a(n) | matching |
                         |---------------|------------|----------|
-                        | oem brand id | integer | oem_brand_id of any matching product linked to the family
-                        | product type | integer | product_type_id of any matching product linked to the family
+                        | oem_brand | integer | oem_brand_id of any matching product linked to the family
+                        | product_type | integer | product_type_id of any matching product linked to the family
                         
                   category_id:
                     type: array
@@ -2123,7 +2123,7 @@ paths:
                       enum: [family_code, oem_brand_en, name_en, category_en]
                   search_filter:
                     type: string
-                    enum: [oem brand, product type]
+                    enum: [oem_brand, product_type]
                     description: >
                       the type of filtering criteria to further refine results.
                   search_filter_value:
@@ -2136,8 +2136,8 @@ paths:
 
                         | search_filter | value is a(n) | matching |
                         |---------------|------------|----------|
-                        | oem brand id | integer | oem_brand_id of any matching product linked to the family
-                        | product type | integer | product_type_id of any matching product linked to the family
+                        | oem_brand | integer | oem_brand_id of any matching product linked to the family
+                        | product_type | integer | product_type_id of any matching product linked to the family
                         
                   category_id:
                     type: array

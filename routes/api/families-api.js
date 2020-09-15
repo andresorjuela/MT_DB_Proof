@@ -20,12 +20,12 @@ const ALLOWED_SEARCH_PARAMETERS = [
 ];
 
 const SEARCH_FILTERS = {
-  "oem brand": {
+  "oem_brand": {
     join_table: "v_product",
     join_column: "family_id",
     where_column: "oem_brand_id",
   },
-  "product type": {
+  "product_type": {
     join_table: "v_product",
     join_column: "family_id",
     where_column: "product_type_id",
