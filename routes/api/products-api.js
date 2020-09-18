@@ -42,12 +42,12 @@ const SEARCH_FILTERS = {
     join_column: "product_id",
     where_column: "certificate_id",
   },
-  "custom attribute": {
+  "custom_attribute": {
     join_table: "t_product_custom_attribute",
     join_column: "product_id",
     where_column: "custom_attribute_id",
   },
-  "image type": {
+  "image_type": {
     join_table: "t_product_image",
     join_column: "product_id",
     where_column: "image_type_id",
@@ -55,12 +55,12 @@ const SEARCH_FILTERS = {
   "lifecycle": {
     where_column: "lifecycle_id",
   },
-  "marketing region": {
+  "marketing_region": {
     join_table: "t_product_marketing_region",
     join_column: "product_id",
     where_column: "marketing_region_id",
   },
-  "packaging factor": {
+  "packaging_factor": {
     where_column: "packaging_factor_id",
   },
   "supplier": {
@@ -68,12 +68,12 @@ const SEARCH_FILTERS = {
     join_column: "product_id",
     where_column: "supplier_id",
   },
-  "oem reference": {
+  "oem_reference": {
     join_table: "t_product_oem_reference",
     join_column: "product_id",
     where_column: "name",
   },
-  "product type": {
+  "product_type": {
     where_column: "product_type_id",
   },
 };
@@ -409,7 +409,7 @@ router.post('/:product_id/filter_options', function (req, res, next) {
     dao: req.app.locals.Database.ProductFilterOption(),
     toSave: req.body, //assuming an array
     query: {product_id: req.params.product_id},
-    comparison: function(obj){ return obj.filter_option_id; }
+    comparison: function(obj){ return `${obj.filter_option_id}|${obj.product_id}|${obj.priority_order}`; }
   };
   next();
 }, saveAll);

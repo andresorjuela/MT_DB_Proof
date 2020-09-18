@@ -27,7 +27,7 @@ const SEARCH_FILTERS = {
   "brand": {
     where_column: "brand_id",
   },
-  "equipment type": {
+  "equipment_type": {
     where_column: "equipment_type_id",
   },
   

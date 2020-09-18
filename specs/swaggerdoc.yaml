@@ -144,6 +144,95 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /brands:
+    summary: Brands for products.
+    parameters:
+    - name: id
+      in: query
+      description: a specific brand id
+      required: false
+      schema:
+        type: integer
+    - name: name_en
+      in: query
+      description: name of the brand (English)
+      required: false
+      schema:
+        type: string
+    - name: name_zh
+      in: query
+      description: name of the brand (Chinese)
+      required: false
+      schema:
+        type: string
+    get:
+      summary: searches for brands
+      tags:
+        - general
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  brands:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Brand'
+
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+  /custom_attributes:
+    summary: Custom attributes that may be assigned to products.
+    parameters:
+    - name: id
+      in: query
+      description: a specific custom attribute id
+      required: false
+      schema:
+        type: integer
+    - name: name_en
+      in: query
+      description: name of the custom attribute (English)
+      required: false
+      schema:
+        type: string
+    - name: name_zh
+      in: query
+      description: name of the custom attribute (Chinese)
+      required: false
+      schema:
+        type: string
+    - name: category_id
+      in: query
+      description: a specific category_id
+      required: false
+      schema:
+        type: integer
+    get:
+      summary: searches for custom attributes
+      tags:
+        - general
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  custom_attributes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CustomAttribute'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   /equipment_models:
     summary: Models used across all equipment.
     description: An equipment is any entity having a model number that could potentially be assigned to a product.
@@ -190,6 +279,42 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /marketing_regions:
+    summary: Marketing regions.
+    parameters:
+    - name: id
+      in: query
+      description: a specific marketing region id
+      required: false
+      schema:
+        type: integer
+    - name: name_en
+      in: query
+      description: name of the marketing region (English)
+      required: false
+      schema:
+        type: string
+    get:
+      summary: searches for marketing regions
+      tags:
+        - general
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                   marketing_regions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MarketingRegion'
+
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   /suppliers:
     summary: Suppliers of equipment.
     parameters:
@@ -212,7 +337,7 @@ paths:
       schema:
         type: string
     get:
-      summary: searches for equipment models
+      summary: searches for suppliers
       tags:
         - general
       responses:
@@ -223,25 +348,15 @@ paths:
               schema: 
                 type: object
                 properties:
-                  equipment_models:
+                  suppliers:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        model:
-                          type: string
-                        brand_id:
-                          type: integer
-                        brand_en:
-                          type: string
-                        brand_zh:
-                          type: string
+                      $ref: '#/components/schemas/Supplier'
 
         400:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
-    
   /dataload/${entity}/metadata:
     get:
       summary: get table metadata (field and data-type information).
@@ -697,7 +812,7 @@ paths:
                       enum: [sku, oem, name_en, category_en]
                   search_filter:
                     type: string
-                    enum: [brand, certificate, custom attribute, image type, lifecycle, marketing region, packaging factor, supplier, oem reference, product type]
+                    enum: [brand, certificate, custom_attribute, image_type, lifecycle, marketing_region, packaging_factor, supplier, oem_reference, product_type]
                     description: >
                       the type of filtering criteria to further refine results.
                   search_filter_value:
@@ -712,14 +827,14 @@ paths:
                         |---------------|------------|----------|
                         | brand | integer | brand id 
                         | certificate | integer | certificate id
-                        | custom attribute | integer | attribute id 
-                        | image type | integer | image type id
+                        | custom_attribute | integer | attribute id 
+                        | image_type | integer | image type id
                         | lifecycle | integer | lifecycle id
-                        | marketing region | integer | marketing region id
-                        | packaging factor | integer | packaging factor id
+                        | marketing_region | integer | marketing region id
+                        | packaging_factor | integer | packaging factor id
                         | supplier | integer | supplier id
-                        | oem reference | string | name of oem reference 
-                        | product type | integer | product type id
+                        | oem_reference | string | name of oem reference 
+                        | product_type | integer | product type id
                   category_id:
                     type: array
                     description: The categories to add to the product search filtering. Specifying more than one category widens the search results.
@@ -1746,7 +1861,7 @@ paths:
                       enum: [model, brand_en, type_en]
                   search_filter:
                     type: string
-                    enum: [brand, equipment type]
+                    enum: [brand, equipment_type]
                     description: >
                       the type of filtering criteria to further refine results.
                   search_filter_value:
@@ -1760,7 +1875,7 @@ paths:
                         | search_filter | value is a(n) | matching |
                         |---------------|------------|----------|
                         | brand | integer | brand_id of the equipment
-                        | equipment type | integer | equipment_type_id of the equipment 
+                        | equipment_type | integer | equipment_type_id of the equipment 
                    
             examples:
               example1:
@@ -1845,7 +1960,7 @@ paths:
                       enum: [model, brand_en, type_en]
                   search_filter:
                     type: string
-                    enum: [brand, equipment type]
+                    enum: [brand, equipment_type]
                     description: >
                       the type of filtering criteria to further refine results.
                   search_filter_value:
@@ -2498,6 +2613,24 @@ components:
             type: string
             maxLength: 255
       - $ref: '#/components/schemas/Auditable'
+    CustomAttribute:
+      type: object
+      description: A custom attribute that can be assigned to a product
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              readOnly: true
+            name_en:
+              type: string
+              maxLength: 255
+            name_zh:
+              type: string
+              maxLength: 255
+            category_id:
+              type: integer
+        - $ref: '#/components/schemas/Auditable'
     DeleteConfirmation:
       type: object
       description: The payload of an entity deletion confirmation.
@@ -2770,6 +2903,17 @@ components:
                     enum:
                       - regular
                       - admin
+    MarketingRegion:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            name_en:
+              type: string
+            id:
+              type: integer
+              readOnly: true
+        - $ref: '#/components/schemas/Auditable'
     Product:
       type: object
       allOf:
@@ -3309,7 +3453,19 @@ components:
             message:
               type: string
               maxLength: 255
-    
+    Supplier:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            name_en:
+              type: string
+            name_zh:
+              type: string
+            id:
+              type: integer
+              readOnly: true
+        - $ref: '#/components/schemas/Auditable'
   responses:
     400ClientError:
       description: client error
