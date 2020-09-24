@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router({ mergeParams: true });
 var _ = require('lodash');
-let { fetchMany, parseQueryOptions } = require('@apigrate/mysqlutils/lib/express/db-api');
+let { fetchMany, parseQueryOptions, fetchById, updateById} = require('@apigrate/mysqlutils/lib/express/db-api');
 const { fetchManySqlAnd, resultToJson } = require('./db-api-ext');
 const { CriteriaHelper } = require('@apigrate/mysqlutils/lib/criteria-helper');
 
@@ -24,6 +24,30 @@ router.get('/brands', function (req, res, next) {
   }
   next();
 }, fetchMany);
+
+/** Get a brand by id */
+router.get('/brands/:brand_id', function (req, res, next) {
+
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.Brand(),
+    id: req.params.brand_id
+  }
+  next();
+
+}, fetchById);
+
+/** Update a brand */
+router.put('/brands/:brand_id', function (req, res, next) {
+
+  let entity = req.body;
+  res.locals.dbInstructions = {
+    dao: req.app.locals.Database.Brand(),
+    toUpdate: entity
+  }
+  next();
+
+}, updateById);
+
 
 router.get('/categories', function (req, res, next) {
   let  q = parseQueryOptions(req, ['name_en','id'], ["+parent_id","+id"], 1000);

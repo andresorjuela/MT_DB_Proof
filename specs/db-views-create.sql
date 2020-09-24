@@ -4,7 +4,7 @@ create view v_product as select
 p.id, p.sku, p.oem, p.name_en, p.description_en, p.name_zh, p.description_zh, 
 p.product_type_id, t.name_en as product_type_en, t.name_zh as product_type_zh, 
 p.family_id, f.family_code, f.family_connector_code, f.name_en as family_name_en, f.video_link as family_video_link,
-p.oem_brand_id, b.name_en as oem_brand_en, b.name_zh as oem_brand_zh,
+p.oem_brand_id, b.name_en as oem_brand_en, b.name_zh as oem_brand_zh, b.is_oem,
 p.category_id, c.name_en as category_en, c.name_zh as category_zh,
 nf.content as product_name_formula, 
 df.content as product_description_formula, 

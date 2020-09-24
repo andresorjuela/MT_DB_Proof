@@ -186,6 +186,52 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /brands/${id}:
+    parameters:
+    - name: id
+      in: path
+      description: the brand id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: gets a brand by id
+      tags:
+        - general
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Brand'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    put:
+      summary: updates a brand
+      tags:
+        - general
+      requestBody:
+        description: >
+          The brand to be updated.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Brand'
+      responses:
+        200:
+          description: returns the brand 
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Brand'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   /custom_attributes:
     summary: Custom attributes that may be assigned to products.
     parameters:
