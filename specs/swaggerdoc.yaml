@@ -3102,6 +3102,8 @@ components:
             oem_brand_zh:
               type: string
               maxLength: 255
+            is_oem:
+              type: boolean
             packaging_factor:
               type: string
               maxLength: 100
