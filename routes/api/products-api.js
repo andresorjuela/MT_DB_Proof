@@ -71,7 +71,7 @@ const SEARCH_FILTERS = {
   "oem_reference": {
     join_table: "t_product_oem_reference",
     join_column: "product_id",
-    where_column: "name",
+    where_column: "brand_id",
   },
   "product_type": {
     where_column: "product_type_id",
