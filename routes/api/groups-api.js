@@ -139,7 +139,14 @@ router.get('/:group_id/equipment', function (req, res, next) {
 
 /** Saves group equipment */
 router.post('/:group_id/equipment', function (req, res, next) {
-  
+  if(!req.body){
+    return res.status(400).json({message: "Invalid request.", error: "No data provided."});
+  }
+  req.body.forEach(eg=>{
+    //Assign the group id from the param to make it consistent.
+    eg.group_id = req.params.group_id;
+  });
+
   res.locals.dbInstructions = {
     dao: req.app.locals.Database.EquipmentGroup(),
     toSave: req.body, //assuming an array
