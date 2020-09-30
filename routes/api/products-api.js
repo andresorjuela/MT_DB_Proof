@@ -198,6 +198,15 @@ router.get('/skus', async function (req, res, next) {
   res.status(200).json(qresult.map(r=>{return r.sku;}));
 });
 
+/** Gets an array of all distinct OEMs across all products. Used for validation. A SKU should be globally unique. */
+router.get('/oems', async function (req, res, next) {
+  debug(`Getting distinct SKUs...`);
+  let Product = req.app.locals.Database.Product();
+  let qresult = await Product.callDb(`SELECT id, oem FROM ${Product.table} WHERE oem <> '' and oem is not null GROUP BY id, oem ORDER BY oem ASC`);
+  res.status(200).json({total: qresult.length, product_oems: qresult});
+});
+
+
 
 /** Gets a product by id. (The extended view of the product is returned.) */
 router.get('/:product_id', function (req, res, next) {
