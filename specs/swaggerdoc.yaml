@@ -959,6 +959,39 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /products/oems:
+    summary: Gets the distinct oems currently in the database.
+    description: Gets the distinct oems currently in the database. 
+    get:
+      summary: list of OEMs with the associated product id
+      tags:
+        - products
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    description: The number of entries found. 
+                  product_oems:
+                    type: array
+                    items:  
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: the product id
+                        oem:
+                          type: string
+                          description: the oem value
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   /products/${id}:
     summary: Represents a product
     description: A medical product.
@@ -2435,6 +2468,58 @@ paths:
           $ref: '#/components/responses/400ClientError'
         500:
           $ref: '#/components/responses/500ServerError'
+  /groups/${id}/equipment:
+    parameters:
+    - name: id
+      in: path
+      description: the group id
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Get all the equipment for the given group id.
+      tags:
+        - groups
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  equipment_group_views:
+                    type: array
+                    items:
+                    $ref: '#/components/schemas/EquipmentGroupView'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
+    post:
+      summary: saves equipment-group information for a given group
+      tags:
+        - groups
+      requestBody:
+        description: The equipment/group associations for the group. Note, providing the group id on each array element is not necessary.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/EquipmentGroup'
+      responses:
+        200:
+          description: returns the saved equipment groups 
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/EquipmentGroup'
+        400:
+          $ref: '#/components/responses/400ClientError'
+        500:
+          $ref: '#/components/responses/500ServerError'
   /groups/search:
     post:
       summary: Perform an advanced search for groups.
@@ -2780,6 +2865,55 @@ components:
             type: integer
           available_region_name_en:
             type: string
+      - $ref: '#/components/schemas/Auditable'
+    EquipmentGroup:
+      type: object
+      description: Equipment that is associated with a group.
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+            description: id for the association
+          equipment_id:
+            description: References the equipment item.
+            type: integer
+          group_id:
+            description: References the group item.
+            type: integer
+      - $ref: '#/components/schemas/Auditable'
+    EquipmentGroupView:
+      type: object
+      description: Equipment that is associated with a group (includes extended related properties)
+      allOf:
+      - type: object
+        properties:
+          id:
+            type: integer
+            readOnly: true
+            description: id for the association
+          equipment_id:
+            description: References the equipment item.
+            type: integer
+          group_id:
+            description: References the group item.
+            type: integer
+          model:
+            type: string
+            description: the equipment model
+          brand_id:
+            description: References the brand associated with the equipment item.
+            type: integer
+          brand_en:
+            type: string
+            description: brand name (English)
+          brand_zh:
+            type: string
+            description: brand name (Chinese)
+          is_oem:
+            type: boolean
+            description: whether the associated brand is an OEM
       - $ref: '#/components/schemas/Auditable'
     EquipmentImage:
       type: object
