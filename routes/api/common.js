@@ -230,7 +230,7 @@ let parseAdvancedSearchRequest = async function (req, res, next){
     //Done building the where.
 
     // parse options clause
-    if(payload.order_by){
+    if(payload.order_by && payload.order_by.length>0){
       optsclause += ` ORDER BY`;
       let tmp = ``;
       payload.order_by.forEach(col=>{
