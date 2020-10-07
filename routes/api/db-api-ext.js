@@ -222,7 +222,7 @@ let resultToJsonDownload = async function(req, res, next){
     
     let theHeaders = {};
     dao.metadata.forEach( (meta) => {
-      theHeaders[meta.column] = meta.column.toUpperCase();
+      theHeaders[meta.column] = meta.column;
     });
 
     let headersName = `headers`;
