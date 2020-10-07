@@ -3547,6 +3547,10 @@ components:
             maxLength: 255
           is_oem:
             type: boolean
+          brand_en:
+            type: string
+          brand_zh:
+            type: string
       - $ref: '#/components/schemas/Auditable'
     ProductSet:
       type: object
