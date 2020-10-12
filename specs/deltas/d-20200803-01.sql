@@ -3,7 +3,7 @@
   to support international pricing, weights, name audit tracking, and
   some internal notes fields.
 
-  Created 7/30/2020.
+  Created 8/3/2020
   Author: Derek Gau
 */
 
@@ -15,7 +15,8 @@ alter table `t_product`
   rename column `price` to `price_us`,
   add column `price_zh` decimal(9,2) DEFAULT null,
   add column `price_eu` decimal(9,2) DEFAULT null,
-  rename column `weight` to `weight_kg`,
+  rename column `weight` to `weight_kg`;
+alter table `t_product`
   modify column `weight_kg` decimal(9,4) DEFAULT null,
   add column `weight_lbs` decimal(9,4) DEFAULT null,
   add column `name_en_edit_user_id` int unsigned DEFAULT null,
