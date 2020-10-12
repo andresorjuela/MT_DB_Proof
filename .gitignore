@@ -74,3 +74,4 @@ package*.yaml
 !example.env
 
 test.js
+pkg-*.yaml

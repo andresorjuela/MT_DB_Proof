@@ -5,11 +5,14 @@
   "scripts": {
     "use-development": "cp ./config/development.env .env",
     "use-test": "cp ./config/test.env .env",
-    "package-test": "npm run use-test && sam package --profile medten --template-file sam-test.yaml --output-template-file package-test.yaml --s3-bucket med10-staging",
-    "deploy-test": "aws cloudformation deploy --profile medten --template-file package-test.yaml --stack-name dbtest",
+    "package-test": "npm run use-test && sam package --profile medten-test --template-file sam-test.yaml --output-template-file package-test.yaml --s3-bucket med10test-staging",
+    "deploy-test": "aws cloudformation deploy --profile medten-test --template-file package-test.yaml --stack-name dbtest",
     "use-dbpoc": "cp ./config/dbpoc.env .env",
     "package-dbpoc": "npm run use-dbpoc && sam package --profile medten --template-file sam-dbpoc.yaml --output-template-file package-dbpoc.yaml --s3-bucket med10-staging",
     "deploy-dbpoc": "aws cloudformation deploy --profile medten --template-file package-dbpoc.yaml --stack-name dbpoc",
+    "use-production": "cp ./config/production.env .env",
+    "package-production": "npm run use-production && sam package --profile medten --template-file sam-backend.yaml --output-template-file pkg-dbbackend.yaml --s3-bucket med10-staging",
+    "deploy-production": "aws cloudformation deploy --profile medten --template-file pkg-dbbackend.yaml --stack-name dbbackend",
     "start": "node ./bin/www",
     "startmon": "nodemon ./bin/www"
   },
