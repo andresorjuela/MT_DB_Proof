@@ -4,6 +4,9 @@
   "private": true,
   "scripts": {
     "use-development": "cp ./config/development.env .env",
+    "use-chinatest": "cp ./config/chinatest.env .env",
+    "package-chinatest": "npm run use-chinatest && sam package --profile medten --template-file sam-chinatest.yaml --output-template-file package-chinatest.yaml --s3-bucket med10-staging",
+    "deploy-chinatest": "aws cloudformation deploy --profile medten --template-file package-chinatest.yaml --stack-name dbchinatest",
     "use-test": "cp ./config/test.env .env",
     "package-test": "npm run use-test && sam package --profile medten --template-file sam-test.yaml --output-template-file package-test.yaml --s3-bucket med10-staging",
     "deploy-test": "aws cloudformation deploy --profile medten --template-file package-test.yaml --stack-name dbtest",

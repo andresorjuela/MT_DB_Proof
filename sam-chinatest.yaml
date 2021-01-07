@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Medten Product DB Backend Serverless Application (China Test Environment)
+Parameters:
+  lambdaExecutionRole:
+    Description: 'Required. The role used for lambda execution.'
+    Type: 'String'
+    Default: 'arn:aws:iam::432961014712:role/LambdaExecutionRole'
+
+Resources:
+  handleAnyRequestChinaTest:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: handleAnyRequestChinaTest
+      Handler: lambda.handler
+      Runtime: nodejs12.x
+      CodeUri: ./
+      Description: Handles inbound requests (ChinaTest env) for the AWS serverless express webapp.
+      MemorySize: 256
+      Timeout: 60
+      Role:
+        Ref: lambdaExecutionRole
+      Events:
+        # Define the API Gateway endpoint here.
+        ProxyApiRoot:
+          Type: Api
+          Properties:
+            Path: '/'
+            Method: ANY
+        ProxyApiGreedy:
+          Type: Api
+          Properties:
+            Path: '/{proxy+}'
+            Method: ANY
+      Tags:
+        environment: chinatest
+
+
+  

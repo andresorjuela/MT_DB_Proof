@@ -45,8 +45,8 @@ CREATE TABLE `t_certificate` (
 CREATE TABLE `t_custom_attribute` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `category_id` int(11) unsigned NOT NULL,
-  `value_en` varchar(255) DEFAULT NULL,
-  `value_zh` varchar(255) DEFAULT NULL,
+  `name_en` varchar(255) DEFAULT NULL,
+  `name_zh` varchar(255) DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
@@ -57,9 +57,9 @@ CREATE TABLE `t_custom_attribute` (
 CREATE TABLE `t_product_custom_attribute` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `custom_attribute_id` int(11) unsigned NOT NULL,
-  `product_id` int(11) NOT NULL,
-  `name_en` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `name_zh` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `product_id` int(11) unsigned NOT NULL,
+  `value_en` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `value_zh` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `version` int(11) NOT NULL DEFAULT '0',
