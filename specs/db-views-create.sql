@@ -61,7 +61,7 @@ left outer join t_brand b on b.id = e.brand_id;
 
 -- equipment group view
 create view v_equipment_group as select j.id, j.equipment_id,
-e.model, e.brand_id, b.name_en as brand_en, b.name_zh as brand_zh, b.is_oem,
+e.model, e.brand_id, b.name_en as brand_en, b.name_zh as brand_zh,
 j.group_id, g.group_code, 
 j.created, j.updated
 from t_equipment_group j
