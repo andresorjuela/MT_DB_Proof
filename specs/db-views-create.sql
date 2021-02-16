@@ -92,6 +92,12 @@ from t_product_set s
 left outer join t_product pp on pp.id=s.parent_product_id
 left outer join t_product p on p.id=s.child_product_id;
 
+-- product oem reference view
+create view v_product_oem_reference as 
+select o.id, o.product_id, o.brand_id, b.name_en as brand_en, b.name_zh as brand_zh, o.name, o.created, o.updated 
+from t_product_oem_reference o
+left outer join t_brand b on b.id=o.brand_id;
+
 -- product equipment connect view (depends on equipment view)
 create view v_product_equipment_connect as select pe.*, e.model, e.brand_en, e.brand_zh
 from t_product_equipment_connect pe 

@@ -58,6 +58,7 @@ module.exports = function (pool) {
   factory.ProductEquipmentView          = ()=>{ return create_dao('v_product_equipment_connect', 'product_equipment_connect_view', null, null); };
   factory.ProductFilterOptionView       = ()=>{ return create_dao('v_product_filter_option', 'product_filter_option_view', null, null); };
   factory.ProductImageView              = ()=>{ return create_dao('v_product_image', 'product_image_view', null, null); };
+  factory.ProductOemReferenceView       = ()=>{ return create_dao('v_product_oem_reference', 'product_oem_reference_view', null, null); };
   factory.ProductSetView                = ()=>{ return create_dao('v_product_set', 'product_set_view', null, null); };
   factory.ProductView                   = ()=>{ return create_dao('v_product', 'product_view', null, null); };
 
